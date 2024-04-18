@@ -44,21 +44,6 @@ public class ProductManager implements ProductService {
     }
 
     @Override
-    public List<Product> getAllProducts(String[] sort) {
-        List<Sort.Order> orders = new ArrayList<>();
-
-        if (sort[0].contains(",")) {
-            for (String sortOrder : sort) {
-                String[] _sort = sortOrder.split(",");
-                orders.add(new Sort.Order(getSortDirection(_sort[1]), _sort[0]));
-            }
-        } else {
-            orders.add(new Sort.Order(getSortDirection(sort[1]), sort[0]));
-        }
-        return productRepository.findAll(Sort.by(orders));
-    }
-
-    @Override
     public TreeMap<String, Object> getAllProductsPage(String name, int page, int size, String[] sort) {
         List<Sort.Order> orders = new ArrayList<>();
 
@@ -79,46 +64,63 @@ public class ProductManager implements ProductService {
             pagePro = productRepository.findByNameContaining(name, pagingSort);
         }
 
-        List<Product> products = pagePro.getContent();
+        List<GetAllProductsResponse> responses = pagePro.getContent().stream()
+                .map(product -> this.modelMapperService.forResponse()
+                        .map(product, GetAllProductsResponse.class)).collect(Collectors.toList());
 
         TreeMap<String, Object> response = new TreeMap<>();
-        response.put("products", products);
+        response.put("products", responses);
         response.put("currentPage", pagePro.getNumber());
         response.put("totalItems", pagePro.getTotalElements());
         response.put("totalPages", pagePro.getTotalPages());
         return response;
     }
 
-    @Override
-    public GetAllProductsResponse getByIdProduct(Long id) {
-        Product product = this.productRepository.findById(id).orElseThrow();
+    public TreeMap<String, Object> findByState(boolean isState, int page, int size, String[] sort) {
+        List<Sort.Order> orders = new ArrayList<>();
 
-        GetAllProductsResponse response = this.modelMapperService.forResponse()
-                .map(product, GetAllProductsResponse.class);
+        if (sort[0].contains(",")) {
+            for (String sortOrder : sort) {
+                String[] _sort = sortOrder.split(",");
+                orders.add(new Sort.Order(getSortDirection(_sort[1]), _sort[0]));
+            }
+        } else {
+            orders.add(new Sort.Order(getSortDirection(sort[1]), sort[0]));
+        }
+
+        Pageable pagingSort = PageRequest.of(page, size, Sort.by(orders));
+        Page<Product> pagePro = productRepository.findByState(isState, pagingSort);
+
+        List<GetAllProductsResponse> responses = pagePro.getContent().stream()
+                .map(product -> this.modelMapperService.forResponse()
+                        .map(product, GetAllProductsResponse.class)).collect(Collectors.toList());
+
+        TreeMap<String, Object> response = new TreeMap<>();
+        response.put("products", responses);
+        response.put("currentPage", pagePro.getNumber());
+        response.put("totalItems", pagePro.getTotalElements());
+        response.put("totalPages", pagePro.getTotalPages());
+        return response;
+    }
+
+    public GetAllProductsResponse getProductById(Long id) {
+        Product product = this.productRepository.findById(id).orElseThrow();
+        GetAllProductsResponse response = this.modelMapperService.forResponse().map(product, GetAllProductsResponse.class);
         return response;
     }
 
     @Override
     public void addProduct(CreateProductRequest createProductRequest) {
         this.productBusinessRules.checkIfProductNameExists(createProductRequest.getName());
-        Product product = new Product();
-        product.setName(createProductRequest.getName());
-        product.setDescription(createProductRequest.getDescription());
-        product.setQuantity(createProductRequest.getQuantity());
-        product.setUnitPrice(createProductRequest.getUnitPrice());
-        product.setImageUrl(createProductRequest.getImageUrl());
-        product.setCreatedBy(createProductRequest.getCreatedBy());
-        product.setUpdatedAt(createProductRequest.getUpdatedAt());
+        Product product = this.modelMapperService.forRequest().map(createProductRequest, Product.class);
 
-        ProductCategory productCategory = new ProductCategory();
-        productCategory.setId(createProductRequest.getProductCategoryId());
-        product.setProductCategory(productCategory);
         this.productRepository.save(product);
     }
 
     @Override
     public void updateProduct(UpdateProductRequest updateProductRequest) {
         Product product = this.modelMapperService.forRequest().map(updateProductRequest, Product.class);
+
         this.productRepository.save(product);
     }
 

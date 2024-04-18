@@ -17,6 +17,7 @@ public class GetAllProductsResponse {
     private String description;
     private int quantity;
     private Double unitPrice;
+    private boolean state;
     private String imageUrl;
     private String createdBy;
     private LocalDateTime updatedAt;
