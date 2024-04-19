@@ -103,24 +103,48 @@ public class ProductManager implements ProductService {
         return response;
     }
 
+    public GetAllProductsResponse getProductByBarcodeNumber(String barcodeNumber) {
+        Product product = this.productRepository.findByBarcodeNumber(barcodeNumber);
+        GetAllProductsResponse response = this.modelMapperService.forResponse().map(product, GetAllProductsResponse.class);
+        return response;
+    }
+
     public GetAllProductsResponse getProductById(Long id) {
         Product product = this.productRepository.findById(id).orElseThrow();
         GetAllProductsResponse response = this.modelMapperService.forResponse().map(product, GetAllProductsResponse.class);
         return response;
     }
 
-    @Override
     public void addProduct(CreateProductRequest createProductRequest) {
-        this.productBusinessRules.checkIfProductNameExists(createProductRequest.getName());
-        Product product = this.modelMapperService.forRequest().map(createProductRequest, Product.class);
+        Product existingProduct = this.productRepository.findByName(createProductRequest.getName());
+        if (existingProduct != null) {
+            double existingUnitPrice = existingProduct.getUnitPrice();
+            double requestUnitPrice = createProductRequest.getUnitPrice();
+            double epsilon = 0.0001;
 
-        this.productRepository.save(product);
+            if (Math.abs(existingUnitPrice - requestUnitPrice) < epsilon) {
+                existingProduct.setQuantity(existingProduct.getQuantity() + createProductRequest.getQuantity());
+                this.productRepository.save(existingProduct);
+            }
+        } else {
+            Product product = new Product();
+            product.setName(createProductRequest.getName());
+            product.setDescription(createProductRequest.getDescription());
+            product.setQuantity(createProductRequest.getQuantity());
+            product.setUnitPrice(createProductRequest.getUnitPrice());
+            product.setState(createProductRequest.isState());
+            product.setImageUrl(createProductRequest.getImageUrl());
+            product.setCreatedBy(createProductRequest.getCreatedBy());
+            ProductCategory productCategory = new ProductCategory();
+            productCategory.setId(createProductRequest.getProductCategoryId());
+            product.setProductCategory(productCategory);
+            this.productRepository.save(product);
+        }
     }
 
     @Override
     public void updateProduct(UpdateProductRequest updateProductRequest) {
         Product product = this.modelMapperService.forRequest().map(updateProductRequest, Product.class);
-
         this.productRepository.save(product);
     }
 

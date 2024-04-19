@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 public class GetAllProductsResponse {
     private Long id;
+    private String barcodeNumber;
     private String name;
     private String description;
     private int quantity;

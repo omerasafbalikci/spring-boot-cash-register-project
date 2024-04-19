@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * Product class represents product entity in the database.
@@ -21,6 +22,9 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", unique = true, nullable = false, updatable = false)
     private Long id;
+
+    @Column(name = "barcode_number", unique = true, nullable = false)
+    private String barcodeNumber = UUID.randomUUID().toString().substring(0, 8);
 
     @Column(name = "name")
     private String name;
@@ -45,7 +49,7 @@ public class Product {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_category_id", nullable = false)

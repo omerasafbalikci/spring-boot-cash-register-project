@@ -15,6 +15,7 @@ import java.util.TreeMap;
 public interface ProductService {
     public TreeMap<String, Object> getAllProductsPage(String name, int page, int size, String[] sort);
     public TreeMap<String, Object> findByState(boolean isState, int page, int size, String[] sort);
+    public GetAllProductsResponse getProductByBarcodeNumber(String barcodeNumber);
     public GetAllProductsResponse getProductById(Long id);
     void addProduct(CreateProductRequest createProductRequest);
     void updateProduct(UpdateProductRequest updateProductRequest);

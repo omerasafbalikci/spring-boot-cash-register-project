@@ -8,12 +8,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class CreateProductRequest {
+
     @NotNull
     @NotBlank
     private String name;
@@ -28,7 +30,6 @@ public class CreateProductRequest {
     @NotNull
     @NotBlank
     private String createdBy;
-    private LocalDateTime updatedAt = LocalDateTime.now();
     @NotNull
     private Long productCategoryId;
 }

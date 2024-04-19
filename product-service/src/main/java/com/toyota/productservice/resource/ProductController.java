@@ -39,7 +39,7 @@ public class ProductController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/tutorials/state")
+    @GetMapping("/state")
     public ResponseEntity<TreeMap<String, Object>> findByState(
             @RequestParam(defaultValue = "true") boolean isState,
             @RequestParam(defaultValue = "0") int page,
@@ -49,7 +49,12 @@ public class ProductController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/products/{id}")
+    @GetMapping("/barcodenumbers/{barcodeNumber}")
+    public GetAllProductsResponse getProductByBarcodeNumber(@PathVariable("barcodeNumber") String barcodeNumber) {
+        return productService.getProductByBarcodeNumber(barcodeNumber);
+    }
+
+    @GetMapping("/{id}")
     public GetAllProductsResponse getProductById(@PathVariable("id") Long id) {
         return productService.getProductById(id);
     }

@@ -16,21 +16,13 @@ import java.time.LocalDateTime;
 public class UpdateProductRequest {
     @NotNull
     private Long id;
-    @NotNull
-    @NotBlank
     private String name;
     private String description;
-    @NotNull
     private int quantity;
-    @NotNull
     private Double unitPrice;
-    @NotNull
     private boolean state;
     private String imageUrl;
-    @NotNull
-    @NotBlank
     private String createdBy;
-    private LocalDateTime updatedAt = LocalDateTime.now();
-    @NotNull
+    private LocalDateTime updatedAt;
     private Long productCategoryId;
 }
