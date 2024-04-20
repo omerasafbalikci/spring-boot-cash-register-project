@@ -21,6 +21,7 @@
     <modules>
         <module>discovery-server</module>
         <module>product-service</module>
+        <module>sales-service</module>
     </modules>
 
     <properties>
