@@ -75,17 +75,8 @@ public class ProductCategoryManager implements ProductCategoryService {
     @Override
     public void updateCategory(UpdateProductCategoryRequest updateProductCategoryRequest) {
         ProductCategory existingProductCategory = this.productCategoryRepository.findById(updateProductCategoryRequest.getId()).orElseThrow(() -> new RuntimeException("Ürün bulunamadı"));
-
         ProductCategory productCategory = this.modelMapperService.forRequest().map(updateProductCategoryRequest, ProductCategory.class);
-        if (productCategory.getName() == null) {
-            productCategory.setName(existingProductCategory.getName());
-        }
-        if (productCategory.getDescription() == null) {
-            productCategory.setDescription(existingProductCategory.getDescription());
-        }
-        if (productCategory.getImageUrl() == null) {
-            productCategory.setImageUrl(existingProductCategory.getImageUrl());
-        }
+        productCategoryBusinessRules.checkUpdate(productCategory, existingProductCategory);
         productCategory.setUpdatedAt(LocalDateTime.now());
         this.productCategoryRepository.save(productCategory);
     }

@@ -77,6 +77,7 @@ public class ProductManager implements ProductService {
         return response;
     }
 
+    @Override
     public TreeMap<String, Object> findByState(Boolean state, int page, int size, String[] sort) {
         List<Sort.Order> orders = new ArrayList<>();
 
@@ -104,62 +105,54 @@ public class ProductManager implements ProductService {
         return response;
     }
 
+    @Override
     public GetAllProductsResponse getProductByBarcodeNumber(String barcodeNumber) {
         Product product = this.productRepository.findByBarcodeNumber(barcodeNumber);
-        GetAllProductsResponse response = this.modelMapperService.forResponse().map(product, GetAllProductsResponse.class);
-        return response;
+        return this.modelMapperService.forResponse().map(product, GetAllProductsResponse.class);
     }
 
+    @Override
     public GetAllProductsResponse getProductById(Long id) {
         Product product = this.productRepository.findById(id).orElseThrow();
-        GetAllProductsResponse response = this.modelMapperService.forResponse().map(product, GetAllProductsResponse.class);
-        return response;
+        return this.modelMapperService.forResponse().map(product, GetAllProductsResponse.class);
     }
 
+    @Override
     public void addProduct(CreateProductRequest createProductRequest) {
         Product existingProduct = this.productRepository.findByName(createProductRequest.getName());
+        Product product = new Product();
         if (existingProduct != null) {
             double existingUnitPrice = existingProduct.getUnitPrice();
             double requestUnitPrice = createProductRequest.getUnitPrice();
             double epsilon = 0.0001;
 
             if (Math.abs(existingUnitPrice - requestUnitPrice) < epsilon) {
-                existingProduct.setQuantity(existingProduct.getQuantity() + createProductRequest.getQuantity());
-                existingProduct.setUpdatedAt(LocalDateTime.now());
-                this.productRepository.save(existingProduct);
+                product.setQuantity(existingProduct.getQuantity() + createProductRequest.getQuantity());
+                productRepository.deleteById(existingProduct.getId());
+            } else {
+                product.setQuantity(createProductRequest.getQuantity());
             }
         } else {
-            Product product = this.modelMapperService.forRequest().map(createProductRequest, Product.class);
-            product.setUpdatedAt(LocalDateTime.now());
-            this.productRepository.save(product);
+            product.setQuantity(createProductRequest.getQuantity());
         }
+        product.setName(createProductRequest.getName());
+        product.setDescription(createProductRequest.getDescription());
+        product.setUnitPrice(createProductRequest.getUnitPrice());
+        product.setState(createProductRequest.getState());
+        product.setImageUrl(createProductRequest.getImageUrl());
+        product.setCreatedBy(createProductRequest.getCreatedBy());
+        ProductCategory productCategory = new ProductCategory();
+        productCategory.setId(createProductRequest.getProductCategoryId());
+        product.setProductCategory(productCategory);
+        product.setUpdatedAt(LocalDateTime.now());
+        this.productRepository.save(product);
     }
 
     @Override
     public void updateProduct(UpdateProductRequest updateProductRequest) {
         Product existingProduct = this.productRepository.findById(updateProductRequest.getId()).orElseThrow(() -> new RuntimeException("Ürün bulunamadı"));
         Product product = this.modelMapperService.forRequest().map(updateProductRequest, Product.class);
-        if (product.getName() == null) {
-            product.setName(existingProduct.getName());
-        }
-        if (product.getDescription() == null) {
-            product.setDescription(existingProduct.getDescription());
-        }
-        if (product.getQuantity() == null) {
-            product.setQuantity(existingProduct.getQuantity());
-        }
-        if (product.getUnitPrice() == null) {
-            product.setUnitPrice(existingProduct.getUnitPrice());
-        }
-        if (product.getState() == null) {
-            product.setState(existingProduct.getState());
-        }
-        if (product.getImageUrl() == null) {
-            product.setImageUrl(existingProduct.getImageUrl());
-        }
-        if (product.getProductCategory() == null) {
-            product.setProductCategory(existingProduct.getProductCategory());
-        }
+        productBusinessRules.checkUpdate(product, existingProduct);
         product.setUpdatedAt(LocalDateTime.now());
         this.productRepository.save(product);
     }
