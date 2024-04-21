@@ -8,6 +8,7 @@ import com.toyota.productservice.dto.requests.UpdateProductRequest;
 import com.toyota.productservice.dto.responses.GetAllProductsResponse;
 import com.toyota.productservice.service.abstracts.ProductService;
 import com.toyota.productservice.service.rules.ProductBusinessRules;
+import com.toyota.productservice.utilities.exceptions.EntityAlreadyExistsException;
 import com.toyota.productservice.utilities.mappers.ModelMapperService;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -130,7 +131,7 @@ public class ProductManager implements ProductService {
                 product.setQuantity(existingProduct.getQuantity() + createProductRequest.getQuantity());
                 productRepository.deleteById(existingProduct.getId());
             } else {
-                product.setQuantity(createProductRequest.getQuantity());
+                throw new EntityAlreadyExistsException("Product already exists");
             }
         } else {
             product.setQuantity(createProductRequest.getQuantity());
