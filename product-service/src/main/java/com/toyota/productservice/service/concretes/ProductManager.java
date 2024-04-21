@@ -19,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -76,7 +77,7 @@ public class ProductManager implements ProductService {
         return response;
     }
 
-    public TreeMap<String, Object> findByState(boolean isState, int page, int size, String[] sort) {
+    public TreeMap<String, Object> findByState(Boolean state, int page, int size, String[] sort) {
         List<Sort.Order> orders = new ArrayList<>();
 
         if (sort[0].contains(",")) {
@@ -89,7 +90,7 @@ public class ProductManager implements ProductService {
         }
 
         Pageable pagingSort = PageRequest.of(page, size, Sort.by(orders));
-        Page<Product> pagePro = productRepository.findByState(isState, pagingSort);
+        Page<Product> pagePro = productRepository.findByState(state, pagingSort);
 
         List<GetAllProductsResponse> responses = pagePro.getContent().stream()
                 .map(product -> this.modelMapperService.forResponse()
@@ -124,27 +125,42 @@ public class ProductManager implements ProductService {
 
             if (Math.abs(existingUnitPrice - requestUnitPrice) < epsilon) {
                 existingProduct.setQuantity(existingProduct.getQuantity() + createProductRequest.getQuantity());
+                existingProduct.setUpdatedAt(LocalDateTime.now());
                 this.productRepository.save(existingProduct);
             }
         } else {
-            Product product = new Product();
-            product.setName(createProductRequest.getName());
-            product.setDescription(createProductRequest.getDescription());
-            product.setQuantity(createProductRequest.getQuantity());
-            product.setUnitPrice(createProductRequest.getUnitPrice());
-            product.setState(createProductRequest.isState());
-            product.setImageUrl(createProductRequest.getImageUrl());
-            product.setCreatedBy(createProductRequest.getCreatedBy());
-            ProductCategory productCategory = new ProductCategory();
-            productCategory.setId(createProductRequest.getProductCategoryId());
-            product.setProductCategory(productCategory);
+            Product product = this.modelMapperService.forRequest().map(createProductRequest, Product.class);
+            product.setUpdatedAt(LocalDateTime.now());
             this.productRepository.save(product);
         }
     }
 
     @Override
     public void updateProduct(UpdateProductRequest updateProductRequest) {
+        Product existingProduct = this.productRepository.findById(updateProductRequest.getId()).orElseThrow(() -> new RuntimeException("Ürün bulunamadı"));
         Product product = this.modelMapperService.forRequest().map(updateProductRequest, Product.class);
+        if (product.getName() == null) {
+            product.setName(existingProduct.getName());
+        }
+        if (product.getDescription() == null) {
+            product.setDescription(existingProduct.getDescription());
+        }
+        if (product.getQuantity() == null) {
+            product.setQuantity(existingProduct.getQuantity());
+        }
+        if (product.getUnitPrice() == null) {
+            product.setUnitPrice(existingProduct.getUnitPrice());
+        }
+        if (product.getState() == null) {
+            product.setState(existingProduct.getState());
+        }
+        if (product.getImageUrl() == null) {
+            product.setImageUrl(existingProduct.getImageUrl());
+        }
+        if (product.getProductCategory() == null) {
+            product.setProductCategory(existingProduct.getProductCategory());
+        }
+        product.setUpdatedAt(LocalDateTime.now());
         this.productRepository.save(product);
     }
 

@@ -16,9 +16,9 @@ public class GetAllProductsResponse {
     private String barcodeNumber;
     private String name;
     private String description;
-    private int quantity;
+    private Integer quantity;
     private Double unitPrice;
-    private boolean state;
+    private Boolean state;
     private String imageUrl;
     private String createdBy;
     private LocalDateTime updatedAt;

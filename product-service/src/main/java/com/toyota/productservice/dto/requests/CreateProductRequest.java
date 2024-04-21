@@ -7,25 +7,21 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class CreateProductRequest {
-
     @NotNull
     @NotBlank
     private String name;
     private String description;
     @NotNull
-    private int quantity;
+    private Integer quantity;
     @NotNull
     private Double unitPrice;
     @NotNull
-    private boolean state;
+    private Boolean state;
     private String imageUrl;
     @NotNull
     @NotBlank

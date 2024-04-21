@@ -7,6 +7,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * ProductCategory class represents product_category entity in the database.
@@ -24,8 +25,14 @@ public class ProductCategory {
     @Column(name = "id", unique = true, nullable = false, updatable = false)
     private Long id;
 
+    @Column(name = "category_number", unique = true, nullable = false)
+    private String categoryNumber = UUID.randomUUID().toString().substring(0, 8);
+
     @Column(name = "name")
     private String name;
+
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description;
 
     @Column(name = "image_url", columnDefinition = "TEXT")
     private String imageUrl;

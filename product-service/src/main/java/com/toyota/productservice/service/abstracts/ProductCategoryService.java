@@ -7,9 +7,11 @@ import com.toyota.productservice.dto.responses.GetAllProductCategoriesResponse;
 import java.util.List;
 
 public interface ProductCategoryService {
-    List<GetAllProductCategoriesResponse> getAll();
-    GetAllProductCategoriesResponse getById(Long id);
-    void add(CreateProductCategoryRequest createProductCategoryRequest);
-    void update(UpdateProductCategoryRequest updateProductCategoryRequest);
-    void delete(Long id);
+    public List<GetAllProductCategoriesResponse> getAllCategories();
+    public GetAllProductCategoriesResponse getCategoryByName(String name);
+    public GetAllProductCategoriesResponse getCategoryByCategoryNumber(String categoryNumber);
+    public GetAllProductCategoriesResponse getCategoryById(Long id);
+    public void addCategory(CreateProductCategoryRequest createProductCategoryRequest);
+    public void updateCategory(UpdateProductCategoryRequest updateProductCategoryRequest);
+    public void deleteCategory(Long id);
 }

@@ -33,13 +33,13 @@ public class Product {
     private String description;
 
     @Column(name = "quantity")
-    private int quantity;
+    private Integer quantity;
 
     @Column(name = "unit_price", columnDefinition = "numeric")
     private Double unitPrice;
 
     @Column(name = "state", columnDefinition = "BOOLEAN DEFAULT false", nullable = false)
-    private boolean state;
+    private Boolean state;
 
     @Column(name = "image_url", columnDefinition = "TEXT")
     private String imageUrl;
@@ -49,7 +49,7 @@ public class Product {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_category_id", nullable = false)

@@ -41,11 +41,11 @@ public class ProductController {
 
     @GetMapping("/state")
     public ResponseEntity<TreeMap<String, Object>> findByState(
-            @RequestParam(defaultValue = "true") boolean isState,
+            @RequestParam(defaultValue = "true") Boolean state,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "3") int size,
             @RequestParam(defaultValue = "id,asc") String[] sort) {
-        TreeMap<String, Object> response = productService.findByState(isState, page, size, sort);
+        TreeMap<String, Object> response = productService.findByState(state, page, size, sort);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -66,7 +66,7 @@ public class ProductController {
     }
 
     @PutMapping
-    public void update(@RequestBody() UpdateProductRequest updateProductRequest) {
+    public void update(@RequestBody() @Valid UpdateProductRequest updateProductRequest) {
         this.productService.updateProduct(updateProductRequest);
     }
 

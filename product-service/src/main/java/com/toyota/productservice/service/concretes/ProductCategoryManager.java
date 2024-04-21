@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,41 +32,66 @@ public class ProductCategoryManager implements ProductCategoryService {
     private ProductCategoryBusinessRules productCategoryBusinessRules;
 
     @Override
-    public List<GetAllProductCategoriesResponse> getAll() {
+    public List<GetAllProductCategoriesResponse> getAllCategories() {
         List<ProductCategory> productCategories = productCategoryRepository.findAll();
 
-        List<GetAllProductCategoriesResponse> productCategoriesResponse = productCategories.stream()
+        return productCategories.stream()
                 .map(productCategory -> this.modelMapperService.forResponse()
                         .map(productCategory, GetAllProductCategoriesResponse.class)).collect(Collectors.toList());
-
-        return productCategoriesResponse;
     }
 
     @Override
-    public GetAllProductCategoriesResponse getById(Long id) {
+    public GetAllProductCategoriesResponse getCategoryByName(String name) {
+        ProductCategory productCategory = this.productCategoryRepository.findByName(name);
+
+        return this.modelMapperService.forResponse()
+                .map(productCategory, GetAllProductCategoriesResponse.class);
+    }
+
+    @Override
+    public GetAllProductCategoriesResponse getCategoryByCategoryNumber(String categoryNumber) {
+        ProductCategory productCategory = this.productCategoryRepository.findByCategoryNumber(categoryNumber);
+
+        return this.modelMapperService.forResponse()
+                .map(productCategory, GetAllProductCategoriesResponse.class);
+    }
+
+    @Override
+    public GetAllProductCategoriesResponse getCategoryById(Long id) {
         ProductCategory productCategory = this.productCategoryRepository.findById(id).orElseThrow();
 
-        GetAllProductCategoriesResponse response = this.modelMapperService.forResponse()
+        return this.modelMapperService.forResponse()
                 .map(productCategory, GetAllProductCategoriesResponse.class);
-
-        return response;
     }
 
     @Override
-    public void add(CreateProductCategoryRequest createProductCategoryRequest) {
+    public void addCategory(CreateProductCategoryRequest createProductCategoryRequest) {
         this.productCategoryBusinessRules.checkIfProductCategoryNameExists(createProductCategoryRequest.getName());
         ProductCategory productCategory = this.modelMapperService.forRequest().map(createProductCategoryRequest, ProductCategory.class);
+        productCategory.setUpdatedAt(LocalDateTime.now());
         this.productCategoryRepository.save(productCategory);
     }
 
     @Override
-    public void update(UpdateProductCategoryRequest updateProductCategoryRequest) {
+    public void updateCategory(UpdateProductCategoryRequest updateProductCategoryRequest) {
+        ProductCategory existingProductCategory = this.productCategoryRepository.findById(updateProductCategoryRequest.getId()).orElseThrow(() -> new RuntimeException("Ürün bulunamadı"));
+
         ProductCategory productCategory = this.modelMapperService.forRequest().map(updateProductCategoryRequest, ProductCategory.class);
+        if (productCategory.getName() == null) {
+            productCategory.setName(existingProductCategory.getName());
+        }
+        if (productCategory.getDescription() == null) {
+            productCategory.setDescription(existingProductCategory.getDescription());
+        }
+        if (productCategory.getImageUrl() == null) {
+            productCategory.setImageUrl(existingProductCategory.getImageUrl());
+        }
+        productCategory.setUpdatedAt(LocalDateTime.now());
         this.productCategoryRepository.save(productCategory);
     }
 
     @Override
-    public void delete(Long id) {
+    public void deleteCategory(Long id) {
         this.productCategoryRepository.deleteById(id);
     }
 }

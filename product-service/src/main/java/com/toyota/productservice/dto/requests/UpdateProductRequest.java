@@ -18,11 +18,12 @@ public class UpdateProductRequest {
     private Long id;
     private String name;
     private String description;
-    private int quantity;
+    private Integer quantity;
     private Double unitPrice;
-    private boolean state;
+    private Boolean state;
     private String imageUrl;
+    @NotNull
+    @NotBlank
     private String createdBy;
-    private LocalDateTime updatedAt;
     private Long productCategoryId;
 }
