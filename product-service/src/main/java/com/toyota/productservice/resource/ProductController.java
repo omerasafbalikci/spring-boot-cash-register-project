@@ -51,7 +51,7 @@ public class ProductController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping()
+    @GetMapping("/barcodenumber")
     public GetAllProductsResponse getProductByBarcodeNumber(@RequestParam() String barcodeNumber) {
         return productService.getProductByBarcodeNumber(barcodeNumber);
     }
@@ -67,7 +67,7 @@ public class ProductController {
         return this.productService.addProduct(createProductRequest);
     }
 
-    @PutMapping
+    @PutMapping()
     public GetAllProductsResponse updateProduct(@RequestBody() @Valid UpdateProductRequest updateProductRequest) {
         return this.productService.updateProduct(updateProductRequest);
     }

@@ -31,7 +31,7 @@ public class ProductCategoryController {
         return productCategoryService.findByCategoryNameContaining(name);
     }
 
-    @GetMapping("/categorynumbers")
+    @GetMapping("/categorynumber")
     public GetAllProductCategoriesResponse getCategoryByCategoryNumber(@RequestParam() String categoryNumber) {
         return productCategoryService.getCategoryByCategoryNumber(categoryNumber);
     }
