@@ -43,13 +43,14 @@ public class ProductCategoryManager implements ProductCategoryService {
     }
 
     @Override
-    public GetAllProductCategoriesResponse findByCategoryNameContaining(String name) {
-        ProductCategory productCategory = this.productCategoryRepository.findByNameContainingIgnoreCase(name);
-        if (productCategory != null) {
-            return this.modelMapperService.forResponse()
-                    .map(productCategory, GetAllProductCategoriesResponse.class);
+    public List<GetAllProductCategoriesResponse> findByCategoryNameContaining(String name) {
+        List<ProductCategory> productCategories = this.productCategoryRepository.findByNameContainingIgnoreCase(name);
+        if (!productCategories.isEmpty()) {
+            return productCategories.stream()
+                    .map(category -> modelMapperService.forResponse().map(category, GetAllProductCategoriesResponse.class))
+                    .collect(Collectors.toList());
         } else {
-            throw new EntityNotFoundException("Product category not found");
+            throw new EntityNotFoundException("Product categories not found");
         }
     }
 

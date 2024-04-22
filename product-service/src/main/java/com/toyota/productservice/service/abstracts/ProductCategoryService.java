@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ProductCategoryService {
     List<GetAllProductCategoriesResponse> getAllCategories();
-    GetAllProductCategoriesResponse findByCategoryNameContaining(String name);
+    List<GetAllProductCategoriesResponse> findByCategoryNameContaining(String name);
     GetAllProductCategoriesResponse getCategoryByCategoryNumber(String categoryNumber);
     GetAllProductCategoriesResponse getCategoryById(Long id);
     GetAllProductCategoriesResponse addCategory(CreateProductCategoryRequest createProductCategoryRequest);

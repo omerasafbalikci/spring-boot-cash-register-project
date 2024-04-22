@@ -27,7 +27,7 @@ public class ProductCategoryController {
     }
 
     @GetMapping("/search")
-    public GetAllProductCategoriesResponse findByCategoryNameContaining(@RequestParam() String name) {
+    public List<GetAllProductCategoriesResponse> findByCategoryNameContaining(@RequestParam() String name) {
         return productCategoryService.findByCategoryNameContaining(name);
     }
 
