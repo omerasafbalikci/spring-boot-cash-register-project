@@ -18,7 +18,7 @@ public interface ProductService {
     public TreeMap<String, Object> findByProductState(Boolean isState, int page, int size, String[] sort);
     public GetAllProductsResponse getProductByBarcodeNumber(String barcodeNumber);
     public GetAllProductsResponse getProductById(Long id);
-    public void addProduct(CreateProductRequest createProductRequest);
-    public void updateProduct(UpdateProductRequest updateProductRequest);
-    public void deleteProduct(Long id);
+    public String addProduct(CreateProductRequest createProductRequest);
+    public String updateProduct(UpdateProductRequest updateProductRequest);
+    public String deleteProduct(Long id);
 }

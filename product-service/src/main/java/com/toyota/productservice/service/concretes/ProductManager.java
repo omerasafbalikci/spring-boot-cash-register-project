@@ -150,7 +150,7 @@ public class ProductManager implements ProductService {
     }
 
     @Override
-    public void addProduct(CreateProductRequest createProductRequest) {
+    public String addProduct(CreateProductRequest createProductRequest) {
         Product existingProduct = this.productRepository.findByName(createProductRequest.getName());
         Product product = new Product();
         if (existingProduct != null) {
@@ -178,20 +178,23 @@ public class ProductManager implements ProductService {
         product.setProductCategory(productCategory);
         product.setUpdatedAt(LocalDateTime.now());
         this.productRepository.save(product);
+        return "Product added!";
     }
 
     @Override
-    public void updateProduct(UpdateProductRequest updateProductRequest) {
+    public String updateProduct(UpdateProductRequest updateProductRequest) {
         Product existingProduct = this.productRepository.findById(updateProductRequest.getId()).orElseThrow(() -> new EntityNotFoundException("Product not found"));
         Product product = this.modelMapperService.forRequest().map(updateProductRequest, Product.class);
         productBusinessRules.checkUpdate(product, existingProduct);
         product.setUpdatedAt(LocalDateTime.now());
         this.productRepository.save(product);
+        return "Product updated!";
     }
 
     @Override
-    public void deleteProduct(Long id) {
+    public String deleteProduct(Long id) {
         this.productRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Product not found"));
         this.productRepository.deleteById(id);
+        return "Product deleted!";
     }
 }

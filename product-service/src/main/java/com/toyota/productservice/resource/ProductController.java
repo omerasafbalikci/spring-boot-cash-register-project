@@ -38,9 +38,9 @@ public class ProductController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/search")
+    @GetMapping("/search/{name}")
     public ResponseEntity<TreeMap<String, Object>> findByProductNameContaining(
-            @RequestParam() String name,
+            @PathVariable("name") String name,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "3") int size,
             @RequestParam(defaultValue = "id,asc") String[] sort) {
