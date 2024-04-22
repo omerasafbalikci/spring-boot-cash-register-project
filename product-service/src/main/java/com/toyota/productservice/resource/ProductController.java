@@ -31,21 +31,30 @@ public class ProductController {
 
     @GetMapping()
     public ResponseEntity<TreeMap<String, Object>> getAllProductsPage(
-            @RequestParam(required = false) String name,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "3") int size,
             @RequestParam(defaultValue = "id,asc") String[] sort) {
-        TreeMap<String, Object> response = productService.getAllProductsPage(name, page, size, sort);
+        TreeMap<String, Object> response = productService.getAllProductsPage(page, size, sort);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<TreeMap<String, Object>> findByProductNameContaining(
+            @RequestParam() String name,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "3") int size,
+            @RequestParam(defaultValue = "id,asc") String[] sort) {
+        TreeMap<String, Object> response = productService.findByProductNameContaining(name, page, size, sort);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/state")
-    public ResponseEntity<TreeMap<String, Object>> findByState(
+    public ResponseEntity<TreeMap<String, Object>> findByProductState(
             @RequestParam(defaultValue = "true") Boolean state,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "3") int size,
             @RequestParam(defaultValue = "id,asc") String[] sort) {
-        TreeMap<String, Object> response = productService.findByState(state, page, size, sort);
+        TreeMap<String, Object> response = productService.findByProductState(state, page, size, sort);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -61,17 +70,17 @@ public class ProductController {
 
     @PostMapping()
     @ResponseStatus(code = HttpStatus.CREATED)
-    public void add(@RequestBody @Valid CreateProductRequest createProductRequest) {
+    public void addProduct(@RequestBody @Valid CreateProductRequest createProductRequest) {
         this.productService.addProduct(createProductRequest);
     }
 
     @PutMapping
-    public void update(@RequestBody() @Valid UpdateProductRequest updateProductRequest) {
+    public void updateProduct(@RequestBody() @Valid UpdateProductRequest updateProductRequest) {
         this.productService.updateProduct(updateProductRequest);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
+    public void deleteProduct(@PathVariable Long id) {
         this.productService.deleteProduct(id);
     }
 

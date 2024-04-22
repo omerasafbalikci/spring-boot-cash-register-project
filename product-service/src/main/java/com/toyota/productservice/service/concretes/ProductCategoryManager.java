@@ -42,7 +42,7 @@ public class ProductCategoryManager implements ProductCategoryService {
 
     @Override
     public GetAllProductCategoriesResponse getCategoryByName(String name) {
-        ProductCategory productCategory = this.productCategoryRepository.findByName(name);
+        ProductCategory productCategory = this.productCategoryRepository.findByNameIgnoreCase(name);
 
         return this.modelMapperService.forResponse()
                 .map(productCategory, GetAllProductCategoriesResponse.class);
