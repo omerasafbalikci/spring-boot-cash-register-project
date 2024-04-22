@@ -1,6 +1,5 @@
 package com.toyota.productservice.resource;
 
-import com.toyota.productservice.domain.Product;
 import com.toyota.productservice.dto.requests.CreateProductRequest;
 import com.toyota.productservice.dto.requests.UpdateProductRequest;
 import com.toyota.productservice.dto.responses.GetAllProductsResponse;
@@ -9,16 +8,10 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.TreeMap;
 
 @RestController
@@ -38,9 +31,9 @@ public class ProductController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/search/{name}")
+    @GetMapping("/search")
     public ResponseEntity<TreeMap<String, Object>> findByProductNameContaining(
-            @PathVariable("name") String name,
+            @RequestParam() String name,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "3") int size,
             @RequestParam(defaultValue = "id,asc") String[] sort) {
@@ -58,30 +51,30 @@ public class ProductController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/barcodenumbers/{barcodeNumber}")
-    public GetAllProductsResponse getProductByBarcodeNumber(@PathVariable("barcodeNumber") String barcodeNumber) {
+    @GetMapping()
+    public GetAllProductsResponse getProductByBarcodeNumber(@RequestParam() String barcodeNumber) {
         return productService.getProductByBarcodeNumber(barcodeNumber);
     }
 
-    @GetMapping("/{id}")
-    public GetAllProductsResponse getProductById(@PathVariable("id") Long id) {
+    @GetMapping("/id")
+    public GetAllProductsResponse getProductById(@RequestParam() Long id) {
         return productService.getProductById(id);
     }
 
     @PostMapping()
     @ResponseStatus(code = HttpStatus.CREATED)
-    public void addProduct(@RequestBody @Valid CreateProductRequest createProductRequest) {
-        this.productService.addProduct(createProductRequest);
+    public GetAllProductsResponse addProduct(@RequestBody @Valid CreateProductRequest createProductRequest) {
+        return this.productService.addProduct(createProductRequest);
     }
 
     @PutMapping
-    public void updateProduct(@RequestBody() @Valid UpdateProductRequest updateProductRequest) {
-        this.productService.updateProduct(updateProductRequest);
+    public GetAllProductsResponse updateProduct(@RequestBody() @Valid UpdateProductRequest updateProductRequest) {
+        return this.productService.updateProduct(updateProductRequest);
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteProduct(@PathVariable Long id) {
-        this.productService.deleteProduct(id);
+    @DeleteMapping("/id")
+    public GetAllProductsResponse deleteProduct(@RequestParam() Long id) {
+        return this.productService.deleteProduct(id);
     }
 
 }

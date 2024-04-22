@@ -61,7 +61,7 @@ public class ProductManager implements ProductService {
 
         Pageable pagingSort = PageRequest.of(page, size, Sort.by(orders));
         Page<Product> pagePro;
-        pagePro = productRepository.findAll(pagingSort);
+        pagePro = this.productRepository.findAll(pagingSort);
 
         List<GetAllProductsResponse> responses = pagePro.getContent().stream()
                 .map(product -> this.modelMapperService.forResponse()
@@ -119,7 +119,7 @@ public class ProductManager implements ProductService {
         }
 
         Pageable pagingSort = PageRequest.of(page, size, Sort.by(orders));
-        Page<Product> pagePro = productRepository.findByState(state, pagingSort);
+        Page<Product> pagePro = this.productRepository.findByState(state, pagingSort);
 
         List<GetAllProductsResponse> responses = pagePro.getContent().stream()
                 .map(product -> this.modelMapperService.forResponse()
@@ -150,7 +150,7 @@ public class ProductManager implements ProductService {
     }
 
     @Override
-    public String addProduct(CreateProductRequest createProductRequest) {
+    public GetAllProductsResponse addProduct(CreateProductRequest createProductRequest) {
         Product existingProduct = this.productRepository.findByName(createProductRequest.getName());
         Product product = new Product();
         if (existingProduct != null) {
@@ -160,7 +160,7 @@ public class ProductManager implements ProductService {
 
             if (Math.abs(existingUnitPrice - requestUnitPrice) < epsilon) {
                 product.setQuantity(existingProduct.getQuantity() + createProductRequest.getQuantity());
-                productRepository.deleteById(existingProduct.getId());
+                this.productRepository.deleteById(existingProduct.getId());
             } else {
                 throw new EntityAlreadyExistsException("Product already exists");
             }
@@ -178,23 +178,23 @@ public class ProductManager implements ProductService {
         product.setProductCategory(productCategory);
         product.setUpdatedAt(LocalDateTime.now());
         this.productRepository.save(product);
-        return "Product added!";
+        return this.modelMapperService.forResponse().map(product, GetAllProductsResponse.class);
     }
 
     @Override
-    public String updateProduct(UpdateProductRequest updateProductRequest) {
+    public GetAllProductsResponse updateProduct(UpdateProductRequest updateProductRequest) {
         Product existingProduct = this.productRepository.findById(updateProductRequest.getId()).orElseThrow(() -> new EntityNotFoundException("Product not found"));
         Product product = this.modelMapperService.forRequest().map(updateProductRequest, Product.class);
-        productBusinessRules.checkUpdate(product, existingProduct);
+        this.productBusinessRules.checkUpdate(product, existingProduct);
         product.setUpdatedAt(LocalDateTime.now());
         this.productRepository.save(product);
-        return "Product updated!";
+        return this.modelMapperService.forResponse().map(product, GetAllProductsResponse.class);
     }
 
     @Override
-    public String deleteProduct(Long id) {
-        this.productRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Product not found"));
+    public GetAllProductsResponse deleteProduct(Long id) {
+        Product product = this.productRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Product not found"));
         this.productRepository.deleteById(id);
-        return "Product deleted!";
+        return this.modelMapperService.forResponse().map(product, GetAllProductsResponse.class);
     }
 }
