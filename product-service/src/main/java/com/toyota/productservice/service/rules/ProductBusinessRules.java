@@ -17,12 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
-@NoArgsConstructor
 public class ProductBusinessRules {
-    @Autowired
-    private ProductRepository productRepository;
-
     public void checkUpdate(Product product, Product existingProduct) {
         if (product.getName() == null) {
             product.setName(existingProduct.getName());

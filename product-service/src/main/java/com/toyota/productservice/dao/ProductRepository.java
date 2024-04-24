@@ -14,6 +14,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findByState(Boolean state, Pageable pageable);
     @Query("SELECT p FROM Product p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', ?1, '%'))")
     Page<Product> findByNameContainingIgnoreCase(String name, Pageable pageable);
+    Page<Product> findByInitialLetterIgnoreCase(char initialLetter, Pageable pageable);
     Product findByBarcodeNumber(String barcodeNumber);
-    Product findByName(String name);
+    Product findByNameIgnoreCase(String name);
 }

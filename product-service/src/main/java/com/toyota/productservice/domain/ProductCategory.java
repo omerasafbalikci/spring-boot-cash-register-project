@@ -26,7 +26,7 @@ public class ProductCategory {
     private Long id;
 
     @Column(name = "category_number", unique = true, nullable = false)
-    private String categoryNumber = UUID.randomUUID().toString().substring(0, 8);
+    private String categoryNumber;
 
     @Column(name = "name")
     private String name;

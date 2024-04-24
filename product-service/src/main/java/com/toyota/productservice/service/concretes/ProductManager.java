@@ -76,7 +76,7 @@ public class ProductManager implements ProductService {
     }
 
     @Override
-    public TreeMap<String, Object> findByProductNameContaining(String name, int page, int size, String[] sort) {
+    public TreeMap<String, Object> getProductsByNameContaining(String name, int page, int size, String[] sort) {
         List<Sort.Order> orders = new ArrayList<>();
 
         if (sort[0].contains(",")) {
@@ -106,7 +106,7 @@ public class ProductManager implements ProductService {
     }
 
     @Override
-    public TreeMap<String, Object> findByProductState(Boolean state, int page, int size, String[] sort) {
+    public TreeMap<String, Object> getProductsByState(Boolean state, int page, int size, String[] sort) {
         List<Sort.Order> orders = new ArrayList<>();
 
         if (sort[0].contains(",")) {
@@ -120,6 +120,33 @@ public class ProductManager implements ProductService {
 
         Pageable pagingSort = PageRequest.of(page, size, Sort.by(orders));
         Page<Product> pagePro = this.productRepository.findByState(state, pagingSort);
+
+        List<GetAllProductsResponse> responses = pagePro.getContent().stream()
+                .map(product -> this.modelMapperService.forResponse()
+                        .map(product, GetAllProductsResponse.class)).collect(Collectors.toList());
+
+        TreeMap<String, Object> response = new TreeMap<>();
+        response.put("products", responses);
+        response.put("currentPage", pagePro.getNumber());
+        response.put("totalItems", pagePro.getTotalElements());
+        response.put("totalPages", pagePro.getTotalPages());
+        return response;
+    }
+
+    public TreeMap<String, Object> getProductsByInitialLetter(char initialLetter, int page, int size, String[] sort) {
+        List<Sort.Order> orders = new ArrayList<>();
+
+        if (sort[0].contains(",")) {
+            for (String sortOrder : sort) {
+                String[] _sort = sortOrder.split(",");
+                orders.add(new Sort.Order(getSortDirection(_sort[1]), _sort[0]));
+            }
+        } else {
+            orders.add(new Sort.Order(getSortDirection(sort[1]), sort[0]));
+        }
+
+        Pageable pagingSort = PageRequest.of(page, size, Sort.by(orders));
+        Page<Product> pagePro = this.productRepository.findByInitialLetterIgnoreCase(initialLetter, pagingSort);
 
         List<GetAllProductsResponse> responses = pagePro.getContent().stream()
                 .map(product -> this.modelMapperService.forResponse()
@@ -151,7 +178,7 @@ public class ProductManager implements ProductService {
 
     @Override
     public GetAllProductsResponse addProduct(CreateProductRequest createProductRequest) {
-        Product existingProduct = this.productRepository.findByName(createProductRequest.getName());
+        Product existingProduct = this.productRepository.findByNameIgnoreCase(createProductRequest.getName());
         Product product = new Product();
         if (existingProduct != null) {
             double existingUnitPrice = existingProduct.getUnitPrice();
@@ -165,6 +192,7 @@ public class ProductManager implements ProductService {
                 throw new EntityAlreadyExistsException("Product already exists");
             }
         } else {
+            product.setBarcodeNumber(UUID.randomUUID().toString().substring(0, 8));
             product.setQuantity(createProductRequest.getQuantity());
         }
         product.setName(createProductRequest.getName());

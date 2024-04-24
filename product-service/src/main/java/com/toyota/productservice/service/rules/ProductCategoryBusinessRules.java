@@ -17,7 +17,7 @@ public class ProductCategoryBusinessRules {
     private ProductCategoryRepository productCategoryRepository;
 
     public void checkIfProductCategoryNameExists(String name) {
-        if (this.productCategoryRepository.existsByName(name)) {
+        if (this.productCategoryRepository.existsByNameIgnoreCase(name)) {
             throw new EntityAlreadyExistsException("Product Category already exists");
         }
     }

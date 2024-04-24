@@ -14,12 +14,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class CreateProductCategoryRequest {
-    @NotNull
-    @NotBlank
+    @NotNull(message = "Name must not be null")
+    @NotBlank(message = "Name must not be blank")
     private String name;
     private String description;
     private String imageUrl;
-    @NotNull
-    @NotBlank
+    @NotNull(message = "Created by must not be null")
+    @NotBlank(message = "Created by must not be blank")
     private String createdBy;
 }

@@ -12,20 +12,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class CreateProductRequest {
-    @NotNull
-    @NotBlank
+    @NotNull(message = "Name must not be null")
+    @NotBlank(message = "Name must not be blank")
     private String name;
     private String description;
-    @NotNull
+    @NotNull(message = "Quantity must not be null")
     private Integer quantity;
-    @NotNull
+    @NotNull(message = "Unit price must not be null")
     private Double unitPrice;
-    @NotNull
+    @NotNull(message = "State must not be null")
     private Boolean state;
     private String imageUrl;
-    @NotNull
-    @NotBlank
+    @NotNull(message = "Created by must not be null")
+    @NotBlank(message = "Created by must not be blank")
     private String createdBy;
-    @NotNull
+    @NotNull(message = "Product category id must not be null")
     private Long productCategoryId;
 }

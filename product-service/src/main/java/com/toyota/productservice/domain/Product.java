@@ -24,7 +24,7 @@ public class Product {
     private Long id;
 
     @Column(name = "barcode_number", unique = true, nullable = false)
-    private String barcodeNumber = UUID.randomUUID().toString().substring(0, 8);
+    private String barcodeNumber;
 
     @Column(name = "name")
     private String name;
@@ -54,5 +54,4 @@ public class Product {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_category_id", nullable = false)
     private ProductCategory productCategory;
-
 }

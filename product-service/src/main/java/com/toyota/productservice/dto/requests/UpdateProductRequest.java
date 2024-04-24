@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class UpdateProductRequest {
-    @NotNull
+    @NotNull(message = "Id must not be null")
     private Long id;
     private String name;
     private String description;
@@ -22,8 +22,8 @@ public class UpdateProductRequest {
     private Double unitPrice;
     private Boolean state;
     private String imageUrl;
-    @NotNull
-    @NotBlank
+    @NotNull(message = "Created by must not be null")
+    @NotBlank(message = "Created by must not be blank")
     private String createdBy;
     private Long productCategoryId;
 }

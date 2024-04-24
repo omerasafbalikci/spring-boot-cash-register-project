@@ -32,22 +32,32 @@ public class ProductController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<TreeMap<String, Object>> findByProductNameContaining(
+    public ResponseEntity<TreeMap<String, Object>> getProductsByNameContaining(
             @RequestParam() String name,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "3") int size,
             @RequestParam(defaultValue = "id,asc") String[] sort) {
-        TreeMap<String, Object> response = productService.findByProductNameContaining(name, page, size, sort);
+        TreeMap<String, Object> response = productService.getProductsByNameContaining(name, page, size, sort);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/state")
-    public ResponseEntity<TreeMap<String, Object>> findByProductState(
+    public ResponseEntity<TreeMap<String, Object>> getProductsByState(
             @RequestParam(defaultValue = "true") Boolean state,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "3") int size,
             @RequestParam(defaultValue = "id,asc") String[] sort) {
-        TreeMap<String, Object> response = productService.findByProductState(state, page, size, sort);
+        TreeMap<String, Object> response = productService.getProductsByState(state, page, size, sort);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/letter")
+    public ResponseEntity<TreeMap<String, Object>> getProductsByInitialLetter(
+            @RequestParam() char initialLetter,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "3") int size,
+            @RequestParam(defaultValue = "id,asc") String[] sort) {
+        TreeMap<String, Object> response = productService.getProductsByInitialLetter(initialLetter, page, size, sort);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
