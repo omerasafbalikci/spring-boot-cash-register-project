@@ -17,10 +17,9 @@ import java.util.TreeMap;
 @RestController
 @RequestMapping("/api/products")
 @AllArgsConstructor
-@NoArgsConstructor
 public class ProductController {
     @Autowired
-    private ProductService productService;
+    private final ProductService productService;
 
     @GetMapping()
     public ResponseEntity<TreeMap<String, Object>> getAllProductsPage(
@@ -71,20 +70,31 @@ public class ProductController {
         return productService.getProductById(id);
     }
 
-    @PostMapping()
-    @ResponseStatus(code = HttpStatus.CREATED)
-    public GetAllProductsResponse addProduct(@RequestBody @Valid CreateProductRequest createProductRequest) {
-        return this.productService.addProduct(createProductRequest);
+    @PostMapping("/add")
+    public ResponseEntity<GetAllProductsResponse> addProduct(@RequestBody @Valid CreateProductRequest createProductRequest) {
+        GetAllProductsResponse response = this.productService.addProduct(createProductRequest);
+        if (response == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PutMapping()
-    public GetAllProductsResponse updateProduct(@RequestBody() @Valid UpdateProductRequest updateProductRequest) {
-        return this.productService.updateProduct(updateProductRequest);
+    @PutMapping("/update")
+    public ResponseEntity<GetAllProductsResponse> updateProduct(@RequestBody() @Valid UpdateProductRequest updateProductRequest) {
+        GetAllProductsResponse response = this.productService.updateProduct(updateProductRequest);
+        if (response == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/id")
-    public GetAllProductsResponse deleteProduct(@RequestParam() Long id) {
-        return this.productService.deleteProduct(id);
+    @DeleteMapping("/delete")
+    public ResponseEntity<GetAllProductsResponse> deleteProduct(@RequestParam() Long id) {
+        GetAllProductsResponse response = this.productService.deleteProduct(id);
+        if (response == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(response);
     }
 
 }

@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,10 +17,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/productcategories")
 @AllArgsConstructor
-@NoArgsConstructor
 public class ProductCategoryController {
     @Autowired
-    private ProductCategoryService productCategoryService;
+    private final ProductCategoryService productCategoryService;
 
     @GetMapping()
     public List<GetAllProductCategoriesResponse> getAllCategories() {
@@ -41,20 +41,32 @@ public class ProductCategoryController {
         return productCategoryService.getCategoryById(id);
     }
 
-    @PostMapping()
+    @PostMapping("/add")
     @ResponseStatus(code = HttpStatus.CREATED)
-    public GetAllProductCategoriesResponse addCategory(@RequestBody() @Valid CreateProductCategoryRequest createProductCategoryRequest) {
-        return this.productCategoryService.addCategory(createProductCategoryRequest);
+    public ResponseEntity<GetAllProductCategoriesResponse> addCategory(@RequestBody() @Valid CreateProductCategoryRequest createProductCategoryRequest) {
+        GetAllProductCategoriesResponse response = this.productCategoryService.addCategory(createProductCategoryRequest);
+        if (response == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PutMapping
-    public GetAllProductCategoriesResponse updateCategory(@RequestBody() @Valid UpdateProductCategoryRequest updateProductCategoryRequest) {
-        return this.productCategoryService.updateCategory(updateProductCategoryRequest);
+    @PutMapping("/update")
+    public ResponseEntity<GetAllProductCategoriesResponse> updateCategory(@RequestBody() @Valid UpdateProductCategoryRequest updateProductCategoryRequest) {
+        GetAllProductCategoriesResponse response = this.productCategoryService.updateCategory(updateProductCategoryRequest);
+        if (response == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/id")
-    public GetAllProductCategoriesResponse deleteCategory(@RequestParam() Long id) {
-        return this.productCategoryService.deleteCategory(id);
+    @DeleteMapping("/delete")
+    public ResponseEntity<GetAllProductCategoriesResponse> deleteCategory(@RequestParam() Long id) {
+        GetAllProductCategoriesResponse response = this.productCategoryService.deleteCategory(id);
+        if (response == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(response);
     }
 
 }
