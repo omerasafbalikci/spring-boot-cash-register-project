@@ -12,7 +12,8 @@ import com.toyota.productservice.utilities.exceptions.EntityAlreadyExistsExcepti
 import com.toyota.productservice.utilities.exceptions.EntityNotFoundException;
 import com.toyota.productservice.utilities.mappers.ModelMapperService;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,14 +29,14 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @AllArgsConstructor
-@NoArgsConstructor
 public class ProductManager implements ProductService {
     @Autowired
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
+    private static final Logger logger = LogManager.getLogger(ProductService.class);
     @Autowired
-    private ModelMapperService modelMapperService;
+    private final ModelMapperService modelMapperService;
     @Autowired
-    private ProductBusinessRules productBusinessRules;
+    private final ProductBusinessRules productBusinessRules;
 
     private Sort.Direction getSortDirection(String direction) {
         if (direction.equals("asc")) {
@@ -46,10 +47,8 @@ public class ProductManager implements ProductService {
         return Sort.Direction.ASC;
     }
 
-    @Override
-    public TreeMap<String, Object> getAllProductsPage(int page, int size, String[] sort) {
+    private List<Sort.Order> getOrder(String[] sort) {
         List<Sort.Order> orders = new ArrayList<>();
-
         if (sort[0].contains(",")) {
             for (String sortOrder : sort) {
                 String[] _sort = sortOrder.split(",");
@@ -58,8 +57,13 @@ public class ProductManager implements ProductService {
         } else {
             orders.add(new Sort.Order(getSortDirection(sort[1]), sort[0]));
         }
+        return orders;
+    }
 
-        Pageable pagingSort = PageRequest.of(page, size, Sort.by(orders));
+    @Override
+    public TreeMap<String, Object> getAllProductsPage(int page, int size, String[] sort) {
+        logger.info("Fetching all products with pagination. Page: {}, Size: {}, Sort: {}.", page, size, Arrays.toString(sort));
+        Pageable pagingSort = PageRequest.of(page, size, Sort.by(getOrder(sort)));
         Page<Product> pagePro;
         pagePro = this.productRepository.findAll(pagingSort);
 
@@ -72,26 +76,15 @@ public class ProductManager implements ProductService {
         response.put("currentPage", pagePro.getNumber());
         response.put("totalItems", pagePro.getTotalElements());
         response.put("totalPages", pagePro.getTotalPages());
+        logger.debug("Retrieved {} products for page {}. Total items: {}. Total pages: {}.", responses.size(), pagePro.getNumber(), pagePro.getTotalElements(), pagePro.getTotalPages());
         return response;
     }
 
     @Override
     public TreeMap<String, Object> getProductsByNameContaining(String name, int page, int size, String[] sort) {
-        List<Sort.Order> orders = new ArrayList<>();
-
-        if (sort[0].contains(",")) {
-            for (String sortOrder : sort) {
-                String[] _sort = sortOrder.split(",");
-                orders.add(new Sort.Order(getSortDirection(_sort[1]), _sort[0]));
-            }
-        } else {
-            orders.add(new Sort.Order(getSortDirection(sort[1]), sort[0]));
-        }
-
-        Pageable pagingSort = PageRequest.of(page, size, Sort.by(orders));
-        Page<Product> pagePro;
-
-        pagePro = this.productRepository.findByNameContainingIgnoreCase(name, pagingSort);
+        logger.info("Fetching products by name containing '{}', with pagination. Page: {}, Size: {}, Sort: {}.", name, page, size, Arrays.toString(sort));
+        Pageable pagingSort = PageRequest.of(page, size, Sort.by(getOrder(sort)));
+        Page<Product> pagePro = this.productRepository.findByNameContainingIgnoreCase(name, pagingSort);
 
         List<GetAllProductsResponse> responses = pagePro.getContent().stream()
                 .map(product -> this.modelMapperService.forResponse()
@@ -102,23 +95,14 @@ public class ProductManager implements ProductService {
         response.put("currentPage", pagePro.getNumber());
         response.put("totalItems", pagePro.getTotalElements());
         response.put("totalPages", pagePro.getTotalPages());
+        logger.debug("Retrieved {} products for page {}. Total items: {}. Total pages: {}.", responses.size(), pagePro.getNumber(), pagePro.getTotalElements(), pagePro.getTotalPages());
         return response;
     }
 
     @Override
     public TreeMap<String, Object> getProductsByState(Boolean state, int page, int size, String[] sort) {
-        List<Sort.Order> orders = new ArrayList<>();
-
-        if (sort[0].contains(",")) {
-            for (String sortOrder : sort) {
-                String[] _sort = sortOrder.split(",");
-                orders.add(new Sort.Order(getSortDirection(_sort[1]), _sort[0]));
-            }
-        } else {
-            orders.add(new Sort.Order(getSortDirection(sort[1]), sort[0]));
-        }
-
-        Pageable pagingSort = PageRequest.of(page, size, Sort.by(orders));
+        logger.info("Fetching products by state '{}', with pagination. Page: {}, Size: {}, Sort: {}.", state, page, size, Arrays.toString(sort));
+        Pageable pagingSort = PageRequest.of(page, size, Sort.by(getOrder(sort)));
         Page<Product> pagePro = this.productRepository.findByState(state, pagingSort);
 
         List<GetAllProductsResponse> responses = pagePro.getContent().stream()
@@ -130,22 +114,13 @@ public class ProductManager implements ProductService {
         response.put("currentPage", pagePro.getNumber());
         response.put("totalItems", pagePro.getTotalElements());
         response.put("totalPages", pagePro.getTotalPages());
+        logger.debug("Retrieved {} products for page {}. Total items: {}. Total pages: {}.", responses.size(), pagePro.getNumber(), pagePro.getTotalElements(), pagePro.getTotalPages());
         return response;
     }
 
     public TreeMap<String, Object> getProductsByInitialLetter(char initialLetter, int page, int size, String[] sort) {
-        List<Sort.Order> orders = new ArrayList<>();
-
-        if (sort[0].contains(",")) {
-            for (String sortOrder : sort) {
-                String[] _sort = sortOrder.split(",");
-                orders.add(new Sort.Order(getSortDirection(_sort[1]), _sort[0]));
-            }
-        } else {
-            orders.add(new Sort.Order(getSortDirection(sort[1]), sort[0]));
-        }
-
-        Pageable pagingSort = PageRequest.of(page, size, Sort.by(orders));
+        logger.info("Fetching products by initial letter '{}', with pagination. Page: {}, Size: {}, Sort: {}.", initialLetter, page, size, Arrays.toString(sort));
+        Pageable pagingSort = PageRequest.of(page, size, Sort.by(getOrder(sort)));
         Page<Product> pagePro = this.productRepository.findByInitialLetterIgnoreCase(initialLetter, pagingSort);
 
         List<GetAllProductsResponse> responses = pagePro.getContent().stream()
@@ -157,27 +132,37 @@ public class ProductManager implements ProductService {
         response.put("currentPage", pagePro.getNumber());
         response.put("totalItems", pagePro.getTotalElements());
         response.put("totalPages", pagePro.getTotalPages());
+        logger.debug("Retrieved {} products for page {}. Total items: {}. Total pages: {}.", responses.size(), pagePro.getNumber(), pagePro.getTotalElements(), pagePro.getTotalPages());
         return response;
     }
 
     @Override
     public GetAllProductsResponse getProductByBarcodeNumber(String barcodeNumber) {
+        logger.info("Fetching product by barcode number '{}'.", barcodeNumber);
         Product product = this.productRepository.findByBarcodeNumber(barcodeNumber);
         if (product != null) {
+            logger.debug("Product found with barcode number '{}'.", barcodeNumber);
             return this.modelMapperService.forResponse().map(product, GetAllProductsResponse.class);
         } else {
+            logger.warn("No product found with barcode number '{}'.", barcodeNumber);
             throw new EntityNotFoundException("Product not found");
         }
     }
 
     @Override
     public GetAllProductsResponse getProductById(Long id) {
-        Product product = this.productRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Product not found"));
+        logger.info("Fetching product by id '{}'.", id);
+        Product product = this.productRepository.findById(id).orElseThrow(() -> {
+            logger.warn("No product found with id '{}'.", id);
+            return new EntityNotFoundException("Product not found");
+        });
+        logger.debug("Product found with id '{}'.", id);
         return this.modelMapperService.forResponse().map(product, GetAllProductsResponse.class);
     }
 
     @Override
     public GetAllProductsResponse addProduct(CreateProductRequest createProductRequest) {
+        logger.info("Adding new product: '{}'.", createProductRequest.getName());
         Product existingProduct = this.productRepository.findByNameIgnoreCase(createProductRequest.getName());
         Product product = new Product();
         if (existingProduct != null) {
@@ -187,13 +172,17 @@ public class ProductManager implements ProductService {
 
             if (Math.abs(existingUnitPrice - requestUnitPrice) < epsilon) {
                 product.setQuantity(existingProduct.getQuantity() + createProductRequest.getQuantity());
+                product.setBarcodeNumber(existingProduct.getBarcodeNumber());
                 this.productRepository.deleteById(existingProduct.getId());
+                logger.debug("Existing product found with name '{}'. Updating quantity and deleting old product.", createProductRequest.getName());
             } else {
+                logger.warn("Product with name '{}' already exists with different unit price.", createProductRequest.getName());
                 throw new EntityAlreadyExistsException("Product already exists");
             }
         } else {
             product.setBarcodeNumber(UUID.randomUUID().toString().substring(0, 8));
             product.setQuantity(createProductRequest.getQuantity());
+            logger.debug("Creating new product with name '{}'.", createProductRequest.getName());
         }
         product.setName(createProductRequest.getName());
         product.setDescription(createProductRequest.getDescription());
@@ -206,23 +195,34 @@ public class ProductManager implements ProductService {
         product.setProductCategory(productCategory);
         product.setUpdatedAt(LocalDateTime.now());
         this.productRepository.save(product);
+        logger.info("New product '{}' added successfully.", createProductRequest.getName());
         return this.modelMapperService.forResponse().map(product, GetAllProductsResponse.class);
     }
 
     @Override
     public GetAllProductsResponse updateProduct(UpdateProductRequest updateProductRequest) {
-        Product existingProduct = this.productRepository.findById(updateProductRequest.getId()).orElseThrow(() -> new EntityNotFoundException("Product not found"));
+        logger.info("Updating product with id '{}'.", updateProductRequest.getId());
+        Product existingProduct = this.productRepository.findById(updateProductRequest.getId()).orElseThrow(() -> {
+            logger.warn("No product found with id '{}'.", updateProductRequest.getId());
+            return new EntityNotFoundException("Product not found");
+        });
         Product product = this.modelMapperService.forRequest().map(updateProductRequest, Product.class);
         this.productBusinessRules.checkUpdate(product, existingProduct);
         product.setUpdatedAt(LocalDateTime.now());
         this.productRepository.save(product);
+        logger.debug("Product with id '{}' updated successfully.", updateProductRequest.getId());
         return this.modelMapperService.forResponse().map(product, GetAllProductsResponse.class);
     }
 
     @Override
     public GetAllProductsResponse deleteProduct(Long id) {
-        Product product = this.productRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Product not found"));
+        logger.info("Deleting product with id '{}'.", id);
+        Product product = this.productRepository.findById(id).orElseThrow(() -> {
+            logger.warn("No product found with id '{}'.", id);
+            return new EntityNotFoundException("Product not found");
+        });
         this.productRepository.deleteById(id);
+        logger.debug("Product with id '{}' deleted successfully.", id);
         return this.modelMapperService.forResponse().map(product, GetAllProductsResponse.class);
     }
 }

@@ -1,12 +1,10 @@
 package com.toyota.productservice.service.concretes;
 
-
 import com.toyota.productservice.dao.ProductCategoryRepository;
 import com.toyota.productservice.domain.ProductCategory;
 import com.toyota.productservice.dto.requests.CreateProductCategoryRequest;
 import com.toyota.productservice.dto.requests.UpdateProductCategoryRequest;
 import com.toyota.productservice.dto.responses.GetAllProductCategoriesResponse;
-import com.toyota.productservice.dto.responses.GetAllProductsResponse;
 import com.toyota.productservice.service.abstracts.ProductCategoryService;
 import com.toyota.productservice.service.rules.ProductCategoryBusinessRules;
 import com.toyota.productservice.utilities.exceptions.EntityNotFoundException;
@@ -53,8 +51,7 @@ public class ProductCategoryManager implements ProductCategoryService {
         if (!productCategories.isEmpty()) {
             logger.debug("Retrieved {} product categories by name containing '{}'.", productCategories.size(), name);
             List<GetAllProductCategoriesResponse> responses = productCategories.stream()
-                    .map(productCategory -> modelMapperService.forResponse().map(productCategory, GetAllProductCategoriesResponse.class))
-                    .toList();
+                    .map(productCategory -> modelMapperService.forResponse().map(productCategory, GetAllProductCategoriesResponse.class)).toList();
             logger.info("Retrieved and converted {} product categories to GetAllProductCategoriesResponse.", responses.size());
             return responses;
         } else {
@@ -69,10 +66,7 @@ public class ProductCategoryManager implements ProductCategoryService {
         ProductCategory productCategory = this.productCategoryRepository.findByCategoryNumber(categoryNumber);
         if (productCategory != null) {
             logger.debug("Retrieved product category with category number '{}'.", categoryNumber);
-            GetAllProductCategoriesResponse response =  this.modelMapperService.forResponse()
-                    .map(productCategory, GetAllProductCategoriesResponse.class);
-            logger.info("Converted product category to GetAllProductCategoriesResponse.");
-            return response;
+            return this.modelMapperService.forResponse().map(productCategory, GetAllProductCategoriesResponse.class);
         } else {
             logger.warn("No product category found with category number '{}'.", categoryNumber);
             throw new EntityNotFoundException("Product category not found");
@@ -82,50 +76,50 @@ public class ProductCategoryManager implements ProductCategoryService {
     @Override
     public GetAllProductCategoriesResponse getCategoryById(Long id) {
         logger.info("Fetching product category by id '{}'.", id);
-        ProductCategory productCategory = this.productCategoryRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Product category not found"));
+        ProductCategory productCategory = this.productCategoryRepository.findById(id).orElseThrow(() -> {
+            logger.warn("No product category found with id '{}'.", id);
+            return new EntityNotFoundException("Product category not found");
+        });
         logger.debug("Retrieved product category with id '{}'.", id);
-        GetAllProductCategoriesResponse response = this.modelMapperService.forResponse()
-                .map(productCategory, GetAllProductCategoriesResponse.class);
-        logger.info("Converted product category to GetAllProductCategoriesResponse.");
-        return response;
+        return this.modelMapperService.forResponse().map(productCategory, GetAllProductCategoriesResponse.class);
     }
 
     @Override
     public GetAllProductCategoriesResponse addCategory(CreateProductCategoryRequest createProductCategoryRequest) {
-        logger.info("Added new product category: '{}'.", createProductCategoryRequest.getName());
+        logger.info("Adding new product category: '{}'.", createProductCategoryRequest.getName());
         this.productCategoryBusinessRules.checkIfProductCategoryNameExists(createProductCategoryRequest.getName());
         ProductCategory productCategory = this.modelMapperService.forRequest().map(createProductCategoryRequest, ProductCategory.class);
         productCategory.setCategoryNumber(UUID.randomUUID().toString().substring(0, 8));
         productCategory.setUpdatedAt(LocalDateTime.now());
         this.productCategoryRepository.save(productCategory);
         logger.debug("New product category added: '{}'.", createProductCategoryRequest.getName());
-        GetAllProductCategoriesResponse response = this.modelMapperService.forResponse().map(productCategory, GetAllProductCategoriesResponse.class);
-        logger.info("Converted product category to GetAllProductCategoriesResponse.");
-        return response;
+        return this.modelMapperService.forResponse().map(productCategory, GetAllProductCategoriesResponse.class);
     }
 
     @Override
     public GetAllProductCategoriesResponse updateCategory(UpdateProductCategoryRequest updateProductCategoryRequest) {
         logger.info("Updating product category with id '{}'.", updateProductCategoryRequest.getId());
-        ProductCategory existingProductCategory = this.productCategoryRepository.findById(updateProductCategoryRequest.getId()).orElseThrow(() -> new EntityNotFoundException("Product category not found"));
+        ProductCategory existingProductCategory = this.productCategoryRepository.findById(updateProductCategoryRequest.getId()).orElseThrow(() -> {
+            logger.warn("No product category found with id '{}'.", updateProductCategoryRequest.getId());
+            return new EntityNotFoundException("Product category not found");
+        });
         ProductCategory productCategory = this.modelMapperService.forRequest().map(updateProductCategoryRequest, ProductCategory.class);
         this.productCategoryBusinessRules.checkUpdate(productCategory, existingProductCategory);
         productCategory.setUpdatedAt(LocalDateTime.now());
         this.productCategoryRepository.save(productCategory);
         logger.debug("Product category updated with id '{}'.", updateProductCategoryRequest.getId());
-        GetAllProductCategoriesResponse response = this.modelMapperService.forResponse().map(productCategory, GetAllProductCategoriesResponse.class);
-        logger.info("Converted product category to GetAllProductCategoriesResponse.");
-        return response;
+        return this.modelMapperService.forResponse().map(productCategory, GetAllProductCategoriesResponse.class);
     }
 
     @Override
     public GetAllProductCategoriesResponse deleteCategory(Long id) {
         logger.info("Deleting product category with id '{}'.", id);
-        ProductCategory productCategory = this.productCategoryRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Product Category not found"));
+        ProductCategory productCategory = this.productCategoryRepository.findById(id).orElseThrow(() -> {
+            logger.warn("No product category found with id '{}'.", id);
+            return new EntityNotFoundException("Product Category not found");
+        });
         this.productCategoryRepository.deleteById(id);
         logger.debug("Product category deleted with id '{}'.", id);
-        GetAllProductCategoriesResponse response = this.modelMapperService.forResponse().map(productCategory, GetAllProductCategoriesResponse.class);
-        logger.info("Converted product category to GetAllProductCategoriesResponse.");
-        return response;
+        return this.modelMapperService.forResponse().map(productCategory, GetAllProductCategoriesResponse.class);
     }
 }

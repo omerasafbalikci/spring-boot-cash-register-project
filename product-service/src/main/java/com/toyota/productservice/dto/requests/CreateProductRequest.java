@@ -1,5 +1,6 @@
 package com.toyota.productservice.dto.requests;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -17,8 +18,10 @@ public class CreateProductRequest {
     private String name;
     private String description;
     @NotNull(message = "Quantity must not be null")
+    @Min(value = 1, message = "Quantity must be greater than or equal to 1")
     private Integer quantity;
     @NotNull(message = "Unit price must not be null")
+    @Min(value = 0, message = "Unit price must be greater than or equal to 0")
     private Double unitPrice;
     @NotNull(message = "State must not be null")
     private Boolean state;
