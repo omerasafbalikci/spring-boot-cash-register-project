@@ -27,7 +27,7 @@
     </Appenders>
     <Loggers>
         <Logger name="com.toyota.productservice" level="debug" additivity="false">
-            <AppenderRef ref="rollingFile"/>
+            <AppenderRef ref="RollingFile"/>
             <AppenderRef ref="LogToConsole"/>
         </Logger>
         <Root level="info">

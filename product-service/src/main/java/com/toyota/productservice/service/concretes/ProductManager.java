@@ -118,7 +118,7 @@ public class ProductManager implements ProductService {
         return response;
     }
 
-    public TreeMap<String, Object> getProductsByInitialLetter(char initialLetter, int page, int size, String[] sort) {
+    public TreeMap<String, Object> getProductsByInitialLetter(String initialLetter, int page, int size, String[] sort) {
         logger.info("Fetching products by initial letter '{}', with pagination. Page: {}, Size: {}, Sort: {}.", initialLetter, page, size, Arrays.toString(sort));
         Pageable pagingSort = PageRequest.of(page, size, Sort.by(getOrder(sort)));
         Page<Product> pagePro = this.productRepository.findByInitialLetterIgnoreCase(initialLetter, pagingSort);
@@ -172,7 +172,6 @@ public class ProductManager implements ProductService {
 
             if (Math.abs(existingUnitPrice - requestUnitPrice) < epsilon) {
                 product.setQuantity(existingProduct.getQuantity() + createProductRequest.getQuantity());
-                product.setBarcodeNumber(existingProduct.getBarcodeNumber());
                 this.productRepository.deleteById(existingProduct.getId());
                 logger.debug("Existing product found with name '{}'. Updating quantity and deleting old product.", createProductRequest.getName());
             } else {
@@ -180,10 +179,10 @@ public class ProductManager implements ProductService {
                 throw new EntityAlreadyExistsException("Product already exists");
             }
         } else {
-            product.setBarcodeNumber(UUID.randomUUID().toString().substring(0, 8));
             product.setQuantity(createProductRequest.getQuantity());
             logger.debug("Creating new product with name '{}'.", createProductRequest.getName());
         }
+        product.setBarcodeNumber(UUID.randomUUID().toString().substring(0, 8));
         product.setName(createProductRequest.getName());
         product.setDescription(createProductRequest.getDescription());
         product.setUnitPrice(createProductRequest.getUnitPrice());
@@ -208,6 +207,7 @@ public class ProductManager implements ProductService {
         });
         Product product = this.modelMapperService.forRequest().map(updateProductRequest, Product.class);
         this.productBusinessRules.checkUpdate(product, existingProduct);
+        product.setBarcodeNumber(existingProduct.getBarcodeNumber());
         product.setUpdatedAt(LocalDateTime.now());
         this.productRepository.save(product);
         logger.debug("Product with id '{}' updated successfully.", updateProductRequest.getId());

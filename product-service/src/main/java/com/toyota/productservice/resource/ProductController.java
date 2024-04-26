@@ -52,7 +52,7 @@ public class ProductController {
 
     @GetMapping("/letter")
     public ResponseEntity<TreeMap<String, Object>> getProductsByInitialLetter(
-            @RequestParam() char initialLetter,
+            @RequestParam() String initialLetter,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "3") int size,
             @RequestParam(defaultValue = "id,asc") String[] sort) {
