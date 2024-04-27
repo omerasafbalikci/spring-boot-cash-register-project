@@ -105,6 +105,7 @@ public class ProductCategoryManager implements ProductCategoryService {
         });
         ProductCategory productCategory = this.modelMapperService.forRequest().map(updateProductCategoryRequest, ProductCategory.class);
         this.productCategoryBusinessRules.checkUpdate(productCategory, existingProductCategory);
+        productCategory.setCategoryNumber(existingProductCategory.getCategoryNumber());
         productCategory.setUpdatedAt(LocalDateTime.now());
         this.productCategoryRepository.save(productCategory);
         logger.debug("Product category updated with id '{}'.", updateProductCategoryRequest.getId());

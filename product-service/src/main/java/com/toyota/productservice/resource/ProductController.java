@@ -6,7 +6,6 @@ import com.toyota.productservice.dto.responses.GetAllProductsResponse;
 import com.toyota.productservice.service.abstracts.ProductService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -61,39 +60,32 @@ public class ProductController {
     }
 
     @GetMapping("/barcodenumber")
-    public GetAllProductsResponse getProductByBarcodeNumber(@RequestParam() String barcodeNumber) {
-        return productService.getProductByBarcodeNumber(barcodeNumber);
+    public ResponseEntity<GetAllProductsResponse> getProductByBarcodeNumber(@RequestParam() String barcodeNumber) {
+        GetAllProductsResponse response = productService.getProductByBarcodeNumber(barcodeNumber);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/id")
-    public GetAllProductsResponse getProductById(@RequestParam() Long id) {
-        return productService.getProductById(id);
+    public ResponseEntity<GetAllProductsResponse> getProductById(@RequestParam() Long id) {
+        GetAllProductsResponse response = productService.getProductById(id);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/add")
     public ResponseEntity<GetAllProductsResponse> addProduct(@RequestBody @Valid CreateProductRequest createProductRequest) {
         GetAllProductsResponse response = this.productService.addProduct(createProductRequest);
-        if (response == null) {
-            return ResponseEntity.badRequest().build();
-        }
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/update")
     public ResponseEntity<GetAllProductsResponse> updateProduct(@RequestBody() @Valid UpdateProductRequest updateProductRequest) {
         GetAllProductsResponse response = this.productService.updateProduct(updateProductRequest);
-        if (response == null) {
-            return ResponseEntity.badRequest().build();
-        }
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/delete")
     public ResponseEntity<GetAllProductsResponse> deleteProduct(@RequestParam() Long id) {
         GetAllProductsResponse response = this.productService.deleteProduct(id);
-        if (response == null) {
-            return ResponseEntity.badRequest().build();
-        }
         return ResponseEntity.ok(response);
     }
 
