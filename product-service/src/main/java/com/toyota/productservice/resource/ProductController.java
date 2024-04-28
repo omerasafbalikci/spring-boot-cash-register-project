@@ -25,7 +25,7 @@ public class ProductController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "3") int size,
             @RequestParam(defaultValue = "id,asc") String[] sort) {
-        TreeMap<String, Object> response = productService.getAllProductsPage(page, size, sort);
+        TreeMap<String, Object> response = this.productService.getAllProductsPage(page, size, sort);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -35,7 +35,7 @@ public class ProductController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "3") int size,
             @RequestParam(defaultValue = "id,asc") String[] sort) {
-        TreeMap<String, Object> response = productService.getProductsByNameContaining(name, page, size, sort);
+        TreeMap<String, Object> response = this.productService.getProductsByNameContaining(name, page, size, sort);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -45,7 +45,7 @@ public class ProductController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "3") int size,
             @RequestParam(defaultValue = "id,asc") String[] sort) {
-        TreeMap<String, Object> response = productService.getProductsByState(state, page, size, sort);
+        TreeMap<String, Object> response = this.productService.getProductsByState(state, page, size, sort);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -55,19 +55,19 @@ public class ProductController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "3") int size,
             @RequestParam(defaultValue = "id,asc") String[] sort) {
-        TreeMap<String, Object> response = productService.getProductsByInitialLetter(initialLetter, page, size, sort);
+        TreeMap<String, Object> response = this.productService.getProductsByInitialLetter(initialLetter, page, size, sort);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/barcodenumber")
     public ResponseEntity<GetAllProductsResponse> getProductByBarcodeNumber(@RequestParam() String barcodeNumber) {
-        GetAllProductsResponse response = productService.getProductByBarcodeNumber(barcodeNumber);
+        GetAllProductsResponse response = this.productService.getProductByBarcodeNumber(barcodeNumber);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/id")
     public ResponseEntity<GetAllProductsResponse> getProductById(@RequestParam() Long id) {
-        GetAllProductsResponse response = productService.getProductById(id);
+        GetAllProductsResponse response = this.productService.getProductById(id);
         return ResponseEntity.ok(response);
     }
 

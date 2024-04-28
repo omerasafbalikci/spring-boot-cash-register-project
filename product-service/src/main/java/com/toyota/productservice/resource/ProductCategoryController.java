@@ -22,25 +22,25 @@ public class ProductCategoryController {
 
     @GetMapping()
     public ResponseEntity<List<GetAllProductCategoriesResponse>> getAllCategories() {
-        List<GetAllProductCategoriesResponse> responses = productCategoryService.getAllCategories();
+        List<GetAllProductCategoriesResponse> responses = this.productCategoryService.getAllCategories();
         return new ResponseEntity<>(responses, HttpStatus.OK);
     }
 
     @GetMapping("/search")
     public ResponseEntity<List<GetAllProductCategoriesResponse>> getCategoriesByNameContaining(@RequestParam() String name) {
-        List<GetAllProductCategoriesResponse> responses = productCategoryService.getCategoriesByNameContaining(name);
+        List<GetAllProductCategoriesResponse> responses = this.productCategoryService.getCategoriesByNameContaining(name);
         return new ResponseEntity<>(responses, HttpStatus.OK);
     }
 
     @GetMapping("/categorynumber")
     public ResponseEntity<GetAllProductCategoriesResponse> getCategoryByCategoryNumber(@RequestParam() String categoryNumber) {
-        GetAllProductCategoriesResponse response = productCategoryService.getCategoryByCategoryNumber(categoryNumber);
+        GetAllProductCategoriesResponse response = this.productCategoryService.getCategoryByCategoryNumber(categoryNumber);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/id")
     public ResponseEntity<GetAllProductCategoriesResponse> getCategoryById(@RequestParam() Long id) {
-        GetAllProductCategoriesResponse response = productCategoryService.getCategoryById(id);
+        GetAllProductCategoriesResponse response = this.productCategoryService.getCategoryById(id);
         return ResponseEntity.ok(response);
     }
 

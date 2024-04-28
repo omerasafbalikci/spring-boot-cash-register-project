@@ -36,7 +36,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(@NonNull MethodArgumentNotValidException exception,
+    public ResponseEntity<Object> handleMethodArgumentNotValid(@NonNull MethodArgumentNotValidException exception,
                                                                   @NonNull HttpHeaders headers,
                                                                   @NonNull HttpStatusCode status,
                                                                   @NonNull WebRequest request) {
@@ -48,4 +48,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    @Override
+    public ResponseEntity<Object> handleHttpMessageNotReadable(@NonNull HttpMessageNotReadableException exception,
+                                                               @NonNull HttpHeaders headers,
+                                                               @NonNull HttpStatusCode statusCode,
+                                                               @NonNull WebRequest request) {
+        ServletWebRequest servletWebRequest = (ServletWebRequest) request;
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, "Malformed Json Request", exception);
+        errorResponse.setPath(servletWebRequest.getRequest().getRequestURI());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
 }

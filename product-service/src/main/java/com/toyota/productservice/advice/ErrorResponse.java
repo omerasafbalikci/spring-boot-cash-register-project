@@ -20,6 +20,7 @@ public class ErrorResponse {
     private int status;
     private String error;
     private String message;
+    private String debugMessage;
     private String path;
     private List<ValidationError> subErrors;
 
@@ -32,6 +33,14 @@ public class ErrorResponse {
         this.status = status.value();
         this.error = status.getReasonPhrase();
         this.message = message;
+    }
+
+    public ErrorResponse(HttpStatus status, String message, Exception exception) {
+        this();
+        this.status = status.value();
+        this.error = status.getReasonPhrase();
+        this.message = message;
+        this.debugMessage = exception.getLocalizedMessage();
     }
 
     public void addValidationError(List<FieldError> errors) {
