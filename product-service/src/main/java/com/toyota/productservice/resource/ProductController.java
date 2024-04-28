@@ -3,6 +3,7 @@ package com.toyota.productservice.resource;
 import com.toyota.productservice.dto.requests.CreateProductRequest;
 import com.toyota.productservice.dto.requests.UpdateProductRequest;
 import com.toyota.productservice.dto.responses.GetAllProductsResponse;
+import com.toyota.productservice.dto.responses.InventoryResponse;
 import com.toyota.productservice.service.abstracts.ProductService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.TreeMap;
 
 @RestController
@@ -69,6 +71,11 @@ public class ProductController {
     public ResponseEntity<GetAllProductsResponse> getProductById(@RequestParam() Long id) {
         GetAllProductsResponse response = this.productService.getProductById(id);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/skucode")
+    public List<InventoryResponse> isInStock(@RequestParam() List<String> skuCode) {
+        return this.productService.isInStock(skuCode);
     }
 
     @PostMapping("/add")

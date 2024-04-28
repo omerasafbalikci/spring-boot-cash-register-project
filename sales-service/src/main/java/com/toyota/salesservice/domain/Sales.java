@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.util.List;
 
 @Entity
 @Table(name = "sales")
@@ -21,23 +21,12 @@ public class Sales {
     private Long id;
 
     @Column(name = "sales_number", unique = true, nullable = false)
-    private String salesNumber = UUID.randomUUID().toString().substring(0, 8);
-
-    @Column(name = "description", columnDefinition = "TEXT")
-    private String description;
-
-    @Column(name = "price", columnDefinition = "numeric")
-    private Double price;
+    private String salesNumber;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     @Column(name = "sales_date")
     private LocalDateTime salesDate;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "campaign_id")
-    private Campaign campaign;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "cart_id", nullable = false)
-    private Cart cart;
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<SalesItems> salesItemsList;
 }

@@ -17,8 +17,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class ProductBusinessRules {
+    @Autowired
+    private final ProductRepository productRepository;
+
+    public void checkIfSkuCodeExists(String skuCode) {
+        if (this.productRepository.existsBySkuCodeIgnoreCase(skuCode)) {
+            throw new EntityAlreadyExistsException("Product skuCode already exists");
+        }
+    }
+
     public void checkUpdate(Product product, Product existingProduct) {
+        if (product.getSkuCode() == null) {
+            product.setSkuCode(existingProduct.getSkuCode());
+        }
         if (product.getName() == null) {
             product.setName(existingProduct.getName());
         }

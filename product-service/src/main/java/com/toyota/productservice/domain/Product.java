@@ -26,6 +26,9 @@ public class Product {
     @Column(name = "barcode_number", unique = true, nullable = false)
     private String barcodeNumber;
 
+    @Column(name = "sku_code", nullable = false)
+    private String skuCode;
+
     @Column(name = "name")
     private String name;
 

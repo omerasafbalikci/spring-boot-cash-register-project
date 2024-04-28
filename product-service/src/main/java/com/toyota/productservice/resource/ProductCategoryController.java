@@ -45,7 +45,6 @@ public class ProductCategoryController {
     }
 
     @PostMapping("/add")
-    @ResponseStatus(code = HttpStatus.CREATED)
     public ResponseEntity<GetAllProductCategoriesResponse> addCategory(@RequestBody() @Valid CreateProductCategoryRequest createProductCategoryRequest) {
         GetAllProductCategoriesResponse response = this.productCategoryService.addCategory(createProductCategoryRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);

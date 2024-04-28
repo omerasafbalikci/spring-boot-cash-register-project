@@ -6,6 +6,7 @@ import com.toyota.productservice.domain.ProductCategory;
 import com.toyota.productservice.dto.requests.CreateProductRequest;
 import com.toyota.productservice.dto.requests.UpdateProductRequest;
 import com.toyota.productservice.dto.responses.GetAllProductsResponse;
+import com.toyota.productservice.dto.responses.InventoryResponse;
 import com.toyota.productservice.service.abstracts.ProductService;
 import com.toyota.productservice.service.rules.ProductBusinessRules;
 import com.toyota.productservice.utilities.exceptions.EntityAlreadyExistsException;
@@ -118,6 +119,7 @@ public class ProductManager implements ProductService {
         return response;
     }
 
+    @Override
     public TreeMap<String, Object> getProductsByInitialLetter(String initialLetter, int page, int size, String[] sort) {
         logger.info("Fetching products by initial letter '{}', with pagination. Page: {}, Size: {}, Sort: {}.", initialLetter, page, size, Arrays.toString(sort));
         Pageable pagingSort = PageRequest.of(page, size, Sort.by(getOrder(sort)));
@@ -161,6 +163,16 @@ public class ProductManager implements ProductService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<InventoryResponse> isInStock(List<String> skuCode) {
+        return this.productRepository.findBySkuCodeIn(skuCode).stream()
+                .map(product -> InventoryResponse.builder().skuCode(product.getSkuCode())
+                        .isInStock(product.getQuantity() > 0)
+                        .build()
+                ).toList();
+    }
+
+    @Override
     public GetAllProductsResponse addProduct(CreateProductRequest createProductRequest) {
         logger.info("Adding new product: '{}'.", createProductRequest.getName());
         Product existingProduct = this.productRepository.findByNameIgnoreCase(createProductRequest.getName());
@@ -179,10 +191,12 @@ public class ProductManager implements ProductService {
                 throw new EntityAlreadyExistsException("Product already exists");
             }
         } else {
+            this.productBusinessRules.checkIfSkuCodeExists(createProductRequest.getSkuCode());
             product.setQuantity(createProductRequest.getQuantity());
             logger.debug("Creating new product with name '{}'.", createProductRequest.getName());
         }
         product.setBarcodeNumber(UUID.randomUUID().toString().substring(0, 8));
+        product.setSkuCode(createProductRequest.getSkuCode());
         product.setName(createProductRequest.getName());
         product.setDescription(createProductRequest.getDescription());
         product.setUnitPrice(createProductRequest.getUnitPrice());
@@ -207,6 +221,9 @@ public class ProductManager implements ProductService {
         });
         Product product = this.modelMapperService.forRequest().map(updateProductRequest, Product.class);
         this.productBusinessRules.checkUpdate(product, existingProduct);
+        if (this.productRepository.existsBySkuCodeIgnoreCase(product.getSkuCode()) && !existingProduct.getSkuCode().equals(product.getSkuCode())) {
+            throw new EntityAlreadyExistsException("Product skuCode already exists");
+        }
         product.setBarcodeNumber(existingProduct.getBarcodeNumber());
         product.setUpdatedAt(LocalDateTime.now());
         this.productRepository.save(product);

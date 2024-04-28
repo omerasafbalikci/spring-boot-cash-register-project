@@ -41,9 +41,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                                                   @NonNull HttpStatusCode status,
                                                                   @NonNull WebRequest request) {
         ServletWebRequest servletWebRequest = (ServletWebRequest) request;
-        List<FieldError> fieldErrorList = exception.getBindingResult().getFieldErrors();
+        List<FieldError> fieldErrors = exception.getBindingResult().getFieldErrors();
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
-        errorResponse.addValidationError(fieldErrorList);
+        errorResponse.addValidationError(fieldErrors);
         errorResponse.setPath(servletWebRequest.getRequest().getRequestURI());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }

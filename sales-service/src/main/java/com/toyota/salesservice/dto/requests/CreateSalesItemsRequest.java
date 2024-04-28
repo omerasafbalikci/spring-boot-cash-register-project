@@ -7,5 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateCartRequest {
+public class CreateSalesItemsRequest {
+    private String skuCode;
+    private Double price;
+    private Integer quantity;
 }

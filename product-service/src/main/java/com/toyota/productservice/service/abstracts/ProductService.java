@@ -1,15 +1,11 @@
 package com.toyota.productservice.service.abstracts;
 
-import com.toyota.productservice.domain.Product;
 import com.toyota.productservice.dto.requests.CreateProductRequest;
 import com.toyota.productservice.dto.requests.UpdateProductRequest;
 import com.toyota.productservice.dto.responses.GetAllProductsResponse;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.toyota.productservice.dto.responses.InventoryResponse;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.TreeMap;
 
 public interface ProductService {
@@ -19,6 +15,7 @@ public interface ProductService {
     TreeMap<String, Object> getProductsByInitialLetter(String initialLetter, int page, int size, String[] sort);
     GetAllProductsResponse getProductByBarcodeNumber(String barcodeNumber);
     GetAllProductsResponse getProductById(Long id);
+    List<InventoryResponse> isInStock(List<String> skuCode);
     GetAllProductsResponse addProduct(CreateProductRequest createProductRequest);
     GetAllProductsResponse updateProduct(UpdateProductRequest updateProductRequest);
     GetAllProductsResponse deleteProduct(Long id);

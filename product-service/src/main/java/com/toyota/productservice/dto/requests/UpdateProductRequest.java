@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 public class UpdateProductRequest {
     @NotNull(message = "Id must not be null")
     private Long id;
+    private String skuCode;
     private String name;
     private String description;
     @Min(value = 1, message = "Quantity must be greater than or equal to 1")

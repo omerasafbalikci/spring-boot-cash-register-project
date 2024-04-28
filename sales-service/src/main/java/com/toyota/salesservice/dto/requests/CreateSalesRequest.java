@@ -1,18 +1,14 @@
 package com.toyota.salesservice.dto.requests;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateSalesRequest {
-    private String description;
-    @NotNull
-    private Double price;
-    private Long campaignId;
-    @NotNull
-    private Long cartId;
+    private List<CreateSalesItemsRequest> createSalesItemsRequests;
 }
