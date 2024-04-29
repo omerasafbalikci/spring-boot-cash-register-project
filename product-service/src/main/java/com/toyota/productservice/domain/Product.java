@@ -2,6 +2,7 @@ package com.toyota.productservice.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.*;
 
 import java.time.LocalDateTime;

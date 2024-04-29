@@ -4,6 +4,7 @@ import com.toyota.productservice.dao.ProductRepository;
 import com.toyota.productservice.domain.Product;
 import com.toyota.productservice.domain.ProductCategory;
 import com.toyota.productservice.dto.requests.CreateProductRequest;
+import com.toyota.productservice.dto.requests.InventoryRequest;
 import com.toyota.productservice.dto.requests.UpdateProductRequest;
 import com.toyota.productservice.dto.responses.GetAllProductsResponse;
 import com.toyota.productservice.dto.responses.InventoryResponse;
@@ -164,12 +165,21 @@ public class ProductManager implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<InventoryResponse> isInStock(List<String> skuCode) {
-        return this.productRepository.findBySkuCodeIn(skuCode).stream()
-                .map(product -> InventoryResponse.builder().skuCode(product.getSkuCode())
-                        .isInStock(product.getQuantity() > 0)
-                        .build()
-                ).toList();
+    public List<InventoryResponse> checkProduct(List<InventoryRequest> inventoryRequests) {
+        List<InventoryResponse> inventoryResponses = new ArrayList<>();
+        for (InventoryRequest request : inventoryRequests) {
+            String skuCode = request.getSkuCode();
+            Double unitPrice = request.getUnitPrice();
+            Integer quantity = request.getQuantity();
+
+            Product product = this.productRepository.findBySkuCodeIgnoreCase(skuCode);
+            Double availableUnitPrice = product.getUnitPrice();
+            Integer availableQuantity = product.getQuantity();
+
+            boolean result;
+            if (uni)
+
+        }
     }
 
     @Override

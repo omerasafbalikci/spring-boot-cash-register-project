@@ -4,20 +4,22 @@ import com.toyota.salesservice.dao.SalesRepository;
 import com.toyota.salesservice.domain.Sales;
 import com.toyota.salesservice.domain.SalesItems;
 import com.toyota.salesservice.dto.requests.CreateSalesRequest;
+import com.toyota.salesservice.dto.requests.InventoryRequest;
 import com.toyota.salesservice.dto.responses.InventoryResponse;
 import com.toyota.salesservice.service.abstracts.SalesService;
+import com.toyota.salesservice.utilities.exceptions.ProductIsNotInStock;
 import com.toyota.salesservice.utilities.mappers.ModelMapperService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -37,27 +39,27 @@ public class SalesManager implements SalesService {
 
         List<SalesItems> salesItems = createSalesRequest.getCreateSalesItemsRequests().stream()
                 .map(sale -> this.modelMapperService.forRequest()
-                        .map(sale, SalesItems.class)).collect(Collectors.toList());
+                        .map(sale, SalesItems.class)).toList();
         sales.setSalesItemsList(salesItems);
 
-        List<String> skuCodes = sales.getSalesItemsList().stream()
-                .map(SalesItems::getSkuCode)
-                .toList();
+        List<InventoryRequest> inventoryRequests = salesItems.stream()
+                .map(salesItem -> this.modelMapperService.forRequest()
+                        .map(salesItem, InventoryRequest.class)).toList();
 
-        InventoryResponse[] inventoryResponses = webClientBuilder.build().get()
-                .uri("http://product-service/api/products/skucode",
-                        uriBuilder -> uriBuilder.queryParam("skuCode", skuCodes).build())
+        List<InventoryResponse> inventoryResponses = webClientBuilder.build().post()
+                .uri("http://product-service/api/products/checkproduct")
+                .body(BodyInserters.fromValue(inventoryRequests))
                 .retrieve()
-                .bodyToMono(InventoryResponse[].class)
+                .bodyToMono(new ParameterizedTypeReference<List<InventoryResponse>>() {})
                 .block();
 
-        boolean allProductsInStock = Arrays.stream(inventoryResponses)
-                .allMatch(InventoryResponse::getIsInStock);
+        boolean allProductsInStock = inventoryResponses.stream()
+                .allMatch(InventoryResponse::isInStock);
 
         if (allProductsInStock) {
             this.salesRepository.save(sales);
         } else {
-            throw new IllegalArgumentException("Product is not in stock, please try again later");
+            throw new ProductIsNotInStock("Product is not in stock");
         }
     }
 }

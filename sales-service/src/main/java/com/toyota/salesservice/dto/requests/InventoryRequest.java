@@ -1,4 +1,4 @@
-package com.toyota.salesservice.dto.responses;
+package com.toyota.salesservice.dto.requests;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class InventoryResponse {
+public class InventoryRequest {
     private String skuCode;
-    private boolean isInStock;
+    private Double unitPrice;
+    private Integer quantity;
 }

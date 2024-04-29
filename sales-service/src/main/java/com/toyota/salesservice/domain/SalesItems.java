@@ -15,10 +15,17 @@ public class SalesItems {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", unique = true, nullable = false, updatable = false)
     private Long id;
+
+    @Column(name = "barcode_number", unique = true, nullable = false)
+    private String barcodeNumber;
+
     @Column(name = "sku_code")
     private String skuCode;
-    @Column(name = "price", columnDefinition = "numeric")
-    private Double price;
+
     @Column(name = "quantity")
     private Integer quantity;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "sales_id", nullable = false)
+    private Sales sales;
 }

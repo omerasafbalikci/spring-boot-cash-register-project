@@ -1,6 +1,7 @@
 package com.toyota.salesservice.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,6 +28,13 @@ public class Sales {
     @Column(name = "sales_date")
     private LocalDateTime salesDate;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @Column(name = "money", columnDefinition = "numeric")
+    private Double money;
+
+    @Column(name = "change", columnDefinition = "numeric")
+    private Double change;
+
+    @OneToMany(mappedBy = "sales", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<SalesItems> salesItemsList;
 }

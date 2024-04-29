@@ -73,8 +73,9 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/skucode")
-    public List<InventoryResponse> isInStock(@RequestParam() List<String> skuCode) {
+    @GetMapping("/checkproduct")
+    @ResponseStatus(HttpStatus.OK)
+    public List<InventoryResponse> checkProduct(@RequestParam() List<String> skuCode) {
         return this.productService.isInStock(skuCode);
     }
 

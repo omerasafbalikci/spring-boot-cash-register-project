@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.concurrent.CompletableFuture;
+
 @RestController
 @RequestMapping("/api/sales")
 @AllArgsConstructor
@@ -16,8 +18,7 @@ public class SalesController {
 
     @PostMapping()
     @ResponseStatus(code = HttpStatus.CREATED)
-    public String makeSales(@RequestBody CreateSalesRequest createSalesRequest) {
-        this.salesService.makeSales(createSalesRequest);
-        return "Make sale";
+    public CompletableFuture placeOrder(@RequestBody CreateSalesRequest createSalesRequest) {
+        return CompletableFuture.supplyAsync(() -> this.salesService.makeSales(createSalesRequest));
     }
 }
