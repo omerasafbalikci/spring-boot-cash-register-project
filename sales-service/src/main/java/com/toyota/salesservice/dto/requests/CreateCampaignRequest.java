@@ -7,8 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateSalesItemsRequest {
-    private String skuCode;
-    private Integer quantity;
-    private Long campaignId;
+public class CreateCampaignRequest {
+    private String name;
+    private Boolean state;
 }

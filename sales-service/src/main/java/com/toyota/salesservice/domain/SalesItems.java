@@ -22,8 +22,21 @@ public class SalesItems {
     @Column(name = "sku_code")
     private String skuCode;
 
+    @Column(name = "name")
+    private String name;
+
     @Column(name = "quantity")
     private Integer quantity;
+
+    @Column(name = "unit_price", columnDefinition = "numeric")
+    private Double unitPrice;
+
+    @Column(name = "state", nullable = false)
+    private Boolean state;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "campaign_id")
+    private Campaign campaign;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "sales_id", nullable = false)

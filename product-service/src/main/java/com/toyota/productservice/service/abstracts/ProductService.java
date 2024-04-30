@@ -16,7 +16,8 @@ public interface ProductService {
     TreeMap<String, Object> getProductsByInitialLetter(String initialLetter, int page, int size, String[] sort);
     GetAllProductsResponse getProductByBarcodeNumber(String barcodeNumber);
     GetAllProductsResponse getProductById(Long id);
-    List<InventoryResponse> checkProduct(List<InventoryRequest> inventoryRequests);
+    List<InventoryResponse> checkProductInInventory(List<InventoryRequest> inventoryRequests);
+    void updateProductInInventory(List<InventoryRequest> inventoryRequests);
     GetAllProductsResponse addProduct(CreateProductRequest createProductRequest);
     GetAllProductsResponse updateProduct(UpdateProductRequest updateProductRequest);
     GetAllProductsResponse deleteProduct(Long id);

@@ -11,6 +11,5 @@ import java.util.List;
 @NoArgsConstructor
 public class CreateSalesRequest {
     private Double money;
-    private Double change;
     private List<CreateSalesItemsRequest> createSalesItemsRequests;
 }

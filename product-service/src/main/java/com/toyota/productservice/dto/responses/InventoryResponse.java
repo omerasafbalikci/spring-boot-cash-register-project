@@ -10,6 +10,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class InventoryResponse {
+    private String barcodeNumber;
     private String skuCode;
-    private boolean isInStock;
+    private String name;
+    private Integer quantity;
+    private Boolean isInStock;
+    private Double unitPrice;
+    private Boolean state;
 }

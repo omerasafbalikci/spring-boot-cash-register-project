@@ -165,21 +165,37 @@ public class ProductManager implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<InventoryResponse> checkProduct(List<InventoryRequest> inventoryRequests) {
+    public List<InventoryResponse> checkProductInInventory(List<InventoryRequest> inventoryRequests) {
         List<InventoryResponse> inventoryResponses = new ArrayList<>();
         for (InventoryRequest request : inventoryRequests) {
             String skuCode = request.getSkuCode();
-            Double unitPrice = request.getUnitPrice();
             Integer quantity = request.getQuantity();
 
+
             Product product = this.productRepository.findBySkuCodeIgnoreCase(skuCode);
-            Double availableUnitPrice = product.getUnitPrice();
-            Integer availableQuantity = product.getQuantity();
-
-            boolean result;
-            if (uni)
-
+            InventoryResponse inventoryResponse = getInventoryResponse(product, quantity);
+            inventoryResponses.add(inventoryResponse);
         }
+        return inventoryResponses;
+    }
+
+    private static InventoryResponse getInventoryResponse(Product product, Integer quantity) {
+        InventoryResponse inventoryResponse = new InventoryResponse();
+        inventoryResponse.setBarcodeNumber(product.getBarcodeNumber());
+        inventoryResponse.setName(product.getName());
+        if (quantity <= product.getQuantity()) {
+            inventoryResponse.setIsInStock(true);
+        } else {
+            inventoryResponse.setIsInStock(false);
+        }
+        inventoryResponse.setUnitPrice(product.getUnitPrice());
+        inventoryResponse.setState(product.getState());
+        return inventoryResponse;
+    }
+
+    @Override
+    public void updateProductInInventory(List<InventoryRequest> inventoryRequests) {
+
     }
 
     @Override

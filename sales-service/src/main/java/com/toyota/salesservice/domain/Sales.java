@@ -28,6 +28,9 @@ public class Sales {
     @Column(name = "sales_date")
     private LocalDateTime salesDate;
 
+    @Column(name = "created_by")
+    private String createdBy;
+
     @Column(name = "money", columnDefinition = "numeric")
     private Double money;
 

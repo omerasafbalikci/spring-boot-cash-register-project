@@ -1,6 +1,7 @@
 package com.toyota.salesservice.service.concretes;
 
 import com.toyota.salesservice.dao.SalesRepository;
+import com.toyota.salesservice.domain.Campaign;
 import com.toyota.salesservice.domain.Sales;
 import com.toyota.salesservice.domain.SalesItems;
 import com.toyota.salesservice.dto.requests.CreateSalesRequest;
@@ -36,25 +37,41 @@ public class SalesManager implements SalesService {
         Sales sales = new Sales();
         sales.setSalesNumber(UUID.randomUUID().toString().substring(0, 8));
         sales.setSalesDate(LocalDateTime.now());
+        sales.setMoney(createSalesRequest.getMoney());
 
-        List<SalesItems> salesItems = createSalesRequest.getCreateSalesItemsRequests().stream()
-                .map(sale -> this.modelMapperService.forRequest()
-                        .map(sale, SalesItems.class)).toList();
-        sales.setSalesItemsList(salesItems);
-
-        List<InventoryRequest> inventoryRequests = salesItems.stream()
+        List<InventoryRequest> inventoryRequests = createSalesRequest.getCreateSalesItemsRequests().stream()
                 .map(salesItem -> this.modelMapperService.forRequest()
                         .map(salesItem, InventoryRequest.class)).toList();
 
         List<InventoryResponse> inventoryResponses = webClientBuilder.build().post()
-                .uri("http://product-service/api/products/checkproduct")
+                .uri("http://product-service/api/products/checkproductininventory")
                 .body(BodyInserters.fromValue(inventoryRequests))
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<List<InventoryResponse>>() {})
                 .block();
 
-        boolean allProductsInStock = inventoryResponses.stream()
-                .allMatch(InventoryResponse::isInStock);
+        boolean allProductsInStock;
+        if (inventoryResponses != null) {
+            allProductsInStock = inventoryResponses.stream()
+                    .allMatch(InventoryResponse::getIsInStock);
+        } else {
+            throw new RuntimeException();
+        }
+
+        List<SalesItems> salesItems = inventoryResponses.stream()
+                .map(request -> {
+                    SalesItems salesItem = new SalesItems();
+                    salesItem.setBarcodeNumber(request.getBarcodeNumber());
+                    salesItem.setSkuCode(request.getSkuCode());
+                    salesItem.setName(request.getName());
+                    salesItem.setQuantity(request.getQuantity());
+                    salesItem.setUnitPrice(request.getUnitPrice());
+                    salesItem.setState(request.getState());
+
+                    return salesItem;
+                })
+                .toList();
+        sales.setSalesItemsList(salesItems);
 
         if (allProductsInStock) {
             this.salesRepository.save(sales);

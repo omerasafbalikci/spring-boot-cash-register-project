@@ -1,6 +1,7 @@
 package com.toyota.productservice.resource;
 
 import com.toyota.productservice.dto.requests.CreateProductRequest;
+import com.toyota.productservice.dto.requests.InventoryRequest;
 import com.toyota.productservice.dto.requests.UpdateProductRequest;
 import com.toyota.productservice.dto.responses.GetAllProductsResponse;
 import com.toyota.productservice.dto.responses.InventoryResponse;
@@ -73,10 +74,10 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/checkproduct")
+    @GetMapping("/checkproductininventory")
     @ResponseStatus(HttpStatus.OK)
-    public List<InventoryResponse> checkProduct(@RequestParam() List<String> skuCode) {
-        return this.productService.isInStock(skuCode);
+    public List<InventoryResponse> checkProductInInventory(@RequestBody List<InventoryRequest> inventoryRequests) {
+        return this.productService.checkProductInInventory(inventoryRequests);
     }
 
     @PostMapping("/add")

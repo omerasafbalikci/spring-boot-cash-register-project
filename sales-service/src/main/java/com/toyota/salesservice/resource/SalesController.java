@@ -16,9 +16,5 @@ public class SalesController {
     @Autowired
     private final SalesService salesService;
 
-    @PostMapping()
-    @ResponseStatus(code = HttpStatus.CREATED)
-    public CompletableFuture placeOrder(@RequestBody CreateSalesRequest createSalesRequest) {
-        return CompletableFuture.supplyAsync(() -> this.salesService.makeSales(createSalesRequest));
-    }
+
 }
