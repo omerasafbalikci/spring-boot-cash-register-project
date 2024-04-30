@@ -54,6 +54,4 @@ public class ProductBusinessRules {
             product.setProductCategory(existingProduct.getProductCategory());
         }
     }
-
-
 }
