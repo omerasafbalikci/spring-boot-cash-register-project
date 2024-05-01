@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 public class ProductCategoryBusinessRules {
-    @Autowired
     private final ProductCategoryRepository productCategoryRepository;
 
     public void checkIfProductCategoryNameExists(String name) {

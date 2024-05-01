@@ -20,7 +20,6 @@ import java.util.TreeMap;
 @RequestMapping("/api/products")
 @AllArgsConstructor
 public class ProductController {
-    @Autowired
     private final ProductService productService;
 
     @GetMapping()

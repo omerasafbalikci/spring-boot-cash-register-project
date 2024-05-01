@@ -32,12 +32,9 @@ import java.util.stream.Collectors;
 @Transactional
 @AllArgsConstructor
 public class ProductManager implements ProductService {
-    @Autowired
     private final ProductRepository productRepository;
-    private static final Logger logger = LogManager.getLogger(ProductService.class);
-    @Autowired
+    private final Logger logger = LogManager.getLogger(ProductService.class);
     private final ModelMapperService modelMapperService;
-    @Autowired
     private final ProductBusinessRules productBusinessRules;
 
     private Sort.Direction getSortDirection(String direction) {
@@ -66,8 +63,7 @@ public class ProductManager implements ProductService {
     public TreeMap<String, Object> getAllProductsPage(int page, int size, String[] sort) {
         logger.info("Fetching all products with pagination. Page: {}, Size: {}, Sort: {}.", page, size, Arrays.toString(sort));
         Pageable pagingSort = PageRequest.of(page, size, Sort.by(getOrder(sort)));
-        Page<Product> pagePro;
-        pagePro = this.productRepository.findAll(pagingSort);
+        Page<Product> pagePro = this.productRepository.findAll(pagingSort);
 
         List<GetAllProductsResponse> responses = pagePro.getContent().stream()
                 .map(product -> this.modelMapperService.forResponse()

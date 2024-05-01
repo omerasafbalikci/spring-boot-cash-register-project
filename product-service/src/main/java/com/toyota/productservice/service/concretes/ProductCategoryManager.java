@@ -12,7 +12,6 @@ import com.toyota.productservice.utilities.mappers.ModelMapperService;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,12 +23,9 @@ import java.util.UUID;
 @Transactional
 @AllArgsConstructor
 public class ProductCategoryManager implements ProductCategoryService {
-    @Autowired
     private final ProductCategoryRepository productCategoryRepository;
-    private static final Logger logger = LogManager.getLogger(ProductCategoryService.class);
-    @Autowired
+    private final Logger logger = LogManager.getLogger(ProductCategoryService.class);
     private final ModelMapperService modelMapperService;
-    @Autowired
     private final ProductCategoryBusinessRules productCategoryBusinessRules;
 
     @Override
@@ -56,7 +52,7 @@ public class ProductCategoryManager implements ProductCategoryService {
             return responses;
         } else {
             logger.warn("No product categories found by name containing '{}'.", name);
-            throw new EntityNotFoundException("Product categories not found");
+            throw new EntityNotFoundException("Product category not found");
         }
     }
 
@@ -117,7 +113,7 @@ public class ProductCategoryManager implements ProductCategoryService {
         logger.info("Deleting product category with id '{}'.", id);
         ProductCategory productCategory = this.productCategoryRepository.findById(id).orElseThrow(() -> {
             logger.warn("No product category found with id '{}'.", id);
-            return new EntityNotFoundException("Product Category not found");
+            return new EntityNotFoundException("Product category not found");
         });
         this.productCategoryRepository.deleteById(id);
         logger.debug("Product category deleted with id '{}'.", id);

@@ -19,7 +19,6 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class ProductBusinessRules {
-    @Autowired
     private final ProductRepository productRepository;
 
     public void checkIfSkuCodeExists(String skuCode) {

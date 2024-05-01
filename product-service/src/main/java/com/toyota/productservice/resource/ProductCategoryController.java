@@ -17,7 +17,6 @@ import java.util.List;
 @RequestMapping("/api/productcategories")
 @AllArgsConstructor
 public class ProductCategoryController {
-    @Autowired
     private final ProductCategoryService productCategoryService;
 
     @GetMapping()
@@ -61,5 +60,4 @@ public class ProductCategoryController {
         GetAllProductCategoriesResponse response = this.productCategoryService.deleteCategory(id);
         return ResponseEntity.ok(response);
     }
-
 }
