@@ -1,11 +1,13 @@
 package com.toyota.salesservice.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -28,7 +30,14 @@ public class Campaign {
     @Column(name = "state", columnDefinition = "BOOLEAN DEFAULT false", nullable = false)
     private Boolean state;
 
-    @OneToMany(mappedBy = "sales", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @Column(name = "created_by")
+    private String createdBy;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "campaign", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonIgnore
     private List<SalesItems> salesItemsList;
 }

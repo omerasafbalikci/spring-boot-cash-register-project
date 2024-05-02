@@ -1,15 +1,10 @@
 package com.toyota.productservice.dao;
 
 import com.toyota.productservice.domain.Product;
-import com.toyota.productservice.dto.responses.GetAllProductsResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-
-import java.util.List;
-import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findByState(Boolean state, Pageable pageable);
@@ -20,5 +15,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findByInitialLetterIgnoreCase(String initialLetter, Pageable pageable);
     Product findByBarcodeNumber(String barcodeNumber);
     Boolean existsBySkuCodeIgnoreCase(String skuCode);
+    Boolean existsByNameIgnoreCase(String name);
     Product findByNameIgnoreCase(String name);
 }

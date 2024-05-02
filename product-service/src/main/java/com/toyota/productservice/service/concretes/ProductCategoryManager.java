@@ -7,6 +7,7 @@ import com.toyota.productservice.dto.requests.UpdateProductCategoryRequest;
 import com.toyota.productservice.dto.responses.GetAllProductCategoriesResponse;
 import com.toyota.productservice.service.abstracts.ProductCategoryService;
 import com.toyota.productservice.service.rules.ProductCategoryBusinessRules;
+import com.toyota.productservice.utilities.exceptions.EntityAlreadyExistsException;
 import com.toyota.productservice.utilities.exceptions.EntityNotFoundException;
 import com.toyota.productservice.utilities.mappers.ModelMapperService;
 import lombok.AllArgsConstructor;
@@ -101,6 +102,10 @@ public class ProductCategoryManager implements ProductCategoryService {
         });
         ProductCategory productCategory = this.modelMapperService.forRequest().map(updateProductCategoryRequest, ProductCategory.class);
         this.productCategoryBusinessRules.checkUpdate(productCategory, existingProductCategory);
+        if (this.productCategoryRepository.existsByNameIgnoreCase(productCategory.getName()) && !existingProductCategory.getName().equals(productCategory.getName())) {
+            throw new EntityAlreadyExistsException("Product category name already exists");
+        }
+        logger.info("Product category name does not exist. Proceeding with creating the product category.");
         productCategory.setCategoryNumber(existingProductCategory.getCategoryNumber());
         productCategory.setUpdatedAt(LocalDateTime.now());
         this.productCategoryRepository.save(productCategory);

@@ -16,7 +16,6 @@ import com.toyota.productservice.utilities.mappers.ModelMapperService;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -230,7 +229,7 @@ public class ProductManager implements ProductService {
         product.setProductCategory(productCategory);
         product.setUpdatedAt(LocalDateTime.now());
         this.productRepository.save(product);
-        logger.info("New product '{}' added successfully.", createProductRequest.getName());
+        logger.debug("New product '{}' added successfully.", createProductRequest.getName());
         return this.modelMapperService.forResponse().map(product, GetAllProductsResponse.class);
     }
 
@@ -246,6 +245,11 @@ public class ProductManager implements ProductService {
         if (this.productRepository.existsBySkuCodeIgnoreCase(product.getSkuCode()) && !existingProduct.getSkuCode().equals(product.getSkuCode())) {
             throw new EntityAlreadyExistsException("Product skuCode already exists");
         }
+        logger.info("Product skuCode does not exist. Proceeding with creating the product.");
+        if (this.productRepository.existsByNameIgnoreCase(product.getName()) && !existingProduct.getName().equals(product.getName())) {
+            throw new EntityAlreadyExistsException("Product name already exists");
+        }
+        logger.info("Product name does not exist. Proceeding with creating the product.");
         product.setBarcodeNumber(existingProduct.getBarcodeNumber());
         product.setUpdatedAt(LocalDateTime.now());
         this.productRepository.save(product);

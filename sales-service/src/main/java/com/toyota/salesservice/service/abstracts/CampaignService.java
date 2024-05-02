@@ -1,13 +1,16 @@
 package com.toyota.salesservice.service.abstracts;
 
 import com.toyota.salesservice.dto.requests.CreateCampaignRequest;
+import com.toyota.salesservice.dto.requests.UpdateCampaignRequest;
 import com.toyota.salesservice.dto.responses.GetAllCampaignsResponse;
 
-import java.util.TreeMap;
+import java.util.List;
 
 public interface CampaignService {
-    TreeMap<String, Object> getAllCampaignsPage(int page, int size, String[] sort);
+    List<GetAllCampaignsResponse> getAllCampaigns();
+    GetAllCampaignsResponse getCampaignByCampaignNumber(String campaignNumber);
     GetAllCampaignsResponse addCampaign(CreateCampaignRequest createCampaignRequest);
-    GetAllCampaignsResponse updateCampaign(Long id, CreateCampaignRequest createCampaignRequest);
+    GetAllCampaignsResponse updateCampaign(UpdateCampaignRequest updateCampaignRequest);
     GetAllCampaignsResponse deleteCampaign(Long id);
+    void deleteAllCampaigns();
 }

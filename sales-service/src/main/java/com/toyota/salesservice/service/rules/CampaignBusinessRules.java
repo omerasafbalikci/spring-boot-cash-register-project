@@ -1,7 +1,9 @@
 package com.toyota.salesservice.service.rules;
 
 import com.toyota.salesservice.domain.Campaign;
+import org.springframework.stereotype.Service;
 
+@Service
 public class CampaignBusinessRules {
     public void checkUpdate(Campaign campaign, Campaign existingCampaign) {
         if (campaign.getName() == null) {
