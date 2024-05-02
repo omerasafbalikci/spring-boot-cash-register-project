@@ -39,6 +39,6 @@ public class SalesItems {
     private Campaign campaign;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "sales_id", nullable = false)
+    @JoinColumn(name = "sales_id")
     private Sales sales;
 }

@@ -12,6 +12,7 @@ import com.toyota.productservice.service.abstracts.ProductService;
 import com.toyota.productservice.service.rules.ProductBusinessRules;
 import com.toyota.productservice.utilities.exceptions.EntityAlreadyExistsException;
 import com.toyota.productservice.utilities.exceptions.EntityNotFoundException;
+import com.toyota.productservice.utilities.exceptions.ProductIsNotInStockException;
 import com.toyota.productservice.utilities.mappers.ModelMapperService;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -159,15 +160,23 @@ public class ProductManager implements ProductService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<InventoryResponse> checkProductInInventory(List<InventoryRequest> inventoryRequests) {
-        List<InventoryResponse> inventoryResponses = new ArrayList<>();
+        List<InventoryResponse> inventoryResponses = new LinkedList<>();
         for (InventoryRequest request : inventoryRequests) {
             String skuCode = request.getSkuCode();
             Integer quantity = request.getQuantity();
 
-
             Product product = this.productRepository.findBySkuCodeIgnoreCase(skuCode);
+            if (product != null) {
+                if (product.getQuantity() >= quantity) {
+                    product.setQuantity(product.getQuantity() - quantity);
+                    this.productRepository.save(product);
+                } else {
+                    throw new ProductIsNotInStockException("Product is not in stock");
+                }
+            } else {
+                throw new EntityNotFoundException("Product not found");
+            }
             InventoryResponse inventoryResponse = getInventoryResponse(product, quantity);
             inventoryResponses.add(inventoryResponse);
         }
@@ -177,12 +186,10 @@ public class ProductManager implements ProductService {
     private static InventoryResponse getInventoryResponse(Product product, Integer quantity) {
         InventoryResponse inventoryResponse = new InventoryResponse();
         inventoryResponse.setBarcodeNumber(product.getBarcodeNumber());
+        inventoryResponse.setSkuCode(product.getSkuCode());
         inventoryResponse.setName(product.getName());
-        if (quantity <= product.getQuantity()) {
-            inventoryResponse.setIsInStock(true);
-        } else {
-            inventoryResponse.setIsInStock(false);
-        }
+        inventoryResponse.setQuantity(quantity);
+        inventoryResponse.setIsInStock(quantity <= product.getQuantity());
         inventoryResponse.setUnitPrice(product.getUnitPrice());
         inventoryResponse.setState(product.getState());
         return inventoryResponse;
@@ -190,7 +197,18 @@ public class ProductManager implements ProductService {
 
     @Override
     public void updateProductInInventory(List<InventoryRequest> inventoryRequests) {
+        for (InventoryRequest request : inventoryRequests) {
+            String skuCode = request.getSkuCode();
+            Integer quantity = request.getQuantity();
 
+            Product product = this.productRepository.findBySkuCodeIgnoreCase(skuCode);
+            if (product != null) {
+                product.setQuantity(product.getQuantity() + quantity);
+                this.productRepository.save(product);
+            } else {
+                throw new EntityNotFoundException("Product not found");
+            }
+        }
     }
 
     @Override

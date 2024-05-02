@@ -5,18 +5,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetAllCampaignsResponse {
+public class GetAllSalesResponse {
     private Long id;
-    private String campaignNumber;
-    private String name;
-    private String buyPay;
-    private String percent;
-    private String moneyDiscount;
-    private Boolean state;
+    private String salesNumber;
+    private LocalDateTime salesDate;
     private String createdBy;
-    private LocalDateTime updatedAt;
+    private Double money;
+    private Double change;
+    private List<GetAllSalesItemsResponse> salesItemsList;
 }

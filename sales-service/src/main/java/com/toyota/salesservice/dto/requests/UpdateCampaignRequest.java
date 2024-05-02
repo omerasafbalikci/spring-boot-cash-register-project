@@ -10,11 +10,13 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class UpdateCampaignRequest {
     @NotNull(message = "Id must not be null")
     private Long id;
     private String name;
+    private String buyPay;
+    private String percent;
+    private String moneyDiscount;
     private Boolean state;
     @NotNull(message = "Created by must not be null")
     @NotBlank(message = "Created by must not be blank")

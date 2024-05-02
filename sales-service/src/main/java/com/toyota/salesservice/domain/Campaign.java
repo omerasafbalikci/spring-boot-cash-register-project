@@ -27,6 +27,15 @@ public class Campaign {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "buy_pay")
+    private String buyPay;
+
+    @Column(name = "percent")
+    private String percent;
+
+    @Column(name = "money_discount")
+    private String moneyDiscount;
+
     @Column(name = "state", columnDefinition = "BOOLEAN DEFAULT false", nullable = false)
     private Boolean state;
 

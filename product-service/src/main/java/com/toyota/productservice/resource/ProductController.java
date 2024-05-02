@@ -73,10 +73,14 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/checkproductininventory")
-    @ResponseStatus(HttpStatus.OK)
-    public List<InventoryResponse> checkProductInInventory(@RequestBody List<InventoryRequest> inventoryRequests) {
+    @PostMapping("/checkproductininventory")
+    public List<InventoryResponse> checkProductInInventory(@RequestBody @Valid List<InventoryRequest> inventoryRequests) {
         return this.productService.checkProductInInventory(inventoryRequests);
+    }
+
+    @GetMapping("/updateproductininventory")
+    public void updateProductInInventory(@RequestBody @Valid List<InventoryRequest> inventoryRequests) {
+        this.productService.updateProductInInventory(inventoryRequests);
     }
 
     @PostMapping("/add")
