@@ -260,13 +260,7 @@ public class ProductManager implements ProductService {
         });
         Product product = this.modelMapperService.forRequest().map(updateProductRequest, Product.class);
         this.productBusinessRules.checkUpdate(product, existingProduct);
-        if (this.productRepository.existsBySkuCodeIgnoreCase(product.getSkuCode()) && !existingProduct.getSkuCode().equals(product.getSkuCode())) {
-            throw new EntityAlreadyExistsException("Product skuCode already exists");
-        }
         logger.info("Product skuCode does not exist. Proceeding with creating the product.");
-        if (this.productRepository.existsByNameIgnoreCase(product.getName()) && !existingProduct.getName().equals(product.getName())) {
-            throw new EntityAlreadyExistsException("Product name already exists");
-        }
         logger.info("Product name does not exist. Proceeding with creating the product.");
         product.setBarcodeNumber(existingProduct.getBarcodeNumber());
         product.setUpdatedAt(LocalDateTime.now());

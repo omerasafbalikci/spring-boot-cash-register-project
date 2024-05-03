@@ -78,7 +78,7 @@ public class ProductController {
         return this.productService.checkProductInInventory(inventoryRequests);
     }
 
-    @GetMapping("/updateproductininventory")
+    @PostMapping("/updateproductininventory")
     public void updateProductInInventory(@RequestBody @Valid List<InventoryRequest> inventoryRequests) {
         this.productService.updateProductInInventory(inventoryRequests);
     }

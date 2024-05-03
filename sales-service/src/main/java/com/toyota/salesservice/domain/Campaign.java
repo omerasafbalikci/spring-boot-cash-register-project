@@ -30,11 +30,20 @@ public class Campaign {
     @Column(name = "buy_pay")
     private String buyPay;
 
-    @Column(name = "percent")
-    private String percent;
+    @Column(name = "buy_pay_part_one")
+    private Integer buyPayPartOne;
 
-    @Column(name = "money_discount")
-    private String moneyDiscount;
+    @Column(name = "buy_pay_part_two")
+    private Integer buyPayPartTwo;
+
+    @Column(name = "percent(%)")
+    private Integer percent;
+
+    @Column(name = "money_discount(tl)")
+    private Integer moneyDiscount;
+
+    @Column(name = "campaign_type")
+    private Integer campaignType;
 
     @Column(name = "state", columnDefinition = "BOOLEAN DEFAULT false", nullable = false)
     private Boolean state;

@@ -65,6 +65,7 @@ public class CampaignManager implements CampaignService {
         Campaign campaign = this.modelMapperService.forRequest().map(createCampaignRequest, Campaign.class);
         campaign.setCampaignNumber(UUID.randomUUID().toString().substring(0, 8));
         campaign.setUpdatedAt(LocalDateTime.now());
+        this.campaignBusinessRules.checkCampaignDetails(campaign);
         this.campaignRepository.save(campaign);
         logger.debug("New campaign added: '{}'.", createCampaignRequest.getName());
         return this.modelMapperService.forResponse().map(campaign, GetAllCampaignsResponse.class);
@@ -79,12 +80,13 @@ public class CampaignManager implements CampaignService {
         });
         Campaign campaign = this.modelMapperService.forRequest().map(updateCampaignRequest, Campaign.class);
         this.campaignBusinessRules.checkUpdate(campaign, existingCampaign);
-        if (this.campaignRepository.existsByNameIgnoreCase(campaign.getName()) && !existingCampaign.getName().equals(campaign.getName())) {
-            throw new CampaignAlreadyExistsException("Campaign already exists");
-        }
+
         logger.info("Campaign name does not exist. Proceeding with creating the campaign.");
         campaign.setCampaignNumber(existingCampaign.getCampaignNumber());
         campaign.setUpdatedAt(LocalDateTime.now());
+        if (updateCampaignRequest.getBuyPay() != null) {
+            this.campaignBusinessRules.checkCampaignDetails(campaign);
+        }
         this.campaignRepository.save(campaign);
         logger.debug("Campaign with id '{}' updated successfully.", updateCampaignRequest.getId());
         return this.modelMapperService.forResponse().map(campaign, GetAllCampaignsResponse.class);

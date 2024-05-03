@@ -31,6 +31,12 @@ public class Sales {
     @Column(name = "created_by")
     private String createdBy;
 
+    @Column(name = "payment_type")
+    private String paymentType;
+
+    @Column(name = "total_price")
+    private Double totalPrice;
+
     @Column(name = "money", columnDefinition = "numeric")
     private Double money;
 

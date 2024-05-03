@@ -14,8 +14,9 @@ public class GetAllCampaignsResponse {
     private String campaignNumber;
     private String name;
     private String buyPay;
-    private String percent;
-    private String moneyDiscount;
+    private Integer percent;
+    private Integer moneyDiscount;
+    private Integer campaignType;
     private Boolean state;
     private String createdBy;
     private LocalDateTime updatedAt;
