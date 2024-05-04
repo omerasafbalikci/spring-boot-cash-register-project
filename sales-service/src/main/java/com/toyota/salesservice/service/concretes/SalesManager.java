@@ -155,45 +155,18 @@ public class SalesManager implements SalesService {
     }
 
     @Override
-    public TreeMap<String, Object> getAllSalesPage(int page, int size, String[] sort) {
+    public List<GetAllSalesResponse> getAllSalesPage(int page, int size, String[] sort, Long id, String salesNumber,
+                                                   LocalDateTime salesDate, String createdBy, String paymentType,
+                                                   Double totalPrice, Double money, Double change) {
         logger.info("Fetching all sales with pagination. Page: {}, Size: {}, Sort: {}.", page, size, Arrays.toString(sort));
         Pageable pagingSort = PageRequest.of(page, size, Sort.by(getOrder(sort)));
-        Page<Sales> pagePro = this.salesRepository.findAll(pagingSort);
+        Page<Sales> pagePro = this.salesRepository.getSalesFiltered(id, salesNumber,
+                salesDate, createdBy, paymentType, totalPrice, money, change, pagingSort);
 
         List<GetAllSalesResponse> responses = pagePro.getContent().stream()
-                .map(product -> this.modelMapperService.forResponse()
-                        .map(product, GetAllSalesResponse.class)).collect(Collectors.toList());
+                .map(sales -> this.modelMapperService.forResponse()
+                        .map(sales, GetAllSalesResponse.class)).toList();
 
-        TreeMap<String, Object> response = new TreeMap<>();
-        response.put("sales", responses);
-        response.put("currentPage", pagePro.getNumber());
-        response.put("totalItems", pagePro.getTotalElements());
-        response.put("totalPages", pagePro.getTotalPages());
-        logger.debug("Retrieved {} sales for page {}. Total items: {}. Total pages: {}.", responses.size(), pagePro.getNumber(), pagePro.getTotalElements(), pagePro.getTotalPages());
-        return response;
-    }
-
-    @Override
-    public GetAllSalesResponse getSalesBySalesNumber(String salesNumber) {
-        logger.info("Fetching sales by sales number '{}'.", salesNumber);
-        Sales sales = this.salesRepository.findBySalesNumber(salesNumber);
-        if (sales != null) {
-            logger.debug("Sales found with sales number '{}'.", salesNumber);
-            return this.modelMapperService.forResponse().map(sales, GetAllSalesResponse.class);
-        } else {
-            logger.warn("No sales found with sales number '{}'.", salesNumber);
-            throw new SalesNotFoundException("Sales not found");
-        }
-    }
-
-    @Override
-    public GetAllSalesResponse getProductById(Long id) {
-        logger.info("Fetching sales by id '{}'.", id);
-        Sales sales = this.salesRepository.findById(id).orElseThrow(() -> {
-            logger.warn("No sales found with id '{}'.", id);
-            return new SalesNotFoundException("Sales not found");
-        });
-        logger.debug("Sales found with id '{}'.", id);
-        return this.modelMapperService.forResponse().map(sales, GetAllSalesResponse.class);
+        return responses;
     }
 }
