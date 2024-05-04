@@ -2,6 +2,7 @@ package com.toyota.salesservice.resource;
 
 import com.toyota.salesservice.dto.requests.CreateSalesRequest;
 import com.toyota.salesservice.dto.responses.GetAllSalesResponse;
+import com.toyota.salesservice.dto.responses.PaginationResponse;
 import com.toyota.salesservice.service.abstracts.SalesService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -25,7 +26,7 @@ public class SalesController {
     }
 
     @GetMapping()
-    public List<GetAllSalesResponse> getAllSalesPage(
+    public PaginationResponse<GetAllSalesResponse> getAllSalesPage(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "3") int size,
             @RequestParam(defaultValue = "id,asc") String[] sort,

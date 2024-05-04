@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 public class GetAllSalesItemsResponse {
     private Long id;
     private String barcodeNumber;
-    private String skuCode;
     private String name;
     private Integer quantity;
     private Double unitPrice;

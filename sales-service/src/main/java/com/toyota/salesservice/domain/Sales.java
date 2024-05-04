@@ -43,6 +43,9 @@ public class Sales {
     @Column(name = "change", columnDefinition = "numeric")
     private Double change;
 
+    @Column(name = "deleted", columnDefinition = "BOOLEAN DEFAULT false", nullable = false)
+    private boolean deleted;
+
     @OneToMany(mappedBy = "sales", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonIgnore
     private List<SalesItems> salesItemsList;

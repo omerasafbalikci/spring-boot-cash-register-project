@@ -19,9 +19,6 @@ public class ProductBusinessRules {
     }
 
     public void checkUpdate(Product product, Product existingProduct) {
-        if (product.getSkuCode() == null) {
-            product.setSkuCode(existingProduct.getSkuCode());
-        }
         if (product.getName() == null) {
             product.setName(existingProduct.getName());
         }
@@ -44,9 +41,6 @@ public class ProductBusinessRules {
             product.setProductCategory(existingProduct.getProductCategory());
         }
 
-        if (this.productRepository.existsBySkuCodeIgnoreCase(product.getSkuCode()) && !existingProduct.getSkuCode().equals(product.getSkuCode())) {
-            throw new EntityAlreadyExistsException("Product skuCode already exists");
-        }
         if (this.productRepository.existsByNameIgnoreCase(product.getName()) && !existingProduct.getName().equals(product.getName())) {
             throw new EntityAlreadyExistsException("Product name already exists");
         }

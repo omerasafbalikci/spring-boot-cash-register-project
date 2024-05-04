@@ -19,9 +19,6 @@ public class SalesItems {
     @Column(name = "barcode_number", unique = true, nullable = false)
     private String barcodeNumber;
 
-    @Column(name = "sku_code")
-    private String skuCode;
-
     @Column(name = "name")
     private String name;
 
@@ -37,6 +34,9 @@ public class SalesItems {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "campaign_id")
     private Campaign campaign;
+
+    @Column(name = "deleted", columnDefinition = "BOOLEAN DEFAULT false", nullable = false)
+    private boolean deleted;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "sales_id")

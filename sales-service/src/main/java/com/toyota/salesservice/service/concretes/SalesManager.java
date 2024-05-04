@@ -3,11 +3,14 @@ package com.toyota.salesservice.service.concretes;
 import com.toyota.salesservice.dao.SalesRepository;
 import com.toyota.salesservice.domain.Sales;
 import com.toyota.salesservice.domain.SalesItems;
+import com.toyota.salesservice.dto.requests.CreateReturnRequest;
 import com.toyota.salesservice.dto.requests.CreateSalesItemsRequest;
 import com.toyota.salesservice.dto.requests.CreateSalesRequest;
 import com.toyota.salesservice.dto.requests.InventoryRequest;
+import com.toyota.salesservice.dto.responses.GetAllSalesItemsResponse;
 import com.toyota.salesservice.dto.responses.GetAllSalesResponse;
 import com.toyota.salesservice.dto.responses.InventoryResponse;
+import com.toyota.salesservice.dto.responses.PaginationResponse;
 import com.toyota.salesservice.service.abstracts.SalesService;
 import com.toyota.salesservice.service.rules.SalesBusinessRules;
 import com.toyota.salesservice.utilities.exceptions.*;
@@ -25,9 +28,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -45,6 +48,9 @@ public class SalesManager implements SalesService {
         sales.setSalesNumber(UUID.randomUUID().toString().substring(0, 8));
         sales.setSalesDate(LocalDateTime.now());
         sales.setCreatedBy(createSalesRequest.getCreatedBy());
+
+        List<String> barcodeNumbers = createSalesRequest.getCreateSalesItemsRequests().stream()
+                .map(CreateSalesItemsRequest::getBarcodeNumber).toList();
 
         List<Long> campaignIds = createSalesRequest.getCreateSalesItemsRequests().stream()
                 .map(CreateSalesItemsRequest::getCampaignId).toList();
@@ -64,9 +70,8 @@ public class SalesManager implements SalesService {
             List<SalesItems> salesItems = inventoryResponses.stream()
                     .map(response -> {
                         SalesItems salesItem = new SalesItems();
+                        salesItem.setBarcodeNumber(barcodeNumbers.get(inventoryResponses.indexOf(response)));
                         salesItem.setSales(sales);
-                        salesItem.setBarcodeNumber(response.getBarcodeNumber());
-                        salesItem.setSkuCode(response.getSkuCode());
                         salesItem.setName(response.getName());
                         salesItem.setQuantity(response.getQuantity());
                         salesItem.setUnitPrice(response.getUnitPrice());
@@ -132,6 +137,50 @@ public class SalesManager implements SalesService {
         }
     }
 
+    @Override
+    public GetAllSalesItemsResponse toReturn(CreateReturnRequest createReturnRequest) {
+        Sales sales = this.salesRepository.findBySalesNumber(createReturnRequest.getSalesNumber());
+        InventoryRequest inventoryRequest = new InventoryRequest();
+        inventoryRequest.setBarcodeNumber(createReturnRequest.getBarcodeNumber());
+        SalesItems salesItems = new SalesItems();
+        if (sales != null) {
+            LocalDateTime salesDate = sales.getSalesDate();
+            LocalDateTime returnDate = createReturnRequest.getReturnDate();
+            boolean hasBarcodeNumber = false;
+
+            Duration duration = Duration.between(salesDate, returnDate);
+            long days = duration.toDays();
+            if (days > 15) {
+                throw new ReturnPeriodExpiredException("Return period has expired");
+            } else {
+                for (SalesItems salesItem : sales.getSalesItemsList()) {
+                    if (salesItem.getBarcodeNumber().equals(createReturnRequest.getBarcodeNumber())) {
+                        salesItems = salesItem;
+                        salesItem.setDeleted(true);
+                        hasBarcodeNumber = true;
+                        if (salesItem.getQuantity() < createReturnRequest.getQuantity()) {
+                            throw new QuantityIncorrectEntryException("Quantity incorrect entry");
+                        }
+                        inventoryRequest.setQuantity(createReturnRequest.getQuantity());
+                        webClientBuilder.build().post()
+                                .uri("http://product-service/api/products/updateproductininventory")
+                                .body(BodyInserters.fromValue(inventoryRequest))
+                                .retrieve()
+                                .bodyToMono(new ParameterizedTypeReference<List<InventoryResponse>>() {})
+                                .subscribe();
+                        this.salesRepository.save(sales);
+                    }
+                }
+                if (!hasBarcodeNumber) {
+                    throw new SalesItemsNotFoundException("Sales items not found");
+                }
+            }
+        } else {
+            throw new SalesNotFoundException("Sales not found");
+        }
+        return this.modelMapperService.forResponse().map(salesItems, GetAllSalesItemsResponse.class);
+    }
+
     private Sort.Direction getSortDirection(String direction) {
         if (direction.equals("asc")) {
             return Sort.Direction.ASC;
@@ -155,9 +204,9 @@ public class SalesManager implements SalesService {
     }
 
     @Override
-    public List<GetAllSalesResponse> getAllSalesPage(int page, int size, String[] sort, Long id, String salesNumber,
-                                                   LocalDateTime salesDate, String createdBy, String paymentType,
-                                                   Double totalPrice, Double money, Double change) {
+    public PaginationResponse<GetAllSalesResponse> getAllSalesPage(int page, int size, String[] sort, Long id, String salesNumber,
+                                              LocalDateTime salesDate, String createdBy, String paymentType,
+                                              Double totalPrice, Double money, Double change) {
         logger.info("Fetching all sales with pagination. Page: {}, Size: {}, Sort: {}.", page, size, Arrays.toString(sort));
         Pageable pagingSort = PageRequest.of(page, size, Sort.by(getOrder(sort)));
         Page<Sales> pagePro = this.salesRepository.getSalesFiltered(id, salesNumber,
@@ -167,6 +216,6 @@ public class SalesManager implements SalesService {
                 .map(sales -> this.modelMapperService.forResponse()
                         .map(sales, GetAllSalesResponse.class)).toList();
 
-        return responses;
+        return new PaginationResponse<>(responses, pagePro);
     }
 }

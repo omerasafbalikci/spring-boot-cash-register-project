@@ -1,6 +1,5 @@
 package com.toyota.salesservice.dto.requests;
 
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;

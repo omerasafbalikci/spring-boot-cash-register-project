@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 public class GetAllProductsResponse {
     private Long id;
     private String barcodeNumber;
-    private String skuCode;
     private String name;
     private String description;
     private Integer quantity;

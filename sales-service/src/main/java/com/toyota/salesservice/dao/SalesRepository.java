@@ -22,4 +22,5 @@ public interface SalesRepository extends JpaRepository<Sales, Long> {
             "(s.change = COALESCE(NULLIF(?8, 0.0), s.change))")
     Page<Sales> getSalesFiltered(Long id, String salesNumber, LocalDateTime salesDate, String createdBy, String paymentType,
                                  Double totalPrice, Double money, Double change, Pageable pageable);
+    Sales findBySalesNumber(String salesNumber);
 }

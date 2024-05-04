@@ -19,5 +19,6 @@ public class GetAllSalesResponse {
     private Double totalPrice;
     private Double money;
     private Double change;
+    private boolean deleted;
     private List<GetAllSalesItemsResponse> salesItemsList;
 }

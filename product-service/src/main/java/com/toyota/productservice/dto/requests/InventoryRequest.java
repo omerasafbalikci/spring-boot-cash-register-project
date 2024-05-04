@@ -13,9 +13,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class InventoryRequest {
-    @NotNull(message = "SkuCode must not be null")
-    @NotBlank(message = "SkuCode must not be blank")
-    private String skuCode;
+    @NotNull(message = "Barcode number must not be null")
+    @NotBlank(message = "Barcode number must not be blank")
+    private String barcodeNumber;
     @NotNull(message = "Quantity must not be null")
     @Min(value = 1, message = "Quantity must be greater than or equal to 1")
     private Integer quantity;

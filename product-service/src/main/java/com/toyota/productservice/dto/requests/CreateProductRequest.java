@@ -13,9 +13,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class CreateProductRequest {
-    @NotNull(message = "SkuCode must not be null")
-    @NotBlank(message = "SkuCode must not be blank")
-    private String skuCode;
     @NotNull(message = "Name must not be null")
     @NotBlank(message = "Name must not be blank")
     private String name;

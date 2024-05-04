@@ -15,7 +15,9 @@ public class GetAllReportsResponse {
     private String salesNumber;
     private LocalDateTime salesDate;
     private String createdBy;
+    private String paymentType;
+    private Double totalPrice;
     private Double money;
     private Double change;
-    private List<GetAllReportDetailsResponse> reportDetailsResponseList;
+    private List<GetAllReportDetailsResponse> reportDetailsList;
 }

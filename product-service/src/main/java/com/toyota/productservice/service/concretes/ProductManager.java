@@ -163,10 +163,10 @@ public class ProductManager implements ProductService {
     public List<InventoryResponse> checkProductInInventory(List<InventoryRequest> inventoryRequests) {
         List<InventoryResponse> inventoryResponses = new LinkedList<>();
         for (InventoryRequest request : inventoryRequests) {
-            String skuCode = request.getSkuCode();
+            String barcodeNumber = request.getBarcodeNumber();
             Integer quantity = request.getQuantity();
 
-            Product product = this.productRepository.findBySkuCodeIgnoreCase(skuCode);
+            Product product = this.productRepository.findByBarcodeNumber(barcodeNumber);
             if (product != null) {
                 if (product.getQuantity() >= quantity) {
                     product.setQuantity(product.getQuantity() - quantity);
@@ -185,8 +185,6 @@ public class ProductManager implements ProductService {
 
     private static InventoryResponse getInventoryResponse(Product product, Integer quantity) {
         InventoryResponse inventoryResponse = new InventoryResponse();
-        inventoryResponse.setBarcodeNumber(product.getBarcodeNumber());
-        inventoryResponse.setSkuCode(product.getSkuCode());
         inventoryResponse.setName(product.getName());
         inventoryResponse.setQuantity(quantity);
         inventoryResponse.setIsInStock(quantity <= product.getQuantity());
@@ -198,10 +196,10 @@ public class ProductManager implements ProductService {
     @Override
     public void updateProductInInventory(List<InventoryRequest> inventoryRequests) {
         for (InventoryRequest request : inventoryRequests) {
-            String skuCode = request.getSkuCode();
+            String barcodeNumber = request.getBarcodeNumber();
             Integer quantity = request.getQuantity();
 
-            Product product = this.productRepository.findBySkuCodeIgnoreCase(skuCode);
+            Product product = this.productRepository.findByBarcodeNumber(barcodeNumber);
             if (product != null) {
                 product.setQuantity(product.getQuantity() + quantity);
                 this.productRepository.save(product);
@@ -230,12 +228,10 @@ public class ProductManager implements ProductService {
                 throw new EntityAlreadyExistsException("Product already exists");
             }
         } else {
-            this.productBusinessRules.checkIfSkuCodeExists(createProductRequest.getSkuCode());
             product.setQuantity(createProductRequest.getQuantity());
             logger.debug("Creating new product with name '{}'.", createProductRequest.getName());
         }
         product.setBarcodeNumber(UUID.randomUUID().toString().substring(0, 8));
-        product.setSkuCode(createProductRequest.getSkuCode());
         product.setName(createProductRequest.getName());
         product.setDescription(createProductRequest.getDescription());
         product.setUnitPrice(createProductRequest.getUnitPrice());
