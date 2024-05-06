@@ -24,7 +24,7 @@
         <module>sales-service</module>
         <module>report-service</module>
         <module>usermanagement-service</module>
-        <module>verificationauthorization-service</module>
+        <module>authenticationauthorization-service</module>
         <module>api-gateway</module>
     </modules>
 

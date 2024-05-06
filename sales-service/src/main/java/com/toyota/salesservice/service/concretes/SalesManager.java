@@ -236,13 +236,13 @@ public class SalesManager implements SalesService {
                                               Double totalPrice, Double money, Double change) {
         logger.info("Fetching all sales with pagination. Page: {}, Size: {}, Sort: {}.", page, size, Arrays.toString(sort));
         Pageable pagingSort = PageRequest.of(page, size, Sort.by(getOrder(sort)));
-        Page<Sales> pagePro = this.salesRepository.getSalesFiltered(id, salesNumber,
+        Page<Sales> pageSales = this.salesRepository.getSalesFiltered(id, salesNumber,
                 salesDate, createdBy, paymentType, totalPrice, money, change, pagingSort);
 
-        List<GetAllSalesResponse> responses = pagePro.getContent().stream()
+        List<GetAllSalesResponse> responses = pageSales.getContent().stream()
                 .map(sales -> this.modelMapperService.forResponse()
                         .map(sales, GetAllSalesResponse.class)).toList();
 
-        return new PaginationResponse<>(responses, pagePro);
+        return new PaginationResponse<>(responses, pageSales);
     }
 }
