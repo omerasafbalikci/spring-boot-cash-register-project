@@ -12,14 +12,14 @@ import java.time.LocalDateTime;
 @Repository
 public interface SalesRepository extends JpaRepository<Sales, Long> {
     @Query("SELECT s FROM Sales s WHERE " +
-            "(UPPER(s.id) = COALESCE(NULLIF(?1, ''), UPPER(s.id))) AND " +
+            "(?1 IS NULL OR s.id = ?1) AND " +
             "(UPPER(s.salesNumber) LIKE CONCAT('%', UPPER(?2), '%')) AND " +
-            "(s.salesDate = COALESCE(NULLIF(?3, ''), s.salesDate)) AND " +
+            "(?3 IS NULL OR s.salesDate = ?3) AND " +
             "(UPPER(s.createdBy) LIKE CONCAT('%', UPPER(?4), '%')) AND " +
             "(UPPER(s.paymentType) LIKE CONCAT('%', UPPER(?5), '%')) AND " +
-            "(s.totalPrice = COALESCE(NULLIF(?6, 0.0), s.totalPrice)) AND " +
-            "(s.money = COALESCE(NULLIF(?7, 0.0), s.money)) AND " +
-            "(s.change = COALESCE(NULLIF(?8, 0.0), s.change))")
+            "(?6 IS NULL OR s.totalPrice = ?6) AND " +
+            "(?7 IS NULL OR s.money = ?7) AND " +
+            "(?8 IS NULL OR s.change = ?8)")
     Page<Sales> getSalesFiltered(Long id, String salesNumber, LocalDateTime salesDate, String createdBy, String paymentType,
                                  Double totalPrice, Double money, Double change, Pageable pageable);
     Sales findBySalesNumber(String salesNumber);

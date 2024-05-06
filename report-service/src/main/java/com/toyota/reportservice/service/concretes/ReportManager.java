@@ -4,6 +4,7 @@ import com.toyota.reportservice.dto.responses.GetAllReportDetailsResponse;
 import com.toyota.reportservice.dto.responses.GetAllReportsResponse;
 import com.toyota.reportservice.dto.responses.PaginationResponse;
 import com.toyota.reportservice.service.abstracts.ReportService;
+import com.toyota.reportservice.utilities.exceptions.ReportNotFoundException;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -58,20 +59,27 @@ public class ReportManager implements ReportService {
                 .bodyToMono(new ParameterizedTypeReference<PaginationResponse<GetAllReportsResponse>>() {});
     }
 
-    public byte[] generatePdfReport(List<GetAllReportsResponse> reports) throws IOException {
-        PDDocument document = new PDDocument();
-        PDPage page = new PDPage();
-        document.addPage(page);
+    public byte[] generatePdfReport(String salesNumber) throws IOException {
+        Mono<PaginationResponse<GetAllReportsResponse>> reportMono = getAllSalesPage(0, 1, null, null, salesNumber,
+                null, null, null, null, null, null);
 
-        try (PDPageContentStream contentStream = new PDPageContentStream(document, page)) {
-            contentStream.beginText();
-            contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
-            contentStream.newLineAtOffset(100, 700);
-            contentStream.showText("SATIS RAPORU");
-            contentStream.newLine();
-            contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 10);
+        PaginationResponse<GetAllReportsResponse> reportResponse = reportMono.block();
 
-            for (GetAllReportsResponse report : reports) {
+        if (reportResponse != null && reportResponse.getContent() != null && !reportResponse.getContent().isEmpty()) {
+            GetAllReportsResponse report = reportResponse.getContent().get(0);
+
+            PDDocument document = new PDDocument();
+            PDPage page = new PDPage();
+            document.addPage(page);
+
+            try (PDPageContentStream contentStream = new PDPageContentStream(document, page)) {
+                contentStream.beginText();
+                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
+                contentStream.newLineAtOffset(100, 700);
+                contentStream.showText("SATIS RAPORU");
+                contentStream.newLine();
+                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 10);
+
                 contentStream.newLine();
                 contentStream.showText("TARIH : " + report.getSalesDate());
                 contentStream.newLine();
@@ -100,19 +108,20 @@ public class ReportManager implements ReportService {
                 contentStream.newLine();
                 contentStream.showText("KDV FISI DEGILDIR");
                 contentStream.newLine();
+                contentStream.endText();
             }
 
-            contentStream.endText();
-        }
+            byte[] pdfBytes;
+            try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+                document.save(outputStream);
+                pdfBytes = outputStream.toByteArray();
+            }
 
-        byte[] pdfBytes;
-        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            document.save(outputStream);
-            pdfBytes = outputStream.toByteArray();
+            document.close();
+            return pdfBytes;
+        } else {
+            throw new ReportNotFoundException("Report not found");
         }
-
-        document.close();
-        return pdfBytes;
     }
 
 

@@ -61,24 +61,18 @@ public class ProductController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/barcodenumber")
-    public ResponseEntity<GetAllProductsResponse> getProductByBarcodeNumber(@RequestParam() String barcodeNumber) {
-        GetAllProductsResponse response = this.productService.getProductByBarcodeNumber(barcodeNumber);
-        return ResponseEntity.ok(response);
-    }
-
     @GetMapping("/id")
     public ResponseEntity<GetAllProductsResponse> getProductById(@RequestParam() Long id) {
         GetAllProductsResponse response = this.productService.getProductById(id);
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/checkproductininventory")
+    @PostMapping("/check-product-in-inventory")
     public List<InventoryResponse> checkProductInInventory(@RequestBody @Valid List<InventoryRequest> inventoryRequests) {
         return this.productService.checkProductInInventory(inventoryRequests);
     }
 
-    @PostMapping("/updateproductininventory")
+    @PostMapping("/update-product-in-inventory")
     public void updateProductInInventory(@RequestBody @Valid List<InventoryRequest> inventoryRequests) {
         this.productService.updateProductInInventory(inventoryRequests);
     }

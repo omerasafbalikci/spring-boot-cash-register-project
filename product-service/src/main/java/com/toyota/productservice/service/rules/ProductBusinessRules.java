@@ -12,12 +12,6 @@ import org.springframework.stereotype.Service;
 public class ProductBusinessRules {
     private final ProductRepository productRepository;
 
-    public void checkIfSkuCodeExists(String skuCode) {
-        if (this.productRepository.existsBySkuCodeIgnoreCase(skuCode)) {
-            throw new EntityAlreadyExistsException("Product skuCode already exists");
-        }
-    }
-
     public void checkUpdate(Product product, Product existingProduct) {
         if (product.getName() == null) {
             product.setName(existingProduct.getName());

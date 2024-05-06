@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/productcategories")
+@RequestMapping("/api/product-categories")
 @AllArgsConstructor
 public class ProductCategoryController {
     private final ProductCategoryService productCategoryService;
@@ -31,7 +31,7 @@ public class ProductCategoryController {
         return new ResponseEntity<>(responses, HttpStatus.OK);
     }
 
-    @GetMapping("/categorynumber")
+    @GetMapping("/category-number")
     public ResponseEntity<GetAllProductCategoriesResponse> getCategoryByCategoryNumber(@RequestParam() String categoryNumber) {
         GetAllProductCategoriesResponse response = this.productCategoryService.getCategoryByCategoryNumber(categoryNumber);
         return ResponseEntity.ok(response);

@@ -24,7 +24,7 @@ public class CampaignController {
         return new ResponseEntity<>(responses, HttpStatus.OK);
     }
 
-    @GetMapping("/categorynumber")
+    @GetMapping("/campaign-number")
     public ResponseEntity<GetAllCampaignsResponse> getCampaignByCampaignNumber(@RequestParam String campaignNumber) {
         GetAllCampaignsResponse response = this.campaignService.getCampaignByCampaignNumber(campaignNumber);
         return ResponseEntity.ok(response);
@@ -48,7 +48,7 @@ public class CampaignController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/deleteall")
+    @DeleteMapping("/delete-all")
     public String deleteAllCampaign() {
         this.campaignService.deleteAllCampaigns();
         return "Deletion successful!";

@@ -16,7 +16,7 @@ public class SalesItems {
     @Column(name = "id", unique = true, nullable = false, updatable = false)
     private Long id;
 
-    @Column(name = "barcode_number", unique = true, nullable = false)
+    @Column(name = "barcode_number", nullable = false)
     private String barcodeNumber;
 
     @Column(name = "name")

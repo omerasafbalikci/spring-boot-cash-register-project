@@ -40,7 +40,7 @@ public class ProductCategory {
     @Column(name = "created_by")
     private String createdBy;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 

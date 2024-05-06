@@ -1,6 +1,7 @@
 package com.toyota.salesservice.service.concretes;
 
 import com.toyota.salesservice.dao.SalesRepository;
+import com.toyota.salesservice.domain.Campaign;
 import com.toyota.salesservice.domain.Sales;
 import com.toyota.salesservice.domain.SalesItems;
 import com.toyota.salesservice.dto.requests.CreateReturnRequest;
@@ -52,34 +53,52 @@ public class SalesManager implements SalesService {
         List<String> barcodeNumbers = createSalesRequest.getCreateSalesItemsRequests().stream()
                 .map(CreateSalesItemsRequest::getBarcodeNumber).toList();
 
-        List<Long> campaignIds = createSalesRequest.getCreateSalesItemsRequests().stream()
-                .map(CreateSalesItemsRequest::getCampaignId).toList();
+        List<Optional<Long>> campaignIds = createSalesRequest.getCreateSalesItemsRequests().stream()
+                .map(request -> {
+                    Long campaignId = request.getCampaignId();
+                    return Optional.ofNullable(campaignId);
+                })
+                .toList();
 
         List<InventoryRequest> inventoryRequests = createSalesRequest.getCreateSalesItemsRequests().stream()
                 .map(salesItem -> this.modelMapperService.forRequest().map(salesItem, InventoryRequest.class))
                 .toList();
 
         List<InventoryResponse> inventoryResponses = webClientBuilder.build().post()
-                .uri("http://product-service/api/products/checkproductininventory")
+                .uri("http://product-service/api/products/check-product-in-inventory")
                 .body(BodyInserters.fromValue(inventoryRequests))
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<List<InventoryResponse>>() {})
                 .block();
 
         if (inventoryResponses != null && !inventoryResponses.isEmpty()) {
-            List<SalesItems> salesItems = inventoryResponses.stream()
-                    .map(response -> {
-                        SalesItems salesItem = new SalesItems();
-                        salesItem.setBarcodeNumber(barcodeNumbers.get(inventoryResponses.indexOf(response)));
-                        salesItem.setSales(sales);
-                        salesItem.setName(response.getName());
-                        salesItem.setQuantity(response.getQuantity());
-                        salesItem.setUnitPrice(response.getUnitPrice());
-                        salesItem.setState(response.getState());
-                        salesItem.getCampaign().setId((campaignIds.get(inventoryResponses.indexOf(response))));
-                        return salesItem;
-                    })
-                    .toList();
+            List<SalesItems> salesItems = new ArrayList<>();
+            for (int i = 0; i < inventoryResponses.size(); i++) {
+                InventoryResponse response = inventoryResponses.get(i);
+                SalesItems salesItem = new SalesItems();
+                salesItem.setBarcodeNumber(barcodeNumbers.get(i));
+                salesItem.setSales(sales);
+                salesItem.setName(response.getName());
+                salesItem.setQuantity(response.getQuantity());
+                salesItem.setUnitPrice(response.getUnitPrice());
+                salesItem.setState(response.getState());
+
+                if (i < campaignIds.size()) {
+                    Optional<Long> campaignIdOptional = campaignIds.get(i);
+                    if (campaignIdOptional.isPresent()) {
+                        Long campaignId = campaignIdOptional.get();
+                        Campaign campaign = new Campaign();
+                        campaign.setId(campaignId);
+                        salesItem.setCampaign(campaign);
+                    } else {
+                        // Eğer campaignId null ise, salesItem'in kampanyasını null olarak ayarla
+                        salesItem.setCampaign(null);
+                    }
+                }
+
+                salesItems.add(salesItem);
+            }
+
             sales.setSalesItemsList(salesItems);
 
             for (SalesItems salesItem : salesItems) {
@@ -87,17 +106,19 @@ public class SalesManager implements SalesService {
                     throw new ProductStatusFalseException(salesItem.getName() + " status is false");
                 }
 
-                if (salesItem.getCampaign() != null) {
-                    if (salesItem.getCampaign().getCampaignType() == 1) {
+                Campaign campaign = salesItem.getCampaign();
+                if (campaign != null) {
+                    Integer campaignType = campaign.getCampaignType();
+                    if (campaignType == 1) {
                         double price = salesItem.getUnitPrice();
                         double sets = price / (salesItem.getCampaign().getBuyPayPartOne() + salesItem.getCampaign().getBuyPayPartTwo());
                         Double newPrice = price - (sets * salesItem.getCampaign().getBuyPayPartTwo());
                         salesItem.setUnitPrice(newPrice);
-                    } else if (salesItem.getCampaign().getCampaignType() == 2) {
+                    } else if (campaignType == 2) {
                         double price = salesItem.getUnitPrice();
                         Double newPrice = price - (price * salesItem.getCampaign().getPercent() / 100);
                         salesItem.setUnitPrice(newPrice);
-                    } else if (salesItem.getCampaign().getCampaignType() == 3) {
+                    } else if (campaignType == 3) {
                         double price = salesItem.getUnitPrice();
                         Double newPrice = price - salesItem.getCampaign().getMoneyDiscount();
                         salesItem.setUnitPrice(newPrice);
@@ -112,8 +133,14 @@ public class SalesManager implements SalesService {
             sales.setTotalPrice(totalPrice);
 
             if (createSalesRequest.getPaymentType().equals("n") || createSalesRequest.getPaymentType().equals("N")) {
-                sales.setMoney(createSalesRequest.getMoney());
+                sales.setPaymentType("Nakit");
+                if (createSalesRequest.getMoney() != null) {
+                    sales.setMoney(createSalesRequest.getMoney());
+                } else {
+                    throw new NoMoneyEnteredException("No money entered");
+                }
             } else if (createSalesRequest.getPaymentType().equals("k") || createSalesRequest.getPaymentType().equals("K")) {
+                sales.setPaymentType("Kart");
                 sales.setMoney(totalPrice);
             } else {
                 throw new PaymentTypeIncorrectEntryException("Payment type is ıncorrect entry");
@@ -125,7 +152,7 @@ public class SalesManager implements SalesService {
                 return this.modelMapperService.forResponse().map(sales, GetAllSalesResponse.class);
             } else {
                 webClientBuilder.build().post()
-                        .uri("http://product-service/api/products/updateproductininventory")
+                        .uri("http://product-service/api/products/update-product-in-inventory")
                         .body(BodyInserters.fromValue(inventoryRequests))
                         .retrieve()
                         .bodyToMono(new ParameterizedTypeReference<List<InventoryResponse>>() {})
@@ -163,7 +190,7 @@ public class SalesManager implements SalesService {
                         }
                         inventoryRequest.setQuantity(createReturnRequest.getQuantity());
                         webClientBuilder.build().post()
-                                .uri("http://product-service/api/products/updateproductininventory")
+                                .uri("http://product-service/api/products/update-product-in-inventory")
                                 .body(BodyInserters.fromValue(inventoryRequest))
                                 .retrieve()
                                 .bodyToMono(new ParameterizedTypeReference<List<InventoryResponse>>() {})

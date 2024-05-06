@@ -6,6 +6,9 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,6 +18,8 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@FilterDef(name = "notDeleted", parameters = @ParamDef(name = "isDeleted", type = Boolean.class))
+@Filter(name = "notDeleted", condition = "deleted = :isDeleted")
 public class Sales {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +29,7 @@ public class Sales {
     @Column(name = "sales_number", unique = true, nullable = false)
     private String salesNumber;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
     @Column(name = "sales_date")
     private LocalDateTime salesDate;
 

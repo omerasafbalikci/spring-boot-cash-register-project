@@ -136,19 +136,6 @@ public class ProductManager implements ProductService {
     }
 
     @Override
-    public GetAllProductsResponse getProductByBarcodeNumber(String barcodeNumber) {
-        logger.info("Fetching product by barcode number '{}'.", barcodeNumber);
-        Product product = this.productRepository.findByBarcodeNumber(barcodeNumber);
-        if (product != null) {
-            logger.debug("Product found with barcode number '{}'.", barcodeNumber);
-            return this.modelMapperService.forResponse().map(product, GetAllProductsResponse.class);
-        } else {
-            logger.warn("No product found with barcode number '{}'.", barcodeNumber);
-            throw new EntityNotFoundException("Product not found");
-        }
-    }
-
-    @Override
     public GetAllProductsResponse getProductById(Long id) {
         logger.info("Fetching product by id '{}'.", id);
         Product product = this.productRepository.findById(id).orElseThrow(() -> {
@@ -256,7 +243,6 @@ public class ProductManager implements ProductService {
         });
         Product product = this.modelMapperService.forRequest().map(updateProductRequest, Product.class);
         this.productBusinessRules.checkUpdate(product, existingProduct);
-        logger.info("Product skuCode does not exist. Proceeding with creating the product.");
         logger.info("Product name does not exist. Proceeding with creating the product.");
         product.setBarcodeNumber(existingProduct.getBarcodeNumber());
         product.setUpdatedAt(LocalDateTime.now());

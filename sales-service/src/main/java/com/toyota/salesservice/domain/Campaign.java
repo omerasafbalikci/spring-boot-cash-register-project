@@ -21,7 +21,7 @@ public class Campaign {
     @Column(name = "id", unique = true, nullable = false, updatable = false)
     private Long id;
 
-    @Column(name = "barcode_number", unique = true, nullable = false)
+    @Column(name = "campaign_number", unique = true, nullable = false)
     private String campaignNumber;
 
     @Column(name = "name")
@@ -51,7 +51,7 @@ public class Campaign {
     @Column(name = "created_by")
     private String createdBy;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
