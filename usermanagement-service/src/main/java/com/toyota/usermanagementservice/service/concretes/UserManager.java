@@ -180,9 +180,9 @@ public class UserManager implements UserService {
 
     @Override
     public Page<GetAllUsersResponse> getAllUsersPage(int page, int size, String[] sort, Long id, String firstName,
-                                                     String lastName, String userName, String email) {
+                                                     String lastName, String username, String email) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(getOrder(sort)));
-        Page<User> pageUser = this.userRepository.getUsersFiltered(id, firstName, lastName, userName, email, pageable);
+        Page<User> pageUser = this.userRepository.getUsersFiltered(id, firstName, lastName, username, email, pageable);
         return pageUser.map(user -> this.modelMapperService.forResponse()
                         .map(user, GetAllUsersResponse.class));
     }
