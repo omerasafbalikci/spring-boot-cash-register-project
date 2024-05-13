@@ -13,7 +13,6 @@ import java.util.List;
 @Repository
 public interface ProductCategoryRepository extends JpaRepository<ProductCategory, Long> {
     Boolean existsByNameIgnoreCase(String name);
-    @Query("SELECT pc FROM ProductCategory pc WHERE LOWER(pc.name) LIKE LOWER(CONCAT('%', ?1, '%'))")
     List<ProductCategory> findByNameContainingIgnoreCase(String name);
     ProductCategory findByCategoryNumber(String categoryNumber);
 }

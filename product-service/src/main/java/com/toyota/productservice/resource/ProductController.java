@@ -22,14 +22,14 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping()
-    public ResponseEntity<TreeMap<String, Object>> getAllProductsPage(
+    public ResponseEntity<TreeMap<String, Object>> getProductFiltered(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "3") int size,
             @RequestParam(defaultValue = "id,asc") String[] sort,
             @RequestParam(defaultValue = "") Long id,
             @RequestParam(defaultValue = "") String barcodeNumber,
             @RequestParam(defaultValue = "") Boolean state) {
-        TreeMap<String, Object> response = this.productService.getAllProductsPage(page, size, sort, id, barcodeNumber, state);
+        TreeMap<String, Object> response = this.productService.getProductFiltered(page, size, sort, id, barcodeNumber, state);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

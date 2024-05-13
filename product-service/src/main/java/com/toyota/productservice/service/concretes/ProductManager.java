@@ -62,11 +62,11 @@ public class ProductManager implements ProductService {
     }
 
     @Override
-    public TreeMap<String, Object> getAllProductsPage(int page, int size, String[] sort, Long id, String barcodeNumber,
+    public TreeMap<String, Object> getProductFiltered(int page, int size, String[] sort, Long id, String barcodeNumber,
                                                       Boolean state) {
         logger.info("Fetching all products with pagination. Page: {}, Size: {}, Sort: {}. Filter: id={}, barcodeNumber={}, state={}.", page, size, Arrays.toString(sort), id, barcodeNumber, state);
         Pageable pagingSort = PageRequest.of(page, size, Sort.by(getOrder(sort)));
-        Page<Product> pagePro = this.productRepository.getProductFiltered(id, barcodeNumber, state, pagingSort);
+        Page<Product> pagePro = this.productRepository.findByFilters(id, barcodeNumber, state, pagingSort);
 
         List<GetAllProductsResponse> responses = pagePro.getContent().stream()
                 .map(product -> this.modelMapperService.forResponse()
