@@ -9,7 +9,12 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    Page<Product> findByState(Boolean state, Pageable pageable);
+
+    @Query("SELECT p FROM Product p WHERE " +
+            "(?1 IS NULL OR p.id = ?1) AND " +
+            "(UPPER(p.barcodeNumber) LIKE CONCAT('%', UPPER(?2), '%')) AND " +
+            "(?3 IS NULL OR p.state = ?3)")
+    Page<Product> getProductFiltered(Long id, String barcodeNumber, Boolean state, Pageable pageable);
     @Query("SELECT p FROM Product p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', ?1, '%'))")
     Page<Product> findByNameContainingIgnoreCase(String name, Pageable pageable);
     @Query("SELECT p FROM Product p WHERE LOWER(SUBSTRING(p.name, 1, 1)) = LOWER(?1)")

@@ -1,4 +1,4 @@
-package com.toyota.verificationauthorizationservice;
+package com.toyota.authenticationauthorizationservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

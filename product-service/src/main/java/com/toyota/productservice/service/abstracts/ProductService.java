@@ -10,13 +10,13 @@ import java.util.List;
 import java.util.TreeMap;
 
 public interface ProductService {
-    TreeMap<String, Object> getAllProductsPage(int page, int size, String[] sort);
+    TreeMap<String, Object> getAllProductsPage(int page, int size, String[] sort, Long id, String barcodeNumber,
+                                               Boolean state);
     TreeMap<String, Object> getProductsByNameContaining(String name, int page, int size, String[] sort);
-    TreeMap<String, Object> getProductsByState(Boolean isState, int page, int size, String[] sort);
     TreeMap<String, Object> getProductsByInitialLetter(String initialLetter, int page, int size, String[] sort);
-    GetAllProductsResponse getProductById(Long id);
     List<InventoryResponse> checkProductInInventory(List<InventoryRequest> inventoryRequests);
     void updateProductInInventory(List<InventoryRequest> inventoryRequests);
+    void returnedProduct(InventoryRequest inventoryRequest);
     GetAllProductsResponse addProduct(CreateProductRequest createProductRequest);
     GetAllProductsResponse updateProduct(UpdateProductRequest updateProductRequest);
     GetAllProductsResponse deleteProduct(Long id);

@@ -1,8 +1,10 @@
 package com.toyota.productservice.resource;
 
+import com.toyota.productservice.domain.Product;
 import com.toyota.productservice.dto.requests.CreateProductCategoryRequest;
 import com.toyota.productservice.dto.requests.UpdateProductCategoryRequest;
 import com.toyota.productservice.dto.responses.GetAllProductCategoriesResponse;
+import com.toyota.productservice.dto.responses.GetAllProductsResponse;
 import com.toyota.productservice.service.abstracts.ProductCategoryService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -41,6 +43,12 @@ public class ProductCategoryController {
     public ResponseEntity<GetAllProductCategoriesResponse> getCategoryById(@RequestParam() Long id) {
         GetAllProductCategoriesResponse response = this.productCategoryService.getCategoryById(id);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/products")
+    public ResponseEntity<List<GetAllProductsResponse>> getProductsByCategoryId(@RequestParam() Long categoryId) {
+        List<GetAllProductsResponse> responses = this.productCategoryService.getProductsByCategoryId(categoryId);
+        return new ResponseEntity<>(responses, HttpStatus.OK);
     }
 
     @PostMapping("/add")

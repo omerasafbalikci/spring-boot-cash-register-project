@@ -1,5 +1,6 @@
 package com.toyota.productservice.service.concretes;
 
+import com.toyota.productservice.dao.ProductCategoryRepository;
 import com.toyota.productservice.dao.ProductRepository;
 import com.toyota.productservice.domain.Product;
 import com.toyota.productservice.domain.ProductCategory;
@@ -33,6 +34,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class ProductManager implements ProductService {
     private final ProductRepository productRepository;
+    private final ProductCategoryRepository productCategoryRepository;
     private final Logger logger = LogManager.getLogger(ProductService.class);
     private final ModelMapperService modelMapperService;
     private final ProductBusinessRules productBusinessRules;
@@ -60,10 +62,11 @@ public class ProductManager implements ProductService {
     }
 
     @Override
-    public TreeMap<String, Object> getAllProductsPage(int page, int size, String[] sort) {
-        logger.info("Fetching all products with pagination. Page: {}, Size: {}, Sort: {}.", page, size, Arrays.toString(sort));
+    public TreeMap<String, Object> getAllProductsPage(int page, int size, String[] sort, Long id, String barcodeNumber,
+                                                      Boolean state) {
+        logger.info("Fetching all products with pagination. Page: {}, Size: {}, Sort: {}. Filter: id={}, barcodeNumber={}, state={}.", page, size, Arrays.toString(sort), id, barcodeNumber, state);
         Pageable pagingSort = PageRequest.of(page, size, Sort.by(getOrder(sort)));
-        Page<Product> pagePro = this.productRepository.findAll(pagingSort);
+        Page<Product> pagePro = this.productRepository.getProductFiltered(id, barcodeNumber, state, pagingSort);
 
         List<GetAllProductsResponse> responses = pagePro.getContent().stream()
                 .map(product -> this.modelMapperService.forResponse()
@@ -98,25 +101,6 @@ public class ProductManager implements ProductService {
     }
 
     @Override
-    public TreeMap<String, Object> getProductsByState(Boolean state, int page, int size, String[] sort) {
-        logger.info("Fetching products by state '{}', with pagination. Page: {}, Size: {}, Sort: {}.", state, page, size, Arrays.toString(sort));
-        Pageable pagingSort = PageRequest.of(page, size, Sort.by(getOrder(sort)));
-        Page<Product> pagePro = this.productRepository.findByState(state, pagingSort);
-
-        List<GetAllProductsResponse> responses = pagePro.getContent().stream()
-                .map(product -> this.modelMapperService.forResponse()
-                        .map(product, GetAllProductsResponse.class)).collect(Collectors.toList());
-
-        TreeMap<String, Object> response = new TreeMap<>();
-        response.put("products", responses);
-        response.put("currentPage", pagePro.getNumber());
-        response.put("totalItems", pagePro.getTotalElements());
-        response.put("totalPages", pagePro.getTotalPages());
-        logger.debug("Retrieved {} products for page {}. Total items: {}. Total pages: {}.", responses.size(), pagePro.getNumber(), pagePro.getTotalElements(), pagePro.getTotalPages());
-        return response;
-    }
-
-    @Override
     public TreeMap<String, Object> getProductsByInitialLetter(String initialLetter, int page, int size, String[] sort) {
         logger.info("Fetching products by initial letter '{}', with pagination. Page: {}, Size: {}, Sort: {}.", initialLetter, page, size, Arrays.toString(sort));
         Pageable pagingSort = PageRequest.of(page, size, Sort.by(getOrder(sort)));
@@ -136,32 +120,26 @@ public class ProductManager implements ProductService {
     }
 
     @Override
-    public GetAllProductsResponse getProductById(Long id) {
-        logger.info("Fetching product by id '{}'.", id);
-        Product product = this.productRepository.findById(id).orElseThrow(() -> {
-            logger.warn("No product found with id '{}'.", id);
-            return new EntityNotFoundException("Product not found");
-        });
-        logger.debug("Product found with id '{}'.", id);
-        return this.modelMapperService.forResponse().map(product, GetAllProductsResponse.class);
-    }
-
-    @Override
     public List<InventoryResponse> checkProductInInventory(List<InventoryRequest> inventoryRequests) {
         List<InventoryResponse> inventoryResponses = new LinkedList<>();
         for (InventoryRequest request : inventoryRequests) {
             String barcodeNumber = request.getBarcodeNumber();
             Integer quantity = request.getQuantity();
 
+            logger.info("Checking product in inventory for barcodeNumber '{}'", barcodeNumber);
             Product product = this.productRepository.findByBarcodeNumber(barcodeNumber);
             if (product != null) {
+                logger.debug("Product found in inventory for barcodeNumber '{}'", barcodeNumber);
                 if (product.getQuantity() >= quantity) {
+                    logger.debug("Sufficient quantity available for product '{}'", barcodeNumber);
                     product.setQuantity(product.getQuantity() - quantity);
                     this.productRepository.save(product);
                 } else {
+                    logger.warn("Insufficient quantity available for product '{}'", barcodeNumber);
                     throw new ProductIsNotInStockException("Product is not in stock");
                 }
             } else {
+                logger.warn("Product not found in inventory for barcodeNumber '{}'", barcodeNumber);
                 throw new EntityNotFoundException("Product not found");
             }
             InventoryResponse inventoryResponse = getInventoryResponse(product, quantity);
@@ -170,7 +148,8 @@ public class ProductManager implements ProductService {
         return inventoryResponses;
     }
 
-    private static InventoryResponse getInventoryResponse(Product product, Integer quantity) {
+    private InventoryResponse getInventoryResponse(Product product, Integer quantity) {
+        logger.debug("Creating inventory response for product '{}'", product.getName());
         InventoryResponse inventoryResponse = new InventoryResponse();
         inventoryResponse.setName(product.getName());
         inventoryResponse.setQuantity(quantity);
@@ -186,13 +165,33 @@ public class ProductManager implements ProductService {
             String barcodeNumber = request.getBarcodeNumber();
             Integer quantity = request.getQuantity();
 
+            logger.info("Updating product in inventory for barcodeNumber '{}'", barcodeNumber);
             Product product = this.productRepository.findByBarcodeNumber(barcodeNumber);
             if (product != null) {
+                logger.debug("Product found in inventory for barcodeNumber '{}'", barcodeNumber);
                 product.setQuantity(product.getQuantity() + quantity);
                 this.productRepository.save(product);
             } else {
+                logger.warn("Product not found in inventory for barcodeNumber '{}'", barcodeNumber);
                 throw new EntityNotFoundException("Product not found");
             }
+        }
+    }
+
+    @Override
+    public void returnedProduct(InventoryRequest inventoryRequest) {
+        String barcodeNumber = inventoryRequest.getBarcodeNumber();
+        Integer quantity = inventoryRequest.getQuantity();
+
+        logger.info("Returning product with barcodeNumber '{}' to inventory", barcodeNumber);
+        Product product = this.productRepository.findByBarcodeNumber(barcodeNumber);
+        if (product != null) {
+            logger.debug("Product found in inventory for barcodeNumber '{}'", barcodeNumber);
+            product.setQuantity(product.getQuantity() + quantity);
+            this.productRepository.save(product);
+        } else {
+            logger.warn("Product not found in inventory for barcodeNumber '{}'", barcodeNumber);
+            throw new EntityNotFoundException("Product not found");
         }
     }
 
@@ -210,6 +209,7 @@ public class ProductManager implements ProductService {
                 product.setQuantity(existingProduct.getQuantity() + createProductRequest.getQuantity());
                 this.productRepository.deleteById(existingProduct.getId());
                 logger.debug("Existing product found with name '{}'. Updating quantity and deleting old product.", createProductRequest.getName());
+                logger.debug("Old product '{}' with different unit price deleted successfully.", createProductRequest.getName());
             } else {
                 logger.warn("Product with name '{}' already exists with different unit price.", createProductRequest.getName());
                 throw new EntityAlreadyExistsException("Product already exists");
@@ -225,9 +225,8 @@ public class ProductManager implements ProductService {
         product.setState(createProductRequest.getState());
         product.setImageUrl(createProductRequest.getImageUrl());
         product.setCreatedBy(createProductRequest.getCreatedBy());
-        ProductCategory productCategory = new ProductCategory();
-        productCategory.setId(createProductRequest.getProductCategoryId());
-        product.setProductCategory(productCategory);
+        Optional<ProductCategory> optionalProductCategory = this.productCategoryRepository.findById(createProductRequest.getProductCategoryId());
+        optionalProductCategory.ifPresent(product::setProductCategory);
         product.setUpdatedAt(LocalDateTime.now());
         this.productRepository.save(product);
         logger.debug("New product '{}' added successfully.", createProductRequest.getName());

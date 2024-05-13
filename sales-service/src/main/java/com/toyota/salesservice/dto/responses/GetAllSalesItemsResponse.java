@@ -1,5 +1,6 @@
 package com.toyota.salesservice.dto.responses;
 
+import com.toyota.salesservice.domain.Campaign;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,5 +15,6 @@ public class GetAllSalesItemsResponse {
     private Integer quantity;
     private Double unitPrice;
     private Boolean state;
-    private Long campaignName;
+    private boolean deleted;
+    private Campaign campaign;
 }

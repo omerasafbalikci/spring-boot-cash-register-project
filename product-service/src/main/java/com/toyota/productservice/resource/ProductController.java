@@ -8,7 +8,6 @@ import com.toyota.productservice.dto.responses.InventoryResponse;
 import com.toyota.productservice.service.abstracts.ProductService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,8 +25,11 @@ public class ProductController {
     public ResponseEntity<TreeMap<String, Object>> getAllProductsPage(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "3") int size,
-            @RequestParam(defaultValue = "id,asc") String[] sort) {
-        TreeMap<String, Object> response = this.productService.getAllProductsPage(page, size, sort);
+            @RequestParam(defaultValue = "id,asc") String[] sort,
+            @RequestParam(defaultValue = "") Long id,
+            @RequestParam(defaultValue = "") String barcodeNumber,
+            @RequestParam(defaultValue = "") Boolean state) {
+        TreeMap<String, Object> response = this.productService.getAllProductsPage(page, size, sort, id, barcodeNumber, state);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -41,16 +43,6 @@ public class ProductController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/state")
-    public ResponseEntity<TreeMap<String, Object>> getProductsByState(
-            @RequestParam(defaultValue = "true") Boolean state,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "3") int size,
-            @RequestParam(defaultValue = "id,asc") String[] sort) {
-        TreeMap<String, Object> response = this.productService.getProductsByState(state, page, size, sort);
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
     @GetMapping("/letter")
     public ResponseEntity<TreeMap<String, Object>> getProductsByInitialLetter(
             @RequestParam() String initialLetter,
@@ -61,12 +53,6 @@ public class ProductController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/id")
-    public ResponseEntity<GetAllProductsResponse> getProductById(@RequestParam() Long id) {
-        GetAllProductsResponse response = this.productService.getProductById(id);
-        return ResponseEntity.ok(response);
-    }
-
     @PostMapping("/check-product-in-inventory")
     public List<InventoryResponse> checkProductInInventory(@RequestBody @Valid List<InventoryRequest> inventoryRequests) {
         return this.productService.checkProductInInventory(inventoryRequests);
@@ -75,6 +61,11 @@ public class ProductController {
     @PostMapping("/update-product-in-inventory")
     public void updateProductInInventory(@RequestBody @Valid List<InventoryRequest> inventoryRequests) {
         this.productService.updateProductInInventory(inventoryRequests);
+    }
+
+    @PostMapping("/returned-product")
+    public void returnedProduct(@RequestBody @Valid InventoryRequest inventoryRequest) {
+        this.productService.returnedProduct(inventoryRequest);
     }
 
     @PostMapping("/add")

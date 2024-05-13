@@ -35,10 +35,9 @@ public class ReportManager implements ReportService {
 
     @Override
     public Mono<PaginationResponse<GetAllReportsResponse>> getAllSalesPage(int page, int size, String[] sort, Long id, String salesNumber,
-                                             LocalDateTime salesDate, String createdBy, String paymentType,
+                                             String salesDate, String createdBy, String paymentType,
                                              Double totalPrice, Double money, Double change) {
-        return webClientBuilder.build()
-                .get()
+        return webClientBuilder.build().get()
                 .uri("http://sales-service/api/sales", uriBuilder ->
                         uriBuilder
                                 .queryParam("page", page)

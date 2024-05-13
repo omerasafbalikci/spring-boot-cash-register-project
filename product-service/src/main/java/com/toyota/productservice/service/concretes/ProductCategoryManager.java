@@ -1,10 +1,12 @@
 package com.toyota.productservice.service.concretes;
 
 import com.toyota.productservice.dao.ProductCategoryRepository;
+import com.toyota.productservice.domain.Product;
 import com.toyota.productservice.domain.ProductCategory;
 import com.toyota.productservice.dto.requests.CreateProductCategoryRequest;
 import com.toyota.productservice.dto.requests.UpdateProductCategoryRequest;
 import com.toyota.productservice.dto.responses.GetAllProductCategoriesResponse;
+import com.toyota.productservice.dto.responses.GetAllProductsResponse;
 import com.toyota.productservice.service.abstracts.ProductCategoryService;
 import com.toyota.productservice.service.rules.ProductCategoryBusinessRules;
 import com.toyota.productservice.utilities.exceptions.EntityAlreadyExistsException;
@@ -53,7 +55,7 @@ public class ProductCategoryManager implements ProductCategoryService {
             return responses;
         } else {
             logger.warn("No product categories found by name containing '{}'.", name);
-            throw new EntityNotFoundException("Product category not found");
+            throw new EntityNotFoundException("Product category not found for name: " + name);
         }
     }
 
@@ -66,7 +68,7 @@ public class ProductCategoryManager implements ProductCategoryService {
             return this.modelMapperService.forResponse().map(productCategory, GetAllProductCategoriesResponse.class);
         } else {
             logger.warn("No product category found with category number '{}'.", categoryNumber);
-            throw new EntityNotFoundException("Product category not found");
+            throw new EntityNotFoundException("Product category not found for category number: " + categoryNumber);
         }
     }
 
@@ -75,16 +77,36 @@ public class ProductCategoryManager implements ProductCategoryService {
         logger.info("Fetching product category by id '{}'.", id);
         ProductCategory productCategory = this.productCategoryRepository.findById(id).orElseThrow(() -> {
             logger.warn("No product category found with id '{}'.", id);
-            return new EntityNotFoundException("Product category not found");
+            return new EntityNotFoundException("Product category not found for id: " + id);
         });
         logger.debug("Retrieved product category with id '{}'.", id);
         return this.modelMapperService.forResponse().map(productCategory, GetAllProductCategoriesResponse.class);
     }
 
     @Override
+    public List<GetAllProductsResponse> getProductsByCategoryId(Long categoryId) {
+        logger.info("Fetching products by category id '{}'.", categoryId);
+        ProductCategory productCategory = this.productCategoryRepository.findById(categoryId).orElseThrow(() -> {
+            logger.warn("No product category found with id '{}'.", categoryId);
+            return new EntityNotFoundException("Product category not found");
+        });
+        logger.debug("Retrieved products for category id '{}'.", categoryId);
+        List<Product> products = productCategory.getProducts();
+        List<GetAllProductsResponse> responses = products.stream()
+                .map(product -> modelMapperService.forResponse().map(product, GetAllProductsResponse.class)).toList();
+        logger.info("Retrieved and converted {} product to GetAllProductsResponse.", responses.size());
+        return responses;
+    }
+
+    @Override
     public GetAllProductCategoriesResponse addCategory(CreateProductCategoryRequest createProductCategoryRequest) {
         logger.info("Adding new product category: '{}'.", createProductCategoryRequest.getName());
-        this.productCategoryBusinessRules.checkIfProductCategoryNameExists(createProductCategoryRequest.getName());
+        try {
+            this.productCategoryBusinessRules.checkIfProductCategoryNameExists(createProductCategoryRequest.getName());
+        } catch (EntityAlreadyExistsException e) {
+            logger.warn("Product category '{}' already exists.", createProductCategoryRequest.getName());
+            throw new EntityAlreadyExistsException("Product category already exists");
+        }
         ProductCategory productCategory = this.modelMapperService.forRequest().map(createProductCategoryRequest, ProductCategory.class);
         productCategory.setCategoryNumber(UUID.randomUUID().toString().substring(0, 8));
         productCategory.setUpdatedAt(LocalDateTime.now());
@@ -103,9 +125,10 @@ public class ProductCategoryManager implements ProductCategoryService {
         ProductCategory productCategory = this.modelMapperService.forRequest().map(updateProductCategoryRequest, ProductCategory.class);
         this.productCategoryBusinessRules.checkUpdate(productCategory, existingProductCategory);
         if (this.productCategoryRepository.existsByNameIgnoreCase(productCategory.getName()) && !existingProductCategory.getName().equals(productCategory.getName())) {
+            logger.warn("Product category name '{}' already exists.", productCategory.getName());
             throw new EntityAlreadyExistsException("Product category name already exists");
         }
-        logger.info("Product category name does not exist. Proceeding with creating the product category.");
+        logger.info("Product category name does not exist. Proceeding with updating the product category.");
         productCategory.setCategoryNumber(existingProductCategory.getCategoryNumber());
         productCategory.setUpdatedAt(LocalDateTime.now());
         this.productCategoryRepository.save(productCategory);

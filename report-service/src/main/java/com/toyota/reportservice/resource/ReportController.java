@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 
 @RestController
-@RequestMapping("/api/report")
+@RequestMapping("/api/reports")
 @AllArgsConstructor
 public class ReportController {
     private final ReportService reportService;
@@ -27,7 +27,7 @@ public class ReportController {
                                                                            @RequestParam(defaultValue = "id,asc") String[] sort,
                                                                            @RequestParam(defaultValue = "") Long id,
                                                                            @RequestParam(defaultValue = "") String salesNumber,
-                                                                           @RequestParam(defaultValue = "") LocalDateTime salesDate,
+                                                                           @RequestParam(defaultValue = "") String salesDate,
                                                                            @RequestParam(defaultValue = "") String createdBy,
                                                                            @RequestParam(defaultValue = "") String paymentType,
                                                                            @RequestParam(defaultValue = "") Double totalPrice,

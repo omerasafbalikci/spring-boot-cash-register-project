@@ -1,5 +1,6 @@
 package com.toyota.salesservice.service.concretes;
 
+import com.toyota.salesservice.dao.CampaignRepository;
 import com.toyota.salesservice.dao.SalesRepository;
 import com.toyota.salesservice.domain.Campaign;
 import com.toyota.salesservice.domain.Sales;
@@ -32,12 +33,15 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 @Transactional
 @AllArgsConstructor
 public class SalesManager implements SalesService {
     private final SalesRepository salesRepository;
+    private final CampaignRepository campaignRepository;
     private final Logger logger = LogManager.getLogger(SalesService.class);
     private final WebClient.Builder webClientBuilder;
     private final ModelMapperService modelMapperService;
@@ -54,17 +58,14 @@ public class SalesManager implements SalesService {
                 .map(CreateSalesItemsRequest::getBarcodeNumber).toList();
 
         List<Optional<Long>> campaignIds = createSalesRequest.getCreateSalesItemsRequests().stream()
-                .map(request -> {
-                    Long campaignId = request.getCampaignId();
-                    return Optional.ofNullable(campaignId);
-                })
+                .map(request -> Optional.ofNullable(request.getCampaignId()))
                 .toList();
 
         List<InventoryRequest> inventoryRequests = createSalesRequest.getCreateSalesItemsRequests().stream()
                 .map(salesItem -> this.modelMapperService.forRequest().map(salesItem, InventoryRequest.class))
                 .toList();
 
-        List<InventoryResponse> inventoryResponses = webClientBuilder.build().post()
+        List<InventoryResponse> inventoryResponses = this.webClientBuilder.build().post()
                 .uri("http://product-service/api/products/check-product-in-inventory")
                 .body(BodyInserters.fromValue(inventoryRequests))
                 .retrieve()
@@ -72,33 +73,26 @@ public class SalesManager implements SalesService {
                 .block();
 
         if (inventoryResponses != null && !inventoryResponses.isEmpty()) {
-            List<SalesItems> salesItems = new ArrayList<>();
-            for (int i = 0; i < inventoryResponses.size(); i++) {
-                InventoryResponse response = inventoryResponses.get(i);
-                SalesItems salesItem = new SalesItems();
-                salesItem.setBarcodeNumber(barcodeNumbers.get(i));
-                salesItem.setSales(sales);
-                salesItem.setName(response.getName());
-                salesItem.setQuantity(response.getQuantity());
-                salesItem.setUnitPrice(response.getUnitPrice());
-                salesItem.setState(response.getState());
+            List<SalesItems> salesItems = IntStream.range(0, inventoryResponses.size())
+                    .mapToObj(i -> {
+                        InventoryResponse response = inventoryResponses.get(i);
+                        SalesItems salesItem = new SalesItems();
+                        salesItem.setBarcodeNumber(barcodeNumbers.get(i));
+                        salesItem.setSales(sales);
+                        salesItem.setName(response.getName());
+                        salesItem.setQuantity(response.getQuantity());
+                        salesItem.setUnitPrice(response.getUnitPrice());
+                        salesItem.setState(response.getState());
 
-                if (i < campaignIds.size()) {
-                    Optional<Long> campaignIdOptional = campaignIds.get(i);
-                    if (campaignIdOptional.isPresent()) {
-                        Long campaignId = campaignIdOptional.get();
-                        Campaign campaign = new Campaign();
-                        campaign.setId(campaignId);
-                        salesItem.setCampaign(campaign);
-                    } else {
-                        // Eğer campaignId null ise, salesItem'in kampanyasını null olarak ayarla
-                        salesItem.setCampaign(null);
-                    }
-                }
+                        Optional<Long> campaignIdOptional = campaignIds.get(i);
+                        campaignIdOptional.ifPresent(campaignId -> {
+                            Optional<Campaign> optionalCampaign = this.campaignRepository.findById(campaignId);
+                            optionalCampaign.ifPresent(salesItem::setCampaign);
+                        });
 
-                salesItems.add(salesItem);
-            }
-
+                        return salesItem;
+                    })
+                    .collect(Collectors.toList());
             sales.setSalesItemsList(salesItems);
 
             for (SalesItems salesItem : salesItems) {
@@ -109,10 +103,11 @@ public class SalesManager implements SalesService {
                 Campaign campaign = salesItem.getCampaign();
                 if (campaign != null) {
                     Integer campaignType = campaign.getCampaignType();
-                    if (campaignType == 1) {
+                    if (campaignType == 1 && salesItem.getQuantity() >= salesItem.getCampaign().getBuyPayPartOne()) {
                         double price = salesItem.getUnitPrice();
-                        double sets = price / (salesItem.getCampaign().getBuyPayPartOne() + salesItem.getCampaign().getBuyPayPartTwo());
-                        Double newPrice = price - (sets * salesItem.getCampaign().getBuyPayPartTwo());
+                        double setPrice = price / (salesItem.getCampaign().getBuyPayPartOne() + salesItem.getCampaign().getBuyPayPartTwo());
+                        int totalSets = salesItem.getQuantity() / (salesItem.getCampaign().getBuyPayPartOne() + salesItem.getCampaign().getBuyPayPartTwo());
+                        Double newPrice = price * totalSets - (setPrice * salesItem.getCampaign().getBuyPayPartTwo() * totalSets);
                         salesItem.setUnitPrice(newPrice);
                     } else if (campaignType == 2) {
                         double price = salesItem.getUnitPrice();
@@ -137,12 +132,14 @@ public class SalesManager implements SalesService {
                 if (createSalesRequest.getMoney() != null) {
                     sales.setMoney(createSalesRequest.getMoney());
                 } else {
+                    this.salesBusinessRules.updateInventory(inventoryRequests);
                     throw new NoMoneyEnteredException("No money entered");
                 }
             } else if (createSalesRequest.getPaymentType().equals("k") || createSalesRequest.getPaymentType().equals("K")) {
                 sales.setPaymentType("Kart");
                 sales.setMoney(totalPrice);
             } else {
+                this.salesBusinessRules.updateInventory(inventoryRequests);
                 throw new PaymentTypeIncorrectEntryException("Payment type is ıncorrect entry");
             }
 
@@ -151,12 +148,7 @@ public class SalesManager implements SalesService {
                 this.salesRepository.save(sales);
                 return this.modelMapperService.forResponse().map(sales, GetAllSalesResponse.class);
             } else {
-                webClientBuilder.build().post()
-                        .uri("http://product-service/api/products/update-product-in-inventory")
-                        .body(BodyInserters.fromValue(inventoryRequests))
-                        .retrieve()
-                        .bodyToMono(new ParameterizedTypeReference<List<InventoryResponse>>() {})
-                        .block();
+                this.salesBusinessRules.updateInventory(inventoryRequests);
                 throw new InsufficientBalanceException("Insufficient balance");
             }
         } else {
@@ -189,12 +181,12 @@ public class SalesManager implements SalesService {
                             throw new QuantityIncorrectEntryException("Quantity incorrect entry");
                         }
                         inventoryRequest.setQuantity(createReturnRequest.getQuantity());
-                        webClientBuilder.build().post()
-                                .uri("http://product-service/api/products/update-product-in-inventory")
+                        this.webClientBuilder.build().post()
+                                .uri("http://product-service/api/products/returned-product")
                                 .body(BodyInserters.fromValue(inventoryRequest))
                                 .retrieve()
-                                .bodyToMono(new ParameterizedTypeReference<List<InventoryResponse>>() {})
-                                .subscribe();
+                                .toBodilessEntity()
+                                .block();
                         this.salesRepository.save(sales);
                     }
                 }
@@ -232,7 +224,7 @@ public class SalesManager implements SalesService {
 
     @Override
     public PaginationResponse<GetAllSalesResponse> getAllSalesPage(int page, int size, String[] sort, Long id, String salesNumber,
-                                              LocalDateTime salesDate, String createdBy, String paymentType,
+                                              String salesDate, String createdBy, String paymentType,
                                               Double totalPrice, Double money, Double change) {
         logger.info("Fetching all sales with pagination. Page: {}, Size: {}, Sort: {}.", page, size, Arrays.toString(sort));
         Pageable pagingSort = PageRequest.of(page, size, Sort.by(getOrder(sort)));

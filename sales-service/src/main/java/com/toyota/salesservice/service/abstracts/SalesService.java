@@ -12,6 +12,6 @@ public interface SalesService {
     GetAllSalesResponse addSales(CreateSalesRequest createSalesRequest);
     GetAllSalesItemsResponse toReturn(CreateReturnRequest createReturnRequest);
     PaginationResponse<GetAllSalesResponse> getAllSalesPage(int page, int size, String[] sort, Long id, String salesNumber,
-                                                                   LocalDateTime salesDate, String createdBy, String paymentType,
+                                                                   String salesDate, String createdBy, String paymentType,
                                                                    Double totalPrice, Double money, Double change);
 }
