@@ -14,6 +14,7 @@ public class GetAllSalesItemsResponse {
     private String name;
     private Integer quantity;
     private Double unitPrice;
+    private String paymentType;
     private Boolean state;
     private boolean deleted;
     private Campaign campaign;

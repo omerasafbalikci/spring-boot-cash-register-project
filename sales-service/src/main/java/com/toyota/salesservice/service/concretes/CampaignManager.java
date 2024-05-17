@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.TreeMap;
 import java.util.UUID;
 
 @Service
@@ -51,7 +50,7 @@ public class CampaignManager implements CampaignService {
             return this.modelMapperService.forResponse().map(campaign, GetAllCampaignsResponse.class);
         } else {
             logger.warn("No campaign found with category number '{}'.", campaignNumber);
-            throw new CampaignNotFoundException("Campaign not found");
+            throw new CampaignNotFoundException("Campaign not found for campaign number: " + campaignNumber);
         }
     }
 
@@ -63,9 +62,10 @@ public class CampaignManager implements CampaignService {
             throw new CampaignAlreadyExistsException("Campaign already exists");
         }
         Campaign campaign = this.modelMapperService.forRequest().map(createCampaignRequest, Campaign.class);
+        this.campaignBusinessRules.checkCampaignDetails(campaign);
+        this.campaignBusinessRules.addCampaignType(campaign, createCampaignRequest);
         campaign.setCampaignNumber(UUID.randomUUID().toString().substring(0, 8));
         campaign.setUpdatedAt(LocalDateTime.now());
-        this.campaignBusinessRules.checkCampaignDetails(campaign);
         this.campaignRepository.save(campaign);
         logger.debug("New campaign added: '{}'.", createCampaignRequest.getName());
         return this.modelMapperService.forResponse().map(campaign, GetAllCampaignsResponse.class);
@@ -80,13 +80,12 @@ public class CampaignManager implements CampaignService {
         });
         Campaign campaign = this.modelMapperService.forRequest().map(updateCampaignRequest, Campaign.class);
         this.campaignBusinessRules.checkUpdate(campaign, existingCampaign);
-
+        this.campaignBusinessRules.checkCampaignDetails(campaign);
+        this.campaignBusinessRules.updateCampaignType(campaign, updateCampaignRequest);
         logger.info("Campaign name does not exist. Proceeding with creating the campaign.");
+
         campaign.setCampaignNumber(existingCampaign.getCampaignNumber());
         campaign.setUpdatedAt(LocalDateTime.now());
-        if (updateCampaignRequest.getBuyPay() != null) {
-            this.campaignBusinessRules.checkCampaignDetails(campaign);
-        }
         this.campaignRepository.save(campaign);
         logger.debug("Campaign with id '{}' updated successfully.", updateCampaignRequest.getId());
         return this.modelMapperService.forResponse().map(campaign, GetAllCampaignsResponse.class);

@@ -2,6 +2,8 @@ package com.toyota.salesservice.service.rules;
 
 import com.toyota.salesservice.dao.CampaignRepository;
 import com.toyota.salesservice.domain.Campaign;
+import com.toyota.salesservice.dto.requests.CreateCampaignRequest;
+import com.toyota.salesservice.dto.requests.UpdateCampaignRequest;
 import com.toyota.salesservice.utilities.exceptions.CampaignAlreadyExistsException;
 import com.toyota.salesservice.utilities.exceptions.CampaignDetailsAreIncorrectException;
 import lombok.AllArgsConstructor;
@@ -33,6 +35,33 @@ public class CampaignBusinessRules {
             campaign.setBuyPayPartTwo(buyPayPartTwo);
         }
     }
+
+    public void addCampaignType(Campaign campaign, CreateCampaignRequest createCampaignRequest) {
+        if (createCampaignRequest.getBuyPay() == null && createCampaignRequest.getPercent() == null && createCampaignRequest.getMoneyDiscount() == null) {
+            throw new CampaignDetailsAreIncorrectException("Campaign details not entered");
+        }
+        if (createCampaignRequest.getBuyPay() != null) {
+            campaign.setCampaignType(1);
+        } else if (createCampaignRequest.getPercent() != null) {
+            campaign.setCampaignType(2);
+        } else {
+            campaign.setCampaignType(3);
+        }
+    }
+
+    public void updateCampaignType(Campaign campaign, UpdateCampaignRequest updateCampaignRequest) {
+        if (updateCampaignRequest.getBuyPay() == null && updateCampaignRequest.getPercent() == null && updateCampaignRequest.getMoneyDiscount() == null) {
+            throw new CampaignDetailsAreIncorrectException("Campaign details not entered");
+        }
+        if (updateCampaignRequest.getBuyPay() != null) {
+            campaign.setCampaignType(1);
+        } else if (updateCampaignRequest.getPercent() != null) {
+            campaign.setCampaignType(2);
+        } else {
+            campaign.setCampaignType(3);
+        }
+    }
+
     public void checkUpdate(Campaign campaign, Campaign existingCampaign) {
         if (campaign.getName() == null) {
             campaign.setName(existingCampaign.getName());

@@ -18,8 +18,6 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@FilterDef(name = "notDeleted", parameters = @ParamDef(name = "isDeleted", type = Boolean.class))
-@Filter(name = "notDeleted", condition = "deleted = :isDeleted")
 public class Sales {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,8 +34,9 @@ public class Sales {
     @Column(name = "created_by")
     private String createdBy;
 
+    @Enumerated(value = EnumType.STRING)
     @Column(name = "payment_type")
-    private String paymentType;
+    private PaymentType paymentType;
 
     @Column(name = "total_price")
     private Double totalPrice;

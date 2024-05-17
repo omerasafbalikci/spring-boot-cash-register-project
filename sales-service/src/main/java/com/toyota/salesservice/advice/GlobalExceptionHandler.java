@@ -62,8 +62,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(PaymentTypeIncorrectEntryException.class)
-    public ResponseEntity<Object> handlePaymentTypeIncorrectEntryException(PaymentTypeIncorrectEntryException exception, HttpServletRequest request) {
+    @ExceptionHandler(PaymentTypeNotEnteredException.class)
+    public ResponseEntity<Object> handlePaymentTypeIncorrectEntryException(PaymentTypeNotEnteredException exception, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
         errorResponse.setPath(request.getRequestURI());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);

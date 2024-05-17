@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -14,11 +15,13 @@ public class SalesBusinessRules {
     private final WebClient.Builder webClientBuilder;
 
     public void updateInventory(List<InventoryRequest> inventoryRequests) {
-        this.webClientBuilder.build().put()
+        Mono<Void> updateInventoryMono = this.webClientBuilder.build().post()
                 .uri("http://product-service/api/products/update-product-in-inventory")
                 .body(BodyInserters.fromValue(inventoryRequests))
                 .retrieve()
                 .toBodilessEntity()
-                .block();
+                .then();
+
+        updateInventoryMono.subscribe();
     }
 }

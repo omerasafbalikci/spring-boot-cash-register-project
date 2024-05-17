@@ -31,14 +31,15 @@ public class SalesItems {
     @Column(name = "state", nullable = false)
     private Boolean state;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "campaign_id")
     private Campaign campaign;
 
-    @Column(name = "deleted", columnDefinition = "BOOLEAN DEFAULT false", nullable = false)
-    private boolean deleted;
+    @Enumerated(value = EnumType.STRING)
+    @Column(name = "payment_type")
+    private PaymentType paymentType;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sales_id")
     private Sales sales;
 }

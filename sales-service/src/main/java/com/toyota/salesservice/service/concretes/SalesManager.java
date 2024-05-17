@@ -3,6 +3,7 @@ package com.toyota.salesservice.service.concretes;
 import com.toyota.salesservice.dao.CampaignRepository;
 import com.toyota.salesservice.dao.SalesRepository;
 import com.toyota.salesservice.domain.Campaign;
+import com.toyota.salesservice.domain.PaymentType;
 import com.toyota.salesservice.domain.Sales;
 import com.toyota.salesservice.domain.SalesItems;
 import com.toyota.salesservice.dto.requests.CreateReturnRequest;
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -58,21 +60,33 @@ public class SalesManager implements SalesService {
                 .map(CreateSalesItemsRequest::getBarcodeNumber).toList();
 
         List<Optional<Long>> campaignIds = createSalesRequest.getCreateSalesItemsRequests().stream()
-                .map(request -> Optional.ofNullable(request.getCampaignId()))
-                .toList();
+                .map(request -> Optional.ofNullable(request.getCampaignId())).toList();
+
+        List<Optional<String>> paymentTypes = createSalesRequest.getCreateSalesItemsRequests().stream()
+                .map(request -> Optional.ofNullable(request.getPaymentType())).toList();
+
+        if ((createSalesRequest.getPaymentType() == null) && (paymentTypes.stream().allMatch(Optional::isEmpty) || paymentTypes.stream().anyMatch(Optional::isEmpty))) {
+            throw new PaymentTypeNotEnteredException("Payment type not entered");
+        }
+
+        if (createSalesRequest.getPaymentType() != null) {
+            PaymentType paymentType = PaymentType.valueOf(createSalesRequest.getPaymentType().toUpperCase());
+            sales.setPaymentType(paymentType);
+        }
 
         List<InventoryRequest> inventoryRequests = createSalesRequest.getCreateSalesItemsRequests().stream()
-                .map(salesItem -> this.modelMapperService.forRequest().map(salesItem, InventoryRequest.class))
-                .toList();
+                .map(salesItem -> this.modelMapperService.forRequest().map(salesItem, InventoryRequest.class)).toList();
 
-        List<InventoryResponse> inventoryResponses = this.webClientBuilder.build().post()
+        Mono<List<InventoryResponse>> inventoryResponseMono = this.webClientBuilder.build().post()
                 .uri("http://product-service/api/products/check-product-in-inventory")
                 .body(BodyInserters.fromValue(inventoryRequests))
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<InventoryResponse>>() {})
-                .block();
+                .bodyToMono(new ParameterizedTypeReference<List<InventoryResponse>>() {});
 
-        if (inventoryResponses != null && !inventoryResponses.isEmpty()) {
+        List<InventoryResponse> inventoryResponses = inventoryResponseMono.blockOptional().orElse(Collections.emptyList());
+
+
+        if (!inventoryResponses.isEmpty()) {
             List<SalesItems> salesItems = IntStream.range(0, inventoryResponses.size())
                     .mapToObj(i -> {
                         InventoryResponse response = inventoryResponses.get(i);
@@ -90,18 +104,29 @@ public class SalesManager implements SalesService {
                             optionalCampaign.ifPresent(salesItem::setCampaign);
                         });
 
+                        Optional<String> paymentTypeOptional = paymentTypes.get(i);
+                        paymentTypeOptional.ifPresent(paymentType -> {
+                            PaymentType type = PaymentType.valueOf(paymentType.toUpperCase());
+                            salesItem.setPaymentType(type);
+                        });
+
                         return salesItem;
                     })
                     .collect(Collectors.toList());
             sales.setSalesItemsList(salesItems);
 
             for (SalesItems salesItem : salesItems) {
+                if (salesItem.getPaymentType() == null) {
+                    salesItem.setPaymentType(sales.getPaymentType());
+                }
+
                 if (!salesItem.getState()) {
+                    this.salesBusinessRules.updateInventory(inventoryRequests);
                     throw new ProductStatusFalseException(salesItem.getName() + " status is false");
                 }
 
                 Campaign campaign = salesItem.getCampaign();
-                if (campaign != null) {
+                if (campaign != null && campaign.getState()) {
                     Integer campaignType = campaign.getCampaignType();
                     if (campaignType == 1 && salesItem.getQuantity() >= salesItem.getCampaign().getBuyPayPartOne()) {
                         double price = salesItem.getUnitPrice();
@@ -127,21 +152,24 @@ public class SalesManager implements SalesService {
 
             sales.setTotalPrice(totalPrice);
 
-            if (createSalesRequest.getPaymentType().equals("n") || createSalesRequest.getPaymentType().equals("N")) {
-                sales.setPaymentType("Nakit");
-                if (createSalesRequest.getMoney() != null) {
-                    sales.setMoney(createSalesRequest.getMoney());
-                } else {
+            Double money = 0.0;
+            boolean isCash = false;
+            for (SalesItems salesItem : salesItems) {
+                if (salesItem.getPaymentType() == PaymentType.CARD) {
+                    money += (salesItem.getUnitPrice() * salesItem.getQuantity());
+                } else if (salesItem.getPaymentType() == PaymentType.CASH) {
+                    isCash = true;
+                }
+            }
+            if (isCash) {
+                if (createSalesRequest.getMoney() == null) {
                     this.salesBusinessRules.updateInventory(inventoryRequests);
                     throw new NoMoneyEnteredException("No money entered");
                 }
-            } else if (createSalesRequest.getPaymentType().equals("k") || createSalesRequest.getPaymentType().equals("K")) {
-                sales.setPaymentType("Kart");
-                sales.setMoney(totalPrice);
-            } else {
-                this.salesBusinessRules.updateInventory(inventoryRequests);
-                throw new PaymentTypeIncorrectEntryException("Payment type is ıncorrect entry");
+                money += createSalesRequest.getMoney();
             }
+
+            sales.setMoney(money);
 
             if (sales.getMoney() >= totalPrice) {
                 sales.setChange(sales.getMoney() - sales.getTotalPrice());
@@ -159,45 +187,60 @@ public class SalesManager implements SalesService {
     @Override
     public GetAllSalesItemsResponse toReturn(CreateReturnRequest createReturnRequest) {
         Sales sales = this.salesRepository.findBySalesNumber(createReturnRequest.getSalesNumber());
-        InventoryRequest inventoryRequest = new InventoryRequest();
-        inventoryRequest.setBarcodeNumber(createReturnRequest.getBarcodeNumber());
-        SalesItems salesItems = new SalesItems();
-        if (sales != null) {
-            LocalDateTime salesDate = sales.getSalesDate();
-            LocalDateTime returnDate = createReturnRequest.getReturnDate();
-            boolean hasBarcodeNumber = false;
 
-            Duration duration = Duration.between(salesDate, returnDate);
-            long days = duration.toDays();
-            if (days > 15) {
-                throw new ReturnPeriodExpiredException("Return period has expired");
-            } else {
-                for (SalesItems salesItem : sales.getSalesItemsList()) {
-                    if (salesItem.getBarcodeNumber().equals(createReturnRequest.getBarcodeNumber())) {
-                        salesItems = salesItem;
-                        salesItem.setDeleted(true);
-                        hasBarcodeNumber = true;
-                        if (salesItem.getQuantity() < createReturnRequest.getQuantity()) {
-                            throw new QuantityIncorrectEntryException("Quantity incorrect entry");
-                        }
-                        inventoryRequest.setQuantity(createReturnRequest.getQuantity());
-                        this.webClientBuilder.build().post()
-                                .uri("http://product-service/api/products/returned-product")
-                                .body(BodyInserters.fromValue(inventoryRequest))
-                                .retrieve()
-                                .toBodilessEntity()
-                                .block();
-                        this.salesRepository.save(sales);
-                    }
-                }
-                if (!hasBarcodeNumber) {
-                    throw new SalesItemsNotFoundException("Sales items not found");
-                }
-            }
-        } else {
+        if (sales == null) {
             throw new SalesNotFoundException("Sales not found");
         }
-        return this.modelMapperService.forResponse().map(salesItems, GetAllSalesItemsResponse.class);
+
+        LocalDateTime salesDate = sales.getSalesDate();
+        LocalDateTime returnDate = createReturnRequest.getReturnDate();
+        Duration duration = Duration.between(salesDate, returnDate);
+        long days = duration.toDays();
+
+        if (days > 15) {
+            throw new ReturnPeriodExpiredException("Return period has expired");
+        }
+
+        SalesItems salesItem = null;
+        boolean hasBarcodeNumber = false;
+
+        for (SalesItems item : sales.getSalesItemsList()) {
+            if (item.getBarcodeNumber().equals(createReturnRequest.getBarcodeNumber())) {
+                salesItem = item;
+                hasBarcodeNumber = true;
+                break;
+            }
+        }
+
+        if (!hasBarcodeNumber) {
+            throw new SalesItemsNotFoundException("Sales items not found");
+        }
+
+        int returnQuantity = createReturnRequest.getQuantity();
+        if (salesItem.getQuantity() < returnQuantity) {
+            throw new QuantityIncorrectEntryException("Quantity incorrect entry");
+        }
+
+        InventoryRequest inventoryRequest = new InventoryRequest();
+        inventoryRequest.setBarcodeNumber(createReturnRequest.getBarcodeNumber());
+        inventoryRequest.setQuantity(returnQuantity);
+
+        Mono<Void> returnedProductMono = this.webClientBuilder.build().post()
+                .uri("http://product-service/api/products/returned-product")
+                .body(BodyInserters.fromValue(inventoryRequest))
+                .retrieve()
+                .toBodilessEntity()
+                .then();
+
+        returnedProductMono.subscribe();
+
+        salesItem.setQuantity(salesItem.getQuantity() - returnQuantity);
+        sales.setTotalPrice(sales.getTotalPrice() - (salesItem.getUnitPrice() * returnQuantity));
+        sales.setChange(sales.getChange() + (salesItem.getUnitPrice() * returnQuantity));
+
+        this.salesRepository.save(sales);
+
+        return this.modelMapperService.forResponse().map(salesItem, GetAllSalesItemsResponse.class);
     }
 
     private Sort.Direction getSortDirection(String direction) {

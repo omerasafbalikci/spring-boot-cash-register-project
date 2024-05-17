@@ -1,5 +1,6 @@
 package com.toyota.salesservice.dto.requests;
 
+import com.toyota.salesservice.domain.PaymentType;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -17,8 +18,6 @@ public class CreateSalesRequest {
     @NotNull(message = "Created by must not be null")
     @NotBlank(message = "Created by must not be blank")
     private String createdBy;
-    @NotNull(message = "Payment type must not be null")
-    @NotBlank(message = "Payment type must not be blank")
     private String paymentType;
     @Min(value = 0, message = "Money must be greater than or equal to 0")
     private Double money;
