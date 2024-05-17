@@ -1,5 +1,7 @@
 package com.toyota.authenticationauthorizationservice.advice;
 
+import com.toyota.authenticationauthorizationservice.utilities.exceptions.*;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.NonNull;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -9,6 +11,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -17,6 +20,55 @@ import java.util.List;
 
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+    @ExceptionHandler(UsernameTakenException.class)
+    public ResponseEntity<Object> handleUsernameTakenException(UsernameTakenException exception, HttpServletRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.CONFLICT, exception.getMessage());
+        errorResponse.setPath(request.getRequestURI());
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<Object> handleUserNotFoundException(UserNotFoundException exception, HttpServletRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND, exception.getMessage());
+        errorResponse.setPath(request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).header("exception-type", "UserNotFound").body(errorResponse);
+    }
+
+    @ExceptionHandler(InvalidBearerToken.class)
+    public ResponseEntity<Object> handleInvalidBearerToken(InvalidBearerToken exception, HttpServletRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND, exception.getMessage());
+        errorResponse.setPath(request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    @ExceptionHandler(NoRolesException.class)
+    public ResponseEntity<Object> handleNoRolesException(NoRolesException exception, HttpServletRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
+        errorResponse.setPath(request.getRequestURI());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(RoleNotFoundException.class)
+    public ResponseEntity<Object> handleRoleNotFoundException(RoleNotFoundException exception, HttpServletRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND, exception.getMessage());
+        errorResponse.setPath(request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).header("exception-type", "RoleNotFound").body(errorResponse);
+    }
+
+    @ExceptionHandler(IncorrectPasswordException.class)
+    public ResponseEntity<Object> handleIncorrectPasswordException(IncorrectPasswordException exception, HttpServletRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED, exception.getMessage());
+        errorResponse.setPath(request.getRequestURI());
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(InvalidAuthenticationException.class)
+    public ResponseEntity<Object> handleInvalidAuthenticationException(InvalidAuthenticationException exception, HttpServletRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED, exception.getMessage());
+        errorResponse.setPath(request.getRequestURI());
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
+
     @Override
     public ResponseEntity<Object> handleMethodArgumentNotValid(@NonNull MethodArgumentNotValidException exception,
                                                                @NonNull HttpHeaders headers,
