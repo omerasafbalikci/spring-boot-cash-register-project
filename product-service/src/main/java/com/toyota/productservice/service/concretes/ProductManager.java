@@ -2,6 +2,7 @@ package com.toyota.productservice.service.concretes;
 
 import com.toyota.productservice.dao.ProductCategoryRepository;
 import com.toyota.productservice.dao.ProductRepository;
+import com.toyota.productservice.dao.ProductSpecification;
 import com.toyota.productservice.domain.Product;
 import com.toyota.productservice.domain.ProductCategory;
 import com.toyota.productservice.dto.requests.CreateProductRequest;
@@ -29,6 +30,10 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Service implementation for managing products.
+ */
+
 @Service
 @Transactional
 @AllArgsConstructor
@@ -39,6 +44,12 @@ public class ProductManager implements ProductService {
     private final ModelMapperService modelMapperService;
     private final ProductBusinessRules productBusinessRules;
 
+    /**
+     * Determines the sorting direction.
+     *
+     * @param direction the direction to sort (asc or desc)
+     * @return the Sort.Direction enum value
+     */
     private Sort.Direction getSortDirection(String direction) {
         if (direction.equals("asc")) {
             return Sort.Direction.ASC;
@@ -48,6 +59,12 @@ public class ProductManager implements ProductService {
         return Sort.Direction.ASC;
     }
 
+    /**
+     * Creates a list of Sort.Order objects based on the provided sort parameters.
+     *
+     * @param sort the sort parameters
+     * @return a list of Sort.Order objects
+     */
     private List<Sort.Order> getOrder(String[] sort) {
         List<Sort.Order> orders = new ArrayList<>();
         if (sort[0].contains(",")) {
@@ -61,16 +78,29 @@ public class ProductManager implements ProductService {
         return orders;
     }
 
+    /**
+     * Fetches filtered products with pagination and sorting.
+     *
+     * @param page          the page number to fetch
+     * @param size          the number of products per page
+     * @param sort          the sort parameters
+     * @param id            the ID filter
+     * @param barcodeNumber the barcode number filter
+     * @param state         the state filter
+     * @return a TreeMap containing the filtered products and pagination information
+     */
     @Override
     public TreeMap<String, Object> getProductFiltered(int page, int size, String[] sort, Long id, String barcodeNumber,
                                                       Boolean state) {
         logger.info("Fetching all products with pagination. Page: {}, Size: {}, Sort: {}. Filter: id={}, barcodeNumber={}, state={}.", page, size, Arrays.toString(sort), id, barcodeNumber, state);
         Pageable pagingSort = PageRequest.of(page, size, Sort.by(getOrder(sort)));
-        Page<Product> pagePro = this.productRepository.findByFilters(id, barcodeNumber, state, pagingSort);
+        ProductSpecification specification = new ProductSpecification(id, barcodeNumber, state);
+        Page<Product> pagePro = this.productRepository.findAll(specification, pagingSort);
 
         List<GetAllProductsResponse> responses = pagePro.getContent().stream()
                 .map(product -> this.modelMapperService.forResponse()
                         .map(product, GetAllProductsResponse.class)).collect(Collectors.toList());
+        logger.debug("Mapped products to response DTOs. Number of products: {}", responses.size());
 
         TreeMap<String, Object> response = new TreeMap<>();
         response.put("products", responses);
@@ -81,6 +111,15 @@ public class ProductManager implements ProductService {
         return response;
     }
 
+    /**
+     * Fetches products by name containing the specified string with pagination and sorting.
+     *
+     * @param name  the name to search for
+     * @param page  the page number to fetch
+     * @param size  the number of products per page
+     * @param sort  the sort parameters
+     * @return a TreeMap containing the products and pagination information
+     */
     @Override
     public TreeMap<String, Object> getProductsByNameContaining(String name, int page, int size, String[] sort) {
         logger.info("Fetching products by name containing '{}', with pagination. Page: {}, Size: {}, Sort: {}.", name, page, size, Arrays.toString(sort));
@@ -90,6 +129,7 @@ public class ProductManager implements ProductService {
         List<GetAllProductsResponse> responses = pagePro.getContent().stream()
                 .map(product -> this.modelMapperService.forResponse()
                         .map(product, GetAllProductsResponse.class)).collect(Collectors.toList());
+        logger.debug("Mapped products to response DTOs. Number of products: {}", responses.size());
 
         TreeMap<String, Object> response = new TreeMap<>();
         response.put("products", responses);
@@ -100,6 +140,15 @@ public class ProductManager implements ProductService {
         return response;
     }
 
+    /**
+     * Fetches products by initial letter with pagination and sorting.
+     *
+     * @param initialLetter the initial letter to search for
+     * @param page          the page number to fetch
+     * @param size          the number of products per page
+     * @param sort          the sort parameters
+     * @return a TreeMap containing the products and pagination information
+     */
     @Override
     public TreeMap<String, Object> getProductsByInitialLetter(String initialLetter, int page, int size, String[] sort) {
         logger.info("Fetching products by initial letter '{}', with pagination. Page: {}, Size: {}, Sort: {}.", initialLetter, page, size, Arrays.toString(sort));
@@ -109,6 +158,7 @@ public class ProductManager implements ProductService {
         List<GetAllProductsResponse> responses = pagePro.getContent().stream()
                 .map(product -> this.modelMapperService.forResponse()
                         .map(product, GetAllProductsResponse.class)).collect(Collectors.toList());
+        logger.debug("Mapped products to response DTOs. Number of products: {}", responses.size());
 
         TreeMap<String, Object> response = new TreeMap<>();
         response.put("products", responses);
@@ -119,6 +169,12 @@ public class ProductManager implements ProductService {
         return response;
     }
 
+    /**
+     * Checks the availability of products in the inventory.
+     *
+     * @param inventoryRequests a list of inventory requests
+     * @return a list of inventory responses
+     */
     @Override
     public List<InventoryResponse> checkProductInInventory(List<InventoryRequest> inventoryRequests) {
         List<InventoryResponse> inventoryResponses = new LinkedList<>();
@@ -148,6 +204,13 @@ public class ProductManager implements ProductService {
         return inventoryResponses;
     }
 
+    /**
+     * Creates an inventory response object for a product.
+     *
+     * @param product  the product entity
+     * @param quantity the quantity of the product
+     * @return an InventoryResponse object
+     */
     private InventoryResponse getInventoryResponse(Product product, Integer quantity) {
         logger.debug("Creating inventory response for product '{}'", product.getName());
         InventoryResponse inventoryResponse = new InventoryResponse();
@@ -159,6 +222,11 @@ public class ProductManager implements ProductService {
         return inventoryResponse;
     }
 
+    /**
+     * Updates the inventory for a list of products.
+     *
+     * @param inventoryRequests a list of inventory requests
+     */
     @Override
     public void updateProductInInventory(List<InventoryRequest> inventoryRequests) {
         for (InventoryRequest request : inventoryRequests) {
@@ -178,6 +246,11 @@ public class ProductManager implements ProductService {
         }
     }
 
+    /**
+     * Returns a product to the inventory.
+     *
+     * @param inventoryRequest the inventory request
+     */
     @Override
     public void returnedProduct(InventoryRequest inventoryRequest) {
         String barcodeNumber = inventoryRequest.getBarcodeNumber();
@@ -195,6 +268,12 @@ public class ProductManager implements ProductService {
         }
     }
 
+    /**
+     * Adds a new product to the inventory.
+     *
+     * @param createProductRequest the create product request
+     * @return a GetAllProductsResponse object containing the new product details
+     */
     @Override
     public GetAllProductsResponse addProduct(CreateProductRequest createProductRequest) {
         logger.info("Adding new product: '{}'.", createProductRequest.getName());
@@ -226,6 +305,10 @@ public class ProductManager implements ProductService {
         product.setImageUrl(createProductRequest.getImageUrl());
         product.setCreatedBy(createProductRequest.getCreatedBy());
         Optional<ProductCategory> optionalProductCategory = this.productCategoryRepository.findById(createProductRequest.getProductCategoryId());
+        optionalProductCategory.orElseThrow(() -> {
+            logger.warn("No product category found with id '{}'.", createProductRequest.getProductCategoryId());
+            return new EntityNotFoundException("Product category not found with id: " + createProductRequest.getProductCategoryId());
+        });
         optionalProductCategory.ifPresent(product::setProductCategory);
         product.setUpdatedAt(LocalDateTime.now());
         this.productRepository.save(product);
@@ -233,6 +316,12 @@ public class ProductManager implements ProductService {
         return this.modelMapperService.forResponse().map(product, GetAllProductsResponse.class);
     }
 
+    /**
+     * Updates an existing product.
+     *
+     * @param updateProductRequest the update product request
+     * @return a GetAllProductsResponse object containing the updated product details
+     */
     @Override
     public GetAllProductsResponse updateProduct(UpdateProductRequest updateProductRequest) {
         logger.info("Updating product with id '{}'.", updateProductRequest.getId());
@@ -250,6 +339,12 @@ public class ProductManager implements ProductService {
         return this.modelMapperService.forResponse().map(product, GetAllProductsResponse.class);
     }
 
+    /**
+     * Deletes a product by its ID.
+     *
+     * @param id the ID of the product to delete
+     * @return a GetAllProductsResponse object containing the deleted product details
+     */
     @Override
     public GetAllProductsResponse deleteProduct(Long id) {
         logger.info("Deleting product with id '{}'.", id);

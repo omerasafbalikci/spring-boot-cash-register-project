@@ -11,6 +11,11 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A class representing an error response.
+ * This class is used to encapsulate details about errors that occur within the application.
+ */
+
 @Getter
 @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -24,10 +29,19 @@ public class ErrorResponse {
     private String path;
     private List<ValidationError> subErrors;
 
+    /**
+     * Default constructor initializing the timestamp.
+     */
     public ErrorResponse() {
         this.localDateTime = LocalDateTime.now();
     }
 
+    /**
+     * Constructs an ErrorResponse with the specified status and message.
+     *
+     * @param status the HTTP status
+     * @param message the error message
+     */
     public ErrorResponse(HttpStatus status, String message) {
         this();
         this.status = status.value();
@@ -35,6 +49,13 @@ public class ErrorResponse {
         this.message = message;
     }
 
+    /**
+     * Constructs an ErrorResponse with the specified status, message, and exception.
+     *
+     * @param status the HTTP status
+     * @param message the error message
+     * @param exception the exception that caused the error
+     */
     public ErrorResponse(HttpStatus status, String message, Exception exception) {
         this();
         this.status = status.value();
@@ -43,6 +64,11 @@ public class ErrorResponse {
         this.debugMessage = exception.getLocalizedMessage();
     }
 
+    /**
+     * Adds validation errors to the ErrorResponse.
+     *
+     * @param errors the list of FieldError objects
+     */
     public void addValidationError(List<FieldError> errors) {
         if (subErrors == null) {
             subErrors = new ArrayList<>();

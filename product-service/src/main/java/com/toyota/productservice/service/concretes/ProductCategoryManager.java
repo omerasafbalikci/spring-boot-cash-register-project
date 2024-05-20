@@ -22,6 +22,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Service implementation for managing product categories.
+ */
+
 @Service
 @Transactional
 @AllArgsConstructor
@@ -31,6 +35,11 @@ public class ProductCategoryManager implements ProductCategoryService {
     private final ModelMapperService modelMapperService;
     private final ProductCategoryBusinessRules productCategoryBusinessRules;
 
+    /**
+     * Fetches all product categories.
+     *
+     * @return a list of GetAllProductCategoriesResponse objects
+     */
     @Override
     public List<GetAllProductCategoriesResponse> getAllCategories() {
         logger.info("Fetching all product categories.");
@@ -43,6 +52,12 @@ public class ProductCategoryManager implements ProductCategoryService {
         return responses;
     }
 
+    /**
+     * Fetches product categories by name containing the specified string.
+     *
+     * @param name the name string to search for
+     * @return a list of GetAllProductCategoriesResponse objects
+     */
     @Override
     public List<GetAllProductCategoriesResponse> getCategoriesByNameContaining(String name) {
         logger.info("Fetching product categories by name containing '{}'.", name);
@@ -59,6 +74,12 @@ public class ProductCategoryManager implements ProductCategoryService {
         }
     }
 
+    /**
+     * Fetches a product category by its category number.
+     *
+     * @param categoryNumber the category number to search for
+     * @return a GetAllProductCategoriesResponse object
+     */
     @Override
     public GetAllProductCategoriesResponse getCategoryByCategoryNumber(String categoryNumber) {
         logger.info("Fetching product category by category number '{}'.", categoryNumber);
@@ -72,6 +93,12 @@ public class ProductCategoryManager implements ProductCategoryService {
         }
     }
 
+    /**
+     * Fetches a product category by its ID.
+     *
+     * @param id the ID of the product category
+     * @return a GetAllProductCategoriesResponse object
+     */
     @Override
     public GetAllProductCategoriesResponse getCategoryById(Long id) {
         logger.info("Fetching product category by id '{}'.", id);
@@ -83,6 +110,12 @@ public class ProductCategoryManager implements ProductCategoryService {
         return this.modelMapperService.forResponse().map(productCategory, GetAllProductCategoriesResponse.class);
     }
 
+    /**
+     * Fetches products by their category ID.
+     *
+     * @param categoryId the ID of the category
+     * @return a list of GetAllProductsResponse objects
+     */
     @Override
     public List<GetAllProductsResponse> getProductsByCategoryId(Long categoryId) {
         logger.info("Fetching products by category id '{}'.", categoryId);
@@ -98,6 +131,12 @@ public class ProductCategoryManager implements ProductCategoryService {
         return responses;
     }
 
+    /**
+     * Adds a new product category.
+     *
+     * @param createProductCategoryRequest the create product category request
+     * @return a GetAllProductCategoriesResponse object containing the new product category details
+     */
     @Override
     public GetAllProductCategoriesResponse addCategory(CreateProductCategoryRequest createProductCategoryRequest) {
         logger.info("Adding new product category: '{}'.", createProductCategoryRequest.getName());
@@ -115,6 +154,12 @@ public class ProductCategoryManager implements ProductCategoryService {
         return this.modelMapperService.forResponse().map(productCategory, GetAllProductCategoriesResponse.class);
     }
 
+    /**
+     * Updates an existing product category.
+     *
+     * @param updateProductCategoryRequest the update product category request
+     * @return a GetAllProductCategoriesResponse object containing the updated product category details
+     */
     @Override
     public GetAllProductCategoriesResponse updateCategory(UpdateProductCategoryRequest updateProductCategoryRequest) {
         logger.info("Updating product category with id '{}'.", updateProductCategoryRequest.getId());
@@ -136,6 +181,12 @@ public class ProductCategoryManager implements ProductCategoryService {
         return this.modelMapperService.forResponse().map(productCategory, GetAllProductCategoriesResponse.class);
     }
 
+    /**
+     * Deletes a product category by its ID.
+     *
+     * @param id the ID of the product category to delete
+     * @return a GetAllProductCategoriesResponse object containing the deleted product category details
+     */
     @Override
     public GetAllProductCategoriesResponse deleteCategory(Long id) {
         logger.info("Deleting product category with id '{}'.", id);

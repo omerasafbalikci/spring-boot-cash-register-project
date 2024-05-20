@@ -6,12 +6,23 @@ import com.toyota.productservice.utilities.exceptions.EntityAlreadyExistsExcepti
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service for handling business rules related to products.
+ */
 
 @Service
 @AllArgsConstructor
 public class ProductBusinessRules {
     private final ProductRepository productRepository;
 
+    /**
+     * Checks and updates the given product's attributes. If any attribute is null,
+     * it will be set to the corresponding value from the existing product.
+     *
+     * @param product          the product to update
+     * @param existingProduct  the existing product with current attributes
+     * @throws EntityAlreadyExistsException if the product name already exists
+     */
     public void checkUpdate(Product product, Product existingProduct) {
         if (product.getName() == null) {
             product.setName(existingProduct.getName());

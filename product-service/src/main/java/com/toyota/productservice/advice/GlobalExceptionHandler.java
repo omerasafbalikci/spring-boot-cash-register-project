@@ -20,8 +20,19 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import java.util.List;
 
+/**
+ * Global exception handler for handling application-wide exceptions.
+ */
+
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+    /**
+     * Handles EntityNotFoundException by returning a NOT_FOUND response.
+     *
+     * @param exception the exception that was thrown
+     * @param request   the HTTP request
+     * @return a ResponseEntity containing an ErrorResponse
+     */
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException exception, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND, exception.getMessage());
@@ -29,6 +40,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
+    /**
+     * Handles EntityAlreadyExistsException by returning a CONFLICT response.
+     *
+     * @param exception the exception that was thrown
+     * @param request   the HTTP request
+     * @return a ResponseEntity containing an ErrorResponse
+     */
     @ExceptionHandler(EntityAlreadyExistsException.class)
     public ResponseEntity<Object> handleEntityAlreadyExistsException(EntityAlreadyExistsException exception, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.CONFLICT, exception.getMessage());
@@ -36,6 +54,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 
+    /**
+     * Handles ProductIsNotInStockException by returning a BAD_REQUEST response.
+     *
+     * @param exception the exception that was thrown
+     * @param request   the HTTP request
+     * @return a ResponseEntity containing an ErrorResponse
+     */
     @ExceptionHandler(ProductIsNotInStockException.class)
     public ResponseEntity<Object> handleProductIsNotInStockException(ProductIsNotInStockException exception, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
@@ -43,6 +68,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * Handles validation exceptions by returning a BAD_REQUEST response.
+     *
+     * @param exception the exception that was thrown
+     * @param headers   the HTTP headers
+     * @param status    the HTTP status
+     * @param request   the WebRequest
+     * @return a ResponseEntity containing an ErrorResponse
+     */
     @Override
     public ResponseEntity<Object> handleMethodArgumentNotValid(@NonNull MethodArgumentNotValidException exception,
                                                                   @NonNull HttpHeaders headers,
@@ -56,6 +90,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * Handles HttpMessageNotReadableException by returning a BAD_REQUEST response for malformed JSON requests.
+     *
+     * @param exception the exception that was thrown
+     * @param headers   the HTTP headers
+     * @param statusCode the HTTP status code
+     * @param request   the WebRequest
+     * @return a ResponseEntity containing an ErrorResponse
+     */
     @Override
     public ResponseEntity<Object> handleHttpMessageNotReadable(@NonNull HttpMessageNotReadableException exception,
                                                                @NonNull HttpHeaders headers,

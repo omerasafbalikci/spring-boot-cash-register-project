@@ -3,16 +3,16 @@ package com.toyota.productservice.dto.requests;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+/**
+ * DTO for product_category used as input.
+ */
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class CreateProductCategoryRequest {
     @NotNull(message = "Name must not be null")
     @NotBlank(message = "Name must not be blank")

@@ -3,16 +3,16 @@ package com.toyota.productservice.dto.requests;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+/**
+ * DTO to update product category.
+ */
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class UpdateProductCategoryRequest {
     @NotNull(message = "Id must not be null")
     private Long id;
