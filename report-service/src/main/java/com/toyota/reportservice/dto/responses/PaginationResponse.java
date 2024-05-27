@@ -7,6 +7,10 @@ import org.springframework.data.domain.Page;
 
 import java.util.List;
 
+/**
+ * @param <T> response for pagination
+ */
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

@@ -4,6 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * DTO for report detail used as response.
+ */
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

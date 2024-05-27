@@ -8,15 +8,25 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
+/**
+ * Service for handling business rules related to reports.
+ */
+
 @Service
 @AllArgsConstructor
 public class ReportBusinessRules {
+    /**
+     * Generates a PDF report with the given sales report data.
+     *
+     * @param report   the sales report data to include in the PDF
+     * @param document the PDDocument to which the content will be added
+     * @param page     the PDPage to which the content will be added
+     * @throws IOException if an I/O error occurs while writing to the PDF document
+     */
     public void pdf(GetAllReportsResponse report, PDDocument document, PDPage page) throws IOException {
         PDType0Font font = PDType0Font.load(document, ReportManager.class.getResourceAsStream("/org/apache/pdfbox/resources/ttf/LiberationSans-Regular.ttf"));
         try (PDPageContentStream contentStream = new PDPageContentStream(document, page)) {

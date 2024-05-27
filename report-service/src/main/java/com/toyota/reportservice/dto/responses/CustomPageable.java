@@ -3,6 +3,10 @@ package com.toyota.reportservice.dto.responses;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Custom pageable for storing details
+ */
+
 @Data
 @NoArgsConstructor
 public class CustomPageable {

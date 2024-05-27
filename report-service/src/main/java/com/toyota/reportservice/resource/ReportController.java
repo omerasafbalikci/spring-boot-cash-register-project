@@ -13,7 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
+
+/**
+ * REST controller for managing reports.
+ */
 
 @RestController
 @RequestMapping("/api/reports")
@@ -21,6 +24,22 @@ import java.time.LocalDateTime;
 public class ReportController {
     private final ReportService reportService;
 
+    /**
+     * Retrieves a paginated list of sales reports.
+     *
+     * @param page        the page number to retrieve, default is 0
+     * @param size        the number of records per page, default is 3
+     * @param sort        the sorting criteria, default is "id,asc"
+     * @param id          the ID of the report to filter by, optional
+     * @param salesNumber the sales number to filter by, optional
+     * @param salesDate   the sales date to filter by, optional
+     * @param createdBy   the creator to filter by, optional
+     * @param paymentType the payment type to filter by, optional
+     * @param totalPrice  the total price to filter by, optional
+     * @param money       the money amount to filter by, optional
+     * @param change      the change amount to filter by, optional
+     * @return a Mono emitting the paginated response with the list of sales reports
+     */
     @GetMapping()
     public Mono<PaginationResponse<GetAllReportsResponse>> getAllSalesPage(
             @RequestParam(defaultValue = "0") int page,
@@ -38,6 +57,13 @@ public class ReportController {
                 salesDate, createdBy, paymentType, totalPrice, money, change);
     }
 
+    /**
+     * Generates a PDF report for a specific sales number.
+     *
+     * @param salesNumber the sales number for which to generate the report
+     * @return a ResponseEntity containing the PDF byte array if successful,
+     *         or an error message if the report generation fails
+     */
    @GetMapping("/generate.pdf")
    public ResponseEntity<byte[]> generatePdfReport(@RequestParam String salesNumber) {
         try {

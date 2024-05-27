@@ -20,6 +20,13 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+    /**
+     * Handles ReportNotFoundException by returning a NOT_FOUND response.
+     *
+     * @param exception the exception that was thrown
+     * @param request   the HttpServletRequest containing the request information
+     * @return a ResponseEntity containing an ErrorResponse with a NOT_FOUND status
+     */
     @ExceptionHandler(ReportNotFoundException.class)
     public ResponseEntity<Object> handleReportNotFoundException(ReportNotFoundException exception, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND, exception.getMessage());
@@ -27,6 +34,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
+    /**
+     * Handles HttpMessageNotReadableException by returning a BAD_REQUEST response for malformed JSON requests.
+     *
+     * @param exception the exception that was thrown
+     * @param headers   the HTTP headers
+     * @param statusCode the HTTP status code
+     * @param request   the WebRequest
+     * @return a ResponseEntity containing an ErrorResponse
+     */
     @Override
     public ResponseEntity<Object> handleHttpMessageNotReadable(@NonNull HttpMessageNotReadableException exception,
                                                                @NonNull HttpHeaders headers,
