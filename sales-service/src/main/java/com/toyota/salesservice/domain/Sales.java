@@ -6,12 +6,13 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Filter;
-import org.hibernate.annotations.FilterDef;
-import org.hibernate.annotations.ParamDef;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+/**
+ * Sales class represents a sales entity in the database.
+ */
 
 @Entity
 @Table(name = "sales")
@@ -46,9 +47,6 @@ public class Sales {
 
     @Column(name = "change", columnDefinition = "numeric")
     private Double change;
-
-    @Column(name = "deleted", columnDefinition = "BOOLEAN DEFAULT false", nullable = false)
-    private boolean deleted;
 
     @OneToMany(mappedBy = "sales", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonIgnore

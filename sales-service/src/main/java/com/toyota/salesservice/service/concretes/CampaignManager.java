@@ -20,6 +20,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Service implementation for managing campaigns.
+ */
+
 @Service
 @Transactional
 @AllArgsConstructor
@@ -29,6 +33,11 @@ public class CampaignManager implements CampaignService {
     private final ModelMapperService modelMapperService;
     private final CampaignBusinessRules campaignBusinessRules;
 
+    /**
+     * Retrieves all campaigns.
+     *
+     * @return a list of GetAllCampaignsResponse objects representing all campaigns.
+     */
     @Override
     public List<GetAllCampaignsResponse> getAllCampaigns() {
         logger.info("Fetching all campaigns.");
@@ -41,6 +50,13 @@ public class CampaignManager implements CampaignService {
         return responses;
     }
 
+    /**
+     * Retrieves a campaign by its campaign number.
+     *
+     * @param campaignNumber the campaign number.
+     * @return a GetAllCampaignsResponse object representing the campaign.
+     * @throws CampaignNotFoundException if no campaign is found with the given campaign number.
+     */
     @Override
     public GetAllCampaignsResponse getCampaignByCampaignNumber(String campaignNumber) {
         logger.info("Fetching campaign by campaign number '{}'.", campaignNumber);
@@ -54,6 +70,13 @@ public class CampaignManager implements CampaignService {
         }
     }
 
+    /**
+     * Adds a new campaign.
+     *
+     * @param createCampaignRequest the request object containing the campaign details.
+     * @return a GetAllCampaignsResponse object representing the added campaign.
+     * @throws CampaignAlreadyExistsException if a campaign with the same name already exists.
+     */
     @Override
     public GetAllCampaignsResponse addCampaign(CreateCampaignRequest createCampaignRequest) {
         logger.info("Adding new campaign: '{}'.", createCampaignRequest.getName());
@@ -61,8 +84,11 @@ public class CampaignManager implements CampaignService {
             logger.warn("Campaign already exists with name '{}'.", createCampaignRequest.getName());
             throw new CampaignAlreadyExistsException("Campaign already exists");
         }
+        logger.debug("Mapping CreateCampaignRequest to Campaign entity.");
         Campaign campaign = this.modelMapperService.forRequest().map(createCampaignRequest, Campaign.class);
+        logger.debug("Checking campaign details.");
         this.campaignBusinessRules.checkCampaignDetails(campaign);
+        logger.debug("Adding campaign type.");
         this.campaignBusinessRules.addCampaignType(campaign, createCampaignRequest);
         campaign.setCampaignNumber(UUID.randomUUID().toString().substring(0, 8));
         campaign.setUpdatedAt(LocalDateTime.now());
@@ -71,6 +97,13 @@ public class CampaignManager implements CampaignService {
         return this.modelMapperService.forResponse().map(campaign, GetAllCampaignsResponse.class);
     }
 
+    /**
+     * Updates an existing campaign.
+     *
+     * @param updateCampaignRequest the request object containing the updated campaign details.
+     * @return a GetAllCampaignsResponse object representing the updated campaign.
+     * @throws CampaignNotFoundException if no campaign is found with the given ID.
+     */
     @Override
     public GetAllCampaignsResponse updateCampaign(UpdateCampaignRequest updateCampaignRequest) {
         logger.info("Updating campaign with id '{}'.", updateCampaignRequest.getId());
@@ -78,11 +111,15 @@ public class CampaignManager implements CampaignService {
             logger.warn("No campaign found with id '{}'.", updateCampaignRequest.getId());
             return new CampaignNotFoundException("Campaign not found");
         });
+        logger.debug("Mapping CreateCampaignRequest to Campaign entity.");
         Campaign campaign = this.modelMapperService.forRequest().map(updateCampaignRequest, Campaign.class);
+        logger.debug("Checking update rules for the campaign.");
         this.campaignBusinessRules.checkUpdate(campaign, existingCampaign);
-        this.campaignBusinessRules.checkCampaignDetails(campaign);
-        this.campaignBusinessRules.updateCampaignType(campaign, updateCampaignRequest);
         logger.info("Campaign name does not exist. Proceeding with creating the campaign.");
+        logger.debug("Checking campaign details.");
+        this.campaignBusinessRules.checkCampaignDetails(campaign);
+        logger.debug("Updating campaign type.");
+        this.campaignBusinessRules.updateCampaignType(campaign, updateCampaignRequest);
 
         campaign.setCampaignNumber(existingCampaign.getCampaignNumber());
         campaign.setUpdatedAt(LocalDateTime.now());
@@ -91,6 +128,13 @@ public class CampaignManager implements CampaignService {
         return this.modelMapperService.forResponse().map(campaign, GetAllCampaignsResponse.class);
     }
 
+    /**
+     * Deletes a campaign by its ID.
+     *
+     * @param id the ID of the campaign to be deleted.
+     * @return a GetAllCampaignsResponse object representing the deleted campaign.
+     * @throws CampaignNotFoundException if no campaign is found with the given ID.
+     */
     @Override
     public GetAllCampaignsResponse deleteCampaign(Long id) {
         logger.info("Deleting campaign with id '{}'.", id);
@@ -103,6 +147,11 @@ public class CampaignManager implements CampaignService {
         return this.modelMapperService.forResponse().map(campaign, GetAllCampaignsResponse.class);
     }
 
+    /**
+     * Deletes all campaigns.
+     *
+     * @throws CampaignNotFoundException if no campaigns are found to delete.
+     */
     @Override
     public void deleteAllCampaigns() {
         logger.info("Deleting all campaigns.");

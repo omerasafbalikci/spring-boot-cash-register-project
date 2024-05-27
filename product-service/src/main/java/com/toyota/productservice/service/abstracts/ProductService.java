@@ -65,13 +65,6 @@ public interface ProductService {
     void updateProductInInventory(List<InventoryRequest> inventoryRequests);
 
     /**
-     * Updates the quantity of returned products in inventory.
-     *
-     * @param inventoryRequest an {@link InventoryRequest} object representing the product to be marked as returned.
-     */
-    void returnedProduct(InventoryRequest inventoryRequest);
-
-    /**
      * Adds a new product.
      *
      * @param createProductRequest a {@link CreateProductRequest} object containing the details of the product to be added.

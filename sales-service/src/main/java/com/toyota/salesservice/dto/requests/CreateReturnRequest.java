@@ -9,6 +9,10 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+/**
+ * DTO for return used as input.
+ */
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

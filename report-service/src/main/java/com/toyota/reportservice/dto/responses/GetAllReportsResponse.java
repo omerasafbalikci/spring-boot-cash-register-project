@@ -1,5 +1,6 @@
 package com.toyota.reportservice.dto.responses;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,5 +20,5 @@ public class GetAllReportsResponse {
     private Double totalPrice;
     private Double money;
     private Double change;
-    private List<GetAllReportDetailsResponse> reportDetailsList;
+    private List<GetAllReportDetailsResponse> salesItemsList;
 }

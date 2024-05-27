@@ -22,23 +22,24 @@ public class ReportController {
     private final ReportService reportService;
 
     @GetMapping()
-    public Mono<PaginationResponse<GetAllReportsResponse>> getAllSalesPage(@RequestParam(defaultValue = "0") int page,
-                                                                           @RequestParam(defaultValue = "3") int size,
-                                                                           @RequestParam(defaultValue = "id,asc") String[] sort,
-                                                                           @RequestParam(defaultValue = "") Long id,
-                                                                           @RequestParam(defaultValue = "") String salesNumber,
-                                                                           @RequestParam(defaultValue = "") String salesDate,
-                                                                           @RequestParam(defaultValue = "") String createdBy,
-                                                                           @RequestParam(defaultValue = "") String paymentType,
-                                                                           @RequestParam(defaultValue = "") Double totalPrice,
-                                                                           @RequestParam(defaultValue = "") Double money,
-                                                                           @RequestParam(defaultValue = "") Double change) {
+    public Mono<PaginationResponse<GetAllReportsResponse>> getAllSalesPage(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "3") int size,
+            @RequestParam(defaultValue = "id,asc") String[] sort,
+            @RequestParam(defaultValue = "") Long id,
+            @RequestParam(defaultValue = "") String salesNumber,
+            @RequestParam(defaultValue = "") String salesDate,
+            @RequestParam(defaultValue = "") String createdBy,
+            @RequestParam(defaultValue = "") String paymentType,
+            @RequestParam(defaultValue = "") Double totalPrice,
+            @RequestParam(defaultValue = "") Double money,
+            @RequestParam(defaultValue = "") Double change) {
         return this.reportService.getAllSalesPage(page, size, sort, id, salesNumber,
                 salesDate, createdBy, paymentType, totalPrice, money, change);
     }
 
-    @GetMapping("/generate-pdf")
-    public ResponseEntity<byte[]> generatePdfReport(@RequestParam String salesNumber) {
+   @GetMapping("/generate.pdf")
+   public ResponseEntity<byte[]> generatePdfReport(@RequestParam String salesNumber) {
         try {
             byte[] pdfBytes = this.reportService.generatePdfReport(salesNumber);
             return ResponseEntity

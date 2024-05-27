@@ -14,10 +14,14 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+/**
+ * Global exception handler for handling application-wide exceptions.
+ */
+
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ReportNotFoundException.class)
-    public ResponseEntity<Object> handleEntityNotFoundException(ReportNotFoundException exception, HttpServletRequest request) {
+    public ResponseEntity<Object> handleReportNotFoundException(ReportNotFoundException exception, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND, exception.getMessage());
         errorResponse.setPath(request.getRequestURI());
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);

@@ -1,0 +1,62 @@
+package com.toyota.reportservice.service.rules;
+
+import com.toyota.reportservice.dto.responses.GetAllReportDetailsResponse;
+import com.toyota.reportservice.dto.responses.GetAllReportsResponse;
+import com.toyota.reportservice.service.concretes.ReportManager;
+import lombok.AllArgsConstructor;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDType0Font;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+
+@Service
+@AllArgsConstructor
+public class ReportBusinessRules {
+    public void pdf(GetAllReportsResponse report, PDDocument document, PDPage page) throws IOException {
+        PDType0Font font = PDType0Font.load(document, ReportManager.class.getResourceAsStream("/org/apache/pdfbox/resources/ttf/LiberationSans-Regular.ttf"));
+        try (PDPageContentStream contentStream = new PDPageContentStream(document, page)) {
+            contentStream.beginText();
+            contentStream.setFont(font, 12);
+            contentStream.newLineAtOffset(200, 700);
+            contentStream.showText("             SATIS RAPORU");
+            contentStream.newLineAtOffset(0, -20);
+            contentStream.setFont(font, 10);
+            contentStream.showText("TARIH : " + report.getSalesDate());
+            contentStream.newLineAtOffset(0, -15);
+            contentStream.showText("SATIS NO : " + report.getSalesNumber());
+            contentStream.newLineAtOffset(0, -15);
+            contentStream.showText("KASIYER : " + report.getCreatedBy());
+            contentStream.newLineAtOffset(0, -15);
+            contentStream.showText("SATIS : " + report.getPaymentType());
+            contentStream.newLineAtOffset(0, -20);
+            contentStream.showText("------------------------------------------------------");
+
+            for (GetAllReportDetailsResponse reportDetails : report.getSalesItemsList()) {
+                contentStream.newLineAtOffset(0, -15);
+                contentStream.showText(reportDetails.getBarcodeNumber() + "    (" + reportDetails.getQuantity() + " ADET X " + reportDetails.getUnitPrice() + ")");
+                contentStream.newLineAtOffset(0, -15);
+                contentStream.showText(reportDetails.getName() + "                                      " + (reportDetails.getTotalPrice()));
+            }
+
+            contentStream.newLineAtOffset(0, -15);
+            contentStream.showText("------------------------------------------------------");
+            contentStream.newLineAtOffset(0, -15);
+            contentStream.showText("ALINAN PARA : " + report.getMoney());
+            contentStream.newLineAtOffset(0, -15);
+            contentStream.showText("PARA USTU : " + report.getChange());
+            contentStream.newLineAtOffset(0, -15);
+            contentStream.showText("------------------------------------------------------");
+            contentStream.newLineAtOffset(0, -15);
+            contentStream.showText("GENEL TOPLAM : " + report.getTotalPrice());
+            contentStream.newLineAtOffset(40, -30);
+            contentStream.showText("KDV FISI DEGILDIR");
+            contentStream.endText();
+        }
+    }
+}
+

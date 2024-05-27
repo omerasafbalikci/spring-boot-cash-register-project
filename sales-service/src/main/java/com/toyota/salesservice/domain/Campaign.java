@@ -2,6 +2,7 @@ package com.toyota.salesservice.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,11 +11,16 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Campaign class represents a campaign entity in the database.
+ */
+
 @Entity
 @Table(name = "campaign")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Campaign {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

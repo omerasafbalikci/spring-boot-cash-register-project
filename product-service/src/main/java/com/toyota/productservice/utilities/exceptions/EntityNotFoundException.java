@@ -1,7 +1,7 @@
 package com.toyota.productservice.utilities.exceptions;
 
 /**
- * EntityAlreadyExistsException thrown if entity not found.
+ * EntityNotFoundException thrown if entity not found.
  */
 
 public class EntityNotFoundException extends RuntimeException {

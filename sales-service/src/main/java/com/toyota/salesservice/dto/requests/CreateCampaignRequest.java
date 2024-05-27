@@ -8,6 +8,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * DTO for campaign used as input.
+ */
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

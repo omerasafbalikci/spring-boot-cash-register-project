@@ -247,28 +247,6 @@ public class ProductManager implements ProductService {
     }
 
     /**
-     * Returns a product to the inventory.
-     *
-     * @param inventoryRequest the inventory request
-     */
-    @Override
-    public void returnedProduct(InventoryRequest inventoryRequest) {
-        String barcodeNumber = inventoryRequest.getBarcodeNumber();
-        Integer quantity = inventoryRequest.getQuantity();
-
-        logger.info("Returning product with barcodeNumber '{}' to inventory", barcodeNumber);
-        Product product = this.productRepository.findByBarcodeNumber(barcodeNumber);
-        if (product != null) {
-            logger.debug("Product found in inventory for barcodeNumber '{}'", barcodeNumber);
-            product.setQuantity(product.getQuantity() + quantity);
-            this.productRepository.save(product);
-        } else {
-            logger.warn("Product not found in inventory for barcodeNumber '{}'", barcodeNumber);
-            throw new EntityNotFoundException("Product not found");
-        }
-    }
-
-    /**
      * Adds a new product to the inventory.
      *
      * @param createProductRequest the create product request
@@ -283,7 +261,6 @@ public class ProductManager implements ProductService {
             double existingUnitPrice = existingProduct.getUnitPrice();
             double requestUnitPrice = createProductRequest.getUnitPrice();
             double epsilon = 0.0001;
-
             if (Math.abs(existingUnitPrice - requestUnitPrice) < epsilon) {
                 product.setQuantity(existingProduct.getQuantity() + createProductRequest.getQuantity());
                 this.productRepository.deleteById(existingProduct.getId());

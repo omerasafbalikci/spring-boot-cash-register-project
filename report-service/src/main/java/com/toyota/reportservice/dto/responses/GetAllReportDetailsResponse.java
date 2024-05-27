@@ -14,5 +14,7 @@ public class GetAllReportDetailsResponse {
     private Integer quantity;
     private Double unitPrice;
     private Boolean state;
-    private Long campaignName;
+    private Double totalPrice;
+    private String paymentType;
+    private String campaignName;
 }

@@ -6,6 +6,10 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+/**
+ * DTO for campaign used as response.
+ */
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

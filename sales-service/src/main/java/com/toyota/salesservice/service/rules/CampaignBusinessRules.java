@@ -11,11 +11,21 @@ import org.springframework.stereotype.Service;
 
 import java.util.regex.Pattern;
 
+/**
+ * Service for handling business rules related to campaigns.
+ */
+
 @Service
 @AllArgsConstructor
 public class CampaignBusinessRules {
     private final CampaignRepository campaignRepository;
 
+    /**
+     * Validates the details of a campaign, ensuring that the buy-pay entry is in the correct format.
+     *
+     * @param campaign the campaign to validate
+     * @throws CampaignDetailsAreIncorrectException if the buy-pay entry is incorrect
+     */
     public void checkCampaignDetails(Campaign campaign) {
         if (campaign.getBuyPay() != null) {
             Pattern pattern = Pattern.compile("^\\d+,\\d+$");
@@ -36,6 +46,13 @@ public class CampaignBusinessRules {
         }
     }
 
+    /**
+     * Sets the campaign type based on the details provided in the create campaign request.
+     *
+     * @param campaign the campaign to update
+     * @param createCampaignRequest the request containing the campaign details
+     * @throws CampaignDetailsAreIncorrectException if no campaign details are provided
+     */
     public void addCampaignType(Campaign campaign, CreateCampaignRequest createCampaignRequest) {
         if (createCampaignRequest.getBuyPay() == null && createCampaignRequest.getPercent() == null && createCampaignRequest.getMoneyDiscount() == null) {
             throw new CampaignDetailsAreIncorrectException("Campaign details not entered");
@@ -49,6 +66,13 @@ public class CampaignBusinessRules {
         }
     }
 
+    /**
+     * Updates the campaign type based on the details provided in the update campaign request.
+     *
+     * @param campaign the campaign to update
+     * @param updateCampaignRequest the request containing the updated campaign details
+     * @throws CampaignDetailsAreIncorrectException if no campaign details are provided
+     */
     public void updateCampaignType(Campaign campaign, UpdateCampaignRequest updateCampaignRequest) {
         if (updateCampaignRequest.getBuyPay() == null && updateCampaignRequest.getPercent() == null && updateCampaignRequest.getMoneyDiscount() == null) {
             throw new CampaignDetailsAreIncorrectException("Campaign details not entered");
@@ -62,6 +86,14 @@ public class CampaignBusinessRules {
         }
     }
 
+    /**
+     * Checks and updates the campaign with existing details if new details are not provided.
+     * Also checks if the campaign name already exists.
+     *
+     * @param campaign the campaign to update
+     * @param existingCampaign the existing campaign details
+     * @throws CampaignAlreadyExistsException if a campaign with the same name already exists
+     */
     public void checkUpdate(Campaign campaign, Campaign existingCampaign) {
         if (campaign.getName() == null) {
             campaign.setName(existingCampaign.getName());

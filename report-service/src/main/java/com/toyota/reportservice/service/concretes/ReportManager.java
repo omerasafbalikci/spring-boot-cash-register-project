@@ -1,18 +1,17 @@
 package com.toyota.reportservice.service.concretes;
 
-import com.toyota.reportservice.dto.responses.GetAllReportDetailsResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.toyota.reportservice.dto.responses.GetAllReportsResponse;
 import com.toyota.reportservice.dto.responses.PaginationResponse;
 import com.toyota.reportservice.service.abstracts.ReportService;
+import com.toyota.reportservice.service.rules.ReportBusinessRules;
 import com.toyota.reportservice.utilities.exceptions.ReportNotFoundException;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -22,7 +21,6 @@ import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -32,12 +30,13 @@ import java.util.List;
 public class ReportManager implements ReportService {
     private final Logger logger = LogManager.getLogger(ReportService.class);
     private final WebClient.Builder webClientBuilder;
+    private final ReportBusinessRules reportBusinessRules;
 
     @Override
     public Mono<PaginationResponse<GetAllReportsResponse>> getAllSalesPage(int page, int size, String[] sort, Long id, String salesNumber,
-                                             String salesDate, String createdBy, String paymentType,
-                                             Double totalPrice, Double money, Double change) {
-        return webClientBuilder.build().get()
+                                                                           String salesDate, String createdBy, String paymentType,
+                                                                           Double totalPrice, Double money, Double change) {
+        return this.webClientBuilder.build().get()
                 .uri("http://sales-service/api/sales", uriBuilder ->
                         uriBuilder
                                 .queryParam("page", page)
@@ -53,10 +52,16 @@ public class ReportManager implements ReportService {
                                 .queryParam("change", change)
                                 .build()
                 )
-                .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<PaginationResponse<GetAllReportsResponse>>() {});
+                .bodyToMono(new ParameterizedTypeReference<PaginationResponse<GetAllReportsResponse>>() {})
+                .doOnSuccess(response -> {
+                    if (response != null) {
+                        logger.info("Page: {} Size: {}, Total:{}",
+                                page, size, response.getPageable().getTotalElements());
+                    }
+                });
     }
+
 
     public byte[] generatePdfReport(String salesNumber) throws IOException {
         Mono<PaginationResponse<GetAllReportsResponse>> reportMono = getAllSalesPage(0, 1, null, null, salesNumber,
@@ -65,50 +70,15 @@ public class ReportManager implements ReportService {
         PaginationResponse<GetAllReportsResponse> reportResponse = reportMono.block();
 
         if (reportResponse != null && reportResponse.getContent() != null && !reportResponse.getContent().isEmpty()) {
-            GetAllReportsResponse report = reportResponse.getContent().get(0);
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new JavaTimeModule());
+            GetAllReportsResponse report = objectMapper.convertValue(reportResponse.getContent().get(0), GetAllReportsResponse.class);
 
             PDDocument document = new PDDocument();
             PDPage page = new PDPage();
             document.addPage(page);
 
-            try (PDPageContentStream contentStream = new PDPageContentStream(document, page)) {
-                contentStream.beginText();
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
-                contentStream.newLineAtOffset(100, 700);
-                contentStream.showText("SATIS RAPORU");
-                contentStream.newLine();
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 10);
-
-                contentStream.newLine();
-                contentStream.showText("TARIH : " + report.getSalesDate());
-                contentStream.newLine();
-                contentStream.showText("SATIS NO : " + report.getSalesNumber());
-                contentStream.newLine();
-                contentStream.showText("KASIYER : " + report.getCreatedBy());
-                contentStream.newLine();
-                contentStream.showText("SATIS : " + report.getPaymentType());
-                contentStream.newLine();
-                contentStream.showText("------------------------------------------------------");
-                for (GetAllReportDetailsResponse reportDetails : report.getReportDetailsList()) {
-                    contentStream.newLine();
-                    contentStream.showText(reportDetails.getBarcodeNumber() + "    (" + reportDetails.getQuantity() + " ADET X " + reportDetails.getUnitPrice() + ")");
-                    contentStream.newLine();
-                    contentStream.showText(reportDetails.getName() + "          " + (reportDetails.getUnitPrice() * reportDetails.getQuantity()));
-                }
-                contentStream.newLine();
-                contentStream.showText("------------------------------------------------------");
-                contentStream.showText("ALINAN PARA : " + report.getMoney());
-                contentStream.newLine();
-                contentStream.showText("PARA USTU : " + report.getChange());
-                contentStream.newLine();
-                contentStream.showText("------------------------------------------------------");
-                contentStream.newLine();
-                contentStream.showText("GENEL TOPLAM : " + report.getTotalPrice());
-                contentStream.newLine();
-                contentStream.showText("KDV FISI DEGILDIR");
-                contentStream.newLine();
-                contentStream.endText();
-            }
+            this.reportBusinessRules.pdf(report, document, page);
 
             byte[] pdfBytes;
             try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
@@ -122,6 +92,4 @@ public class ReportManager implements ReportService {
             throw new ReportNotFoundException("Report not found");
         }
     }
-
-
 }

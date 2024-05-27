@@ -5,6 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * SalesItems class represents a sales_items entity in the database.
+ */
+
 @Entity
 @Table(name = "sales_items")
 @Data
@@ -34,6 +38,9 @@ public class SalesItems {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "campaign_id")
     private Campaign campaign;
+
+    @Column(name = "total_price")
+    private Double totalPrice;
 
     @Enumerated(value = EnumType.STRING)
     @Column(name = "payment_type")

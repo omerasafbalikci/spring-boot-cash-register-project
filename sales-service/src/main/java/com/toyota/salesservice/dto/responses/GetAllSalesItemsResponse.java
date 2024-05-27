@@ -1,9 +1,12 @@
 package com.toyota.salesservice.dto.responses;
 
-import com.toyota.salesservice.domain.Campaign;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+/**
+ * DTO for sales_items used as response.
+ */
 
 @Data
 @AllArgsConstructor
@@ -14,8 +17,8 @@ public class GetAllSalesItemsResponse {
     private String name;
     private Integer quantity;
     private Double unitPrice;
-    private String paymentType;
     private Boolean state;
-    private boolean deleted;
-    private Campaign campaign;
+    private Double totalPrice;
+    private String paymentType;
+    private String campaignName;
 }

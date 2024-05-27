@@ -108,16 +108,6 @@ public class ProductController {
     }
 
     /**
-     * Handles the return of a product.
-     *
-     * @param inventoryRequest the inventory request for the returned product
-     */
-    @PostMapping("/returned-product")
-    public void returnedProduct(@RequestBody @Valid InventoryRequest inventoryRequest) {
-        this.productService.returnedProduct(inventoryRequest);
-    }
-
-    /**
      * Adds a new product.
      *
      * @param createProductRequest the request object containing the details of the product to add

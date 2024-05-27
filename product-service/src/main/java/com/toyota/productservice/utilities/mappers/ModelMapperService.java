@@ -12,7 +12,6 @@ public interface ModelMapperService {
      *
      * @return a configured ModelMapper instance for response mapping
      */
-
     ModelMapper forResponse();
 
     /**

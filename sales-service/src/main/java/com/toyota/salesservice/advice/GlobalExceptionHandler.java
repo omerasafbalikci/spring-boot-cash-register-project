@@ -18,29 +18,61 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import java.util.List;
 
+/**
+ * Global exception handler for handling application-wide exceptions.
+ */
+
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+    /**
+     * Handles CampaignNotFoundException by returning a NOT_FOUND response.
+     *
+     * @param exception the exception that was thrown
+     * @param request   the HttpServletRequest
+     * @return a ResponseEntity containing an ErrorResponse
+     */
     @ExceptionHandler(CampaignNotFoundException.class)
-    public ResponseEntity<Object> handleEntityNotFoundException(CampaignNotFoundException exception, HttpServletRequest request) {
+    public ResponseEntity<Object> handleCampaignNotFoundException(CampaignNotFoundException exception, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND, exception.getMessage());
         errorResponse.setPath(request.getRequestURI());
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
+    /**
+     * Handles CampaignAlreadyExistsException by returning a CONFLICT response.
+     *
+     * @param exception the exception that was thrown
+     * @param request   the HttpServletRequest
+     * @return a ResponseEntity containing an ErrorResponse
+     */
     @ExceptionHandler(CampaignAlreadyExistsException.class)
-    public ResponseEntity<Object> handleEntityAlreadyExistsException(CampaignAlreadyExistsException exception, HttpServletRequest request) {
+    public ResponseEntity<Object> handleCampaignAlreadyExistsException(CampaignAlreadyExistsException exception, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.CONFLICT, exception.getMessage());
         errorResponse.setPath(request.getRequestURI());
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 
+    /**
+     * Handles CampaignDetailsAreIncorrectException by returning a BAD_REQUEST response.
+     *
+     * @param exception the exception that was thrown
+     * @param request   the HttpServletRequest
+     * @return a ResponseEntity containing an ErrorResponse
+     */
     @ExceptionHandler(CampaignDetailsAreIncorrectException.class)
-    public ResponseEntity<Object> handleProductIsNotInStockException(CampaignDetailsAreIncorrectException exception, HttpServletRequest request) {
+    public ResponseEntity<Object> handleCampaignDetailsAreIncorrectException(CampaignDetailsAreIncorrectException exception, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
         errorResponse.setPath(request.getRequestURI());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * Handles FetchInventoryResponseException by returning an INTERNAL_SERVER_ERROR response.
+     *
+     * @param exception the exception that was thrown
+     * @param request   the HttpServletRequest
+     * @return a ResponseEntity containing an ErrorResponse
+     */
     @ExceptionHandler(FetchInventoryResponseException.class)
     public ResponseEntity<Object> handleFetchInventoryResponseException(FetchInventoryResponseException exception, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
@@ -48,6 +80,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    /**
+     * Handles InsufficientBalanceException by returning a BAD_REQUEST response.
+     *
+     * @param exception the exception that was thrown
+     * @param request   the HttpServletRequest
+     * @return a ResponseEntity containing an ErrorResponse
+     */
     @ExceptionHandler(InsufficientBalanceException.class)
     public ResponseEntity<Object> handleInsufficientBalanceException(InsufficientBalanceException exception, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
@@ -55,6 +94,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * Handles NoMoneyEnteredException by returning a BAD_REQUEST response.
+     *
+     * @param exception the exception that was thrown
+     * @param request   the HttpServletRequest
+     * @return a ResponseEntity containing an ErrorResponse
+     */
     @ExceptionHandler(NoMoneyEnteredException.class)
     public ResponseEntity<Object> handleNoMoneyEnteredException(NoMoneyEnteredException exception, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
@@ -62,13 +108,27 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * Handles PaymentTypeNotEnteredException by returning a BAD_REQUEST response.
+     *
+     * @param exception the exception that was thrown
+     * @param request   the HttpServletRequest
+     * @return a ResponseEntity containing an ErrorResponse
+     */
     @ExceptionHandler(PaymentTypeNotEnteredException.class)
-    public ResponseEntity<Object> handlePaymentTypeIncorrectEntryException(PaymentTypeNotEnteredException exception, HttpServletRequest request) {
+    public ResponseEntity<Object> handlePaymentTypeNotEnteredException(PaymentTypeNotEnteredException exception, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
         errorResponse.setPath(request.getRequestURI());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * Handles ProductIsNotInStockException by returning a BAD_REQUEST response.
+     *
+     * @param exception the exception that was thrown
+     * @param request   the HttpServletRequest
+     * @return a ResponseEntity containing an ErrorResponse
+     */
     @ExceptionHandler(ProductIsNotInStockException.class)
     public ResponseEntity<Object> handleProductIsNotInStockException(ProductIsNotInStockException exception, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
@@ -76,6 +136,27 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * Handles ProductNotFoundException by returning a NOT_FOUND response.
+     *
+     * @param exception the exception that was thrown
+     * @param request   the HttpServletRequest
+     * @return a ResponseEntity containing an ErrorResponse
+     */
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ResponseEntity<Object> handleProductNotFoundException(ProductNotFoundException exception, HttpServletRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND, exception.getMessage());
+        errorResponse.setPath(request.getRequestURI());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * Handles ProductStatusFalseException by returning a BAD_REQUEST response.
+     *
+     * @param exception the exception that was thrown
+     * @param request   the HttpServletRequest
+     * @return a ResponseEntity containing an ErrorResponse
+     */
     @ExceptionHandler(ProductStatusFalseException.class)
     public ResponseEntity<Object> handleProductStatusFalseException(ProductStatusFalseException exception, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
@@ -83,6 +164,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * Handles QuantityIncorrectEntryException by returning a BAD_REQUEST response.
+     *
+     * @param exception the exception that was thrown
+     * @param request   the HttpServletRequest
+     * @return a ResponseEntity containing an ErrorResponse
+     */
     @ExceptionHandler(QuantityIncorrectEntryException.class)
     public ResponseEntity<Object> handleQuantityIncorrectEntryException(QuantityIncorrectEntryException exception, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
@@ -90,6 +178,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * Handles ReturnPeriodExpiredException by returning a BAD_REQUEST response.
+     *
+     * @param exception the exception that was thrown
+     * @param request   the HttpServletRequest
+     * @return a ResponseEntity containing an ErrorResponse
+     */
     @ExceptionHandler(ReturnPeriodExpiredException.class)
     public ResponseEntity<Object> handleReturnPeriodExpiredException(ReturnPeriodExpiredException exception, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
@@ -97,6 +192,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * Handles SalesItemsNotFoundException by returning a NOT_FOUND response.
+     *
+     * @param exception the exception that was thrown
+     * @param request   the HttpServletRequest
+     * @return a ResponseEntity containing an ErrorResponse
+     */
     @ExceptionHandler(SalesItemsNotFoundException.class)
     public ResponseEntity<Object> handleSalesItemsNotFoundException(SalesItemsNotFoundException exception, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND, exception.getMessage());
@@ -104,6 +206,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
+    /**
+     * Handles SalesNotFoundException by returning a NOT_FOUND response.
+     *
+     * @param exception the exception that was thrown
+     * @param request   the HttpServletRequest
+     * @return a ResponseEntity containing an ErrorResponse
+     */
     @ExceptionHandler(SalesNotFoundException.class)
     public ResponseEntity<Object> handleSalesNotFoundException(SalesNotFoundException exception, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND, exception.getMessage());
@@ -111,6 +220,29 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
+    /**
+     * Handles UnexpectedException by returning an INTERNAL_SERVER_ERROR response.
+     *
+     * @param exception the exception that was thrown
+     * @param request   the HttpServletRequest
+     * @return a ResponseEntity containing an ErrorResponse
+     */
+    @ExceptionHandler(UnexpectedException.class)
+    public ResponseEntity<Object> handleUnexpectedException(UnexpectedException exception, HttpServletRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
+        errorResponse.setPath(request.getRequestURI());
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    /**
+     * Handles validation exceptions by returning a BAD_REQUEST response.
+     *
+     * @param exception the exception that was thrown
+     * @param headers   the HTTP headers
+     * @param status    the HTTP status
+     * @param request   the WebRequest
+     * @return a ResponseEntity containing an ErrorResponse
+     */
     @Override
     public ResponseEntity<Object> handleMethodArgumentNotValid(@NonNull MethodArgumentNotValidException exception,
                                                                @NonNull HttpHeaders headers,
@@ -124,6 +256,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * Handles HttpMessageNotReadableException by returning a BAD_REQUEST response for malformed JSON requests.
+     *
+     * @param exception the exception that was thrown
+     * @param headers   the HTTP headers
+     * @param statusCode the HTTP status code
+     * @param request   the WebRequest
+     * @return a ResponseEntity containing an ErrorResponse
+     */
     @Override
     public ResponseEntity<Object> handleHttpMessageNotReadable(@NonNull HttpMessageNotReadableException exception,
                                                                @NonNull HttpHeaders headers,

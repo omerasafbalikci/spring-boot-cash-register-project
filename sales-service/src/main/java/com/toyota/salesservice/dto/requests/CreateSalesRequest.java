@@ -1,6 +1,5 @@
 package com.toyota.salesservice.dto.requests;
 
-import com.toyota.salesservice.domain.PaymentType;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -10,6 +9,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+
+/**
+ * DTO for sales used as input.
+ */
 
 @Data
 @AllArgsConstructor

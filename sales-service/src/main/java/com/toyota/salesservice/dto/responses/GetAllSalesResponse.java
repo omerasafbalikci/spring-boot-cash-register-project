@@ -7,6 +7,10 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * DTO for sales used as response.
+ */
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,6 +23,5 @@ public class GetAllSalesResponse {
     private Double totalPrice;
     private Double money;
     private Double change;
-    private boolean deleted;
     private List<GetAllSalesItemsResponse> salesItemsList;
 }
