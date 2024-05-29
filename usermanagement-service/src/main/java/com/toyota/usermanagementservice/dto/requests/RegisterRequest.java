@@ -10,6 +10,10 @@ import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
+/**
+ * DTO for register used as input.
+ */
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

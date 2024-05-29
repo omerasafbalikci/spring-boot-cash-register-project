@@ -8,6 +8,10 @@ import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
+/**
+ * DTO for user used as response.
+ */
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

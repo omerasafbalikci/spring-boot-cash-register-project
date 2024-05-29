@@ -7,6 +7,10 @@ import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
+/**
+ * User class represents a user entity in the database.
+ */
+
 @Entity
 @Table(name = "users")
 @Data

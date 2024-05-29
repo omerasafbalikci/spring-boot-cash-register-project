@@ -32,7 +32,7 @@ public class SalesSpecification {
                 predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("id"), id));
             }
             if (salesNumber != null && !salesNumber.isEmpty()) {
-                predicate = criteriaBuilder.and(predicate, criteriaBuilder.like(root.get("salesNumber"), "%" + salesNumber + "%"));
+                predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("salesNumber"), salesNumber));
             }
             if (salesDate != null && !salesDate.isEmpty()) {
                 predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("salesDate"), salesDate));

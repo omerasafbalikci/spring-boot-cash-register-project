@@ -32,8 +32,8 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("update/{oldUsername}")
-    public Boolean update(@RequestBody String newUsername, @PathVariable("oldUsername") String oldUsername) {
+    @PutMapping("update/{old-username}")
+    public Boolean updateUsername(@RequestBody String newUsername, @PathVariable("old-username") String oldUsername) {
         return this.userService.updateUsername(newUsername, oldUsername);
     }
 
@@ -43,17 +43,17 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @PutMapping("/addRole/{username}")
+    @PutMapping("/add-role/{username}")
     public boolean addRole(@PathVariable("username") String username, @RequestBody String role) {
         return this.userService.addRole(username, role);
     }
 
-    @PutMapping("/removeRole/{username}")
+    @PutMapping("/remove-role/{username}")
     public boolean removeRole(@PathVariable("username") String username, @RequestBody String role) {
         return this.userService.removeRole(username, role);
     }
 
-    @PutMapping("/changePassword")
+    @PutMapping("/change-password")
     public ResponseEntity<Entity> changePassword(HttpServletRequest request, @RequestBody @Valid PasswordRequest passwordRequest) {
         boolean success = this.userService.changePassword(request, passwordRequest);
         if (success) {
@@ -69,7 +69,7 @@ public class UserController {
     }
 
     @PutMapping("/delete")
-    public Boolean delete(@RequestBody String username) {
-        return this.userService.delete(username);
+    public Boolean deleteUsername(@RequestBody String username) {
+        return this.userService.deleteUsername(username);
     }
 }

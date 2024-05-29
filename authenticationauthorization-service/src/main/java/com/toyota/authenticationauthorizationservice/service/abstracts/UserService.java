@@ -12,7 +12,7 @@ public interface UserService {
     Boolean register(RegisterRequest request);
     AuthenticationResponse login(AuthenticationRequest request);
     void logout(String jwt);
-    Boolean delete(String username);
+    Boolean deleteUsername(String username);
     Boolean updateUsername(String newUsername, String oldUsername);
     boolean changePassword(HttpServletRequest request, PasswordRequest passwordRequest);
     Map<String, String> verify();

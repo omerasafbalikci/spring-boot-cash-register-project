@@ -12,6 +12,10 @@ import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
+/**
+ * DTO for user used as input.
+ */
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

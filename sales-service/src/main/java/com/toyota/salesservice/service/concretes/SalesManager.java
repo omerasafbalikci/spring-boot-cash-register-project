@@ -207,8 +207,7 @@ public class SalesManager implements SalesService {
      */
     @Override
     public PaginationResponse<GetAllSalesResponse> getSalesFiltered(int page, int size, String[] sort, Long id, String salesNumber,
-                                              String salesDate, String createdBy, String paymentType,
-                                              Double totalPrice, Double money, Double change) {
+                                              String salesDate, String createdBy, String paymentType, Double totalPrice, Double money, Double change) {
         logger.info("Fetching all sales with pagination. Page: {}, Size: {}, Sort: {}.", page, size, Arrays.toString(sort));
         Pageable pagingSort = PageRequest.of(page, size, Sort.by(getOrder(sort)));
         Specification<Sales> specification = SalesSpecification.filterByCriteria(id, salesNumber, salesDate, createdBy, paymentType, totalPrice, money, change);

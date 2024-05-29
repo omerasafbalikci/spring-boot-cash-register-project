@@ -120,7 +120,7 @@ public class UserManager implements UserService {
     }
 
     @Override
-    public Boolean delete(String username) {
+    public Boolean deleteUsername(String username) {
         Optional<User> optionalUser = this.userRepository.findByUsernameAndDeletedIsFalse(username);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();

@@ -29,9 +29,10 @@ public class UserController {
             @RequestParam(defaultValue = "") String firstName,
             @RequestParam(defaultValue = "") String lastName,
             @RequestParam(defaultValue = "") String username,
-            @RequestParam(defaultValue = "") String email
+            @RequestParam(defaultValue = "") String email,
+            @RequestParam(defaultValue = "") String gender
     ) {
-        return this.userService.getAllUsersPage(page, size, sort, id, firstName, lastName, username, email);
+        return this.userService.getAllUsersPage(page, size, sort, id, firstName, lastName, username, email, gender);
     }
 
     @PostMapping("/create")
