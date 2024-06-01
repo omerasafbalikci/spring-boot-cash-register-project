@@ -8,6 +8,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * DTO which stores old and new password for updating.
+ */
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

@@ -5,6 +5,10 @@ import lombok.*;
 
 import java.util.Date;
 
+/**
+ * Entity representing an authentication token.
+ */
+
 @Entity
 @Data
 @AllArgsConstructor

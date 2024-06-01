@@ -6,6 +6,10 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+/**
+ * Repository interface for accessing users in database.
+ */
+
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsernameAndDeletedIsFalse(String username);

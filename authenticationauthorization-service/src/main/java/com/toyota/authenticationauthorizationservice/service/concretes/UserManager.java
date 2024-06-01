@@ -128,8 +128,9 @@ public class UserManager implements UserService {
             this.userRepository.save(user);
             revokeUserTokens(user);
             return true;
+        } else {
+            throw new UserNotFoundException("User not found");
         }
-        throw new UserNotFoundException("User not found");
      }
 
     @Override

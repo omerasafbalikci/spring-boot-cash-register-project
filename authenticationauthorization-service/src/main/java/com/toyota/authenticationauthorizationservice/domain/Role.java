@@ -8,6 +8,10 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+/**
+ * Domain for Role entity.
+ */
+
 @Entity
 @Table(name = "roles")
 @Data

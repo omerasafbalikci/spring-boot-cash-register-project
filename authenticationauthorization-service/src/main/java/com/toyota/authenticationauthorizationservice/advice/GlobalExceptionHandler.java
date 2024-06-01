@@ -18,8 +18,19 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import java.util.List;
 
+/**
+ * Global exception handler for handling application-wide exceptions.
+ */
+
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+    /**
+     * Handles UsernameTakenException by returning a CONFLICT response.
+     *
+     * @param exception the thrown exception
+     * @param request   the HttpServletRequest
+     * @return a ResponseEntity containing an ErrorResponse
+     */
     @ExceptionHandler(UsernameTakenException.class)
     public ResponseEntity<Object> handleUsernameTakenException(UsernameTakenException exception, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.CONFLICT, exception.getMessage());
@@ -27,6 +38,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 
+    /**
+     * Handles UserNotFoundException by returning a NOT_FOUND response with a custom header.
+     *
+     * @param exception the thrown exception
+     * @param request   the HttpServletRequest
+     * @return a ResponseEntity containing an ErrorResponse
+     */
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<Object> handleUserNotFoundException(UserNotFoundException exception, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND, exception.getMessage());
@@ -34,6 +52,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).header("exception-type", "UserNotFound").body(errorResponse);
     }
 
+    /**
+     * Handles InvalidBearerToken by returning a NOT_FOUND response.
+     *
+     * @param exception the thrown exception
+     * @param request   the HttpServletRequest
+     * @return a ResponseEntity containing an ErrorResponse
+     */
     @ExceptionHandler(InvalidBearerToken.class)
     public ResponseEntity<Object> handleInvalidBearerToken(InvalidBearerToken exception, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND, exception.getMessage());
@@ -41,6 +66,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
+    /**
+     * Handles NoRolesException by returning a BAD_REQUEST response.
+     *
+     * @param exception the thrown exception
+     * @param request   the HttpServletRequest
+     * @return a ResponseEntity containing an ErrorResponse
+     */
     @ExceptionHandler(NoRolesException.class)
     public ResponseEntity<Object> handleNoRolesException(NoRolesException exception, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
@@ -48,6 +80,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * Handles RoleNotFoundException by returning a NOT_FOUND response with a custom header.
+     *
+     * @param exception the thrown exception
+     * @param request   the HttpServletRequest
+     * @return a ResponseEntity containing an ErrorResponse
+     */
     @ExceptionHandler(RoleNotFoundException.class)
     public ResponseEntity<Object> handleRoleNotFoundException(RoleNotFoundException exception, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND, exception.getMessage());
@@ -55,6 +94,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).header("exception-type", "RoleNotFound").body(errorResponse);
     }
 
+    /**
+     * Handles IncorrectPasswordException by returning an UNAUTHORIZED response.
+     *
+     * @param exception the thrown exception
+     * @param request   the HttpServletRequest
+     * @return a ResponseEntity containing an ErrorResponse
+     */
     @ExceptionHandler(IncorrectPasswordException.class)
     public ResponseEntity<Object> handleIncorrectPasswordException(IncorrectPasswordException exception, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED, exception.getMessage());
@@ -62,6 +108,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
 
+    /**
+     * Handles InvalidAuthenticationException by returning an UNAUTHORIZED response.
+     *
+     * @param exception the thrown exception
+     * @param request   the HttpServletRequest
+     * @return a ResponseEntity containing an ErrorResponse
+     */
     @ExceptionHandler(InvalidAuthenticationException.class)
     public ResponseEntity<Object> handleInvalidAuthenticationException(InvalidAuthenticationException exception, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED, exception.getMessage());
@@ -69,6 +122,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
 
+    /**
+     * Handles validation exceptions by returning a BAD_REQUEST response.
+     *
+     * @param exception the exception that was thrown
+     * @param headers   the HTTP headers
+     * @param status    the HTTP status
+     * @param request   the WebRequest
+     * @return a ResponseEntity containing an ErrorResponse
+     */
     @Override
     public ResponseEntity<Object> handleMethodArgumentNotValid(@NonNull MethodArgumentNotValidException exception,
                                                                @NonNull HttpHeaders headers,
@@ -82,6 +144,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * Handles HttpMessageNotReadableException by returning a BAD_REQUEST response for malformed JSON requests.
+     *
+     * @param exception the exception that was thrown
+     * @param headers   the HTTP headers
+     * @param statusCode the HTTP status code
+     * @param request   the WebRequest
+     * @return a ResponseEntity containing an ErrorResponse
+     */
     @Override
     public ResponseEntity<Object> handleHttpMessageNotReadable(@NonNull HttpMessageNotReadableException exception,
                                                                @NonNull HttpHeaders headers,
