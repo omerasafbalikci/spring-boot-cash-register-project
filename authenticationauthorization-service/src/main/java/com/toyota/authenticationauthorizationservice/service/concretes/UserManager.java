@@ -30,6 +30,10 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Service implementation for managing users.
+ */
+
 @Service
 @AllArgsConstructor
 public class UserManager implements UserService {
@@ -43,12 +47,23 @@ public class UserManager implements UserService {
     @Value("${application.security.jwt.expiration-time}")
     private long jwtExpiration;
 
+    /**
+     * Registers a new user with the given registration request.
+     *
+     * @param request the registration request containing the user details
+     * @return true if the registration is successful, false otherwise
+     * @throws UsernameTakenException if the username is already taken
+     * @throws NoRolesException if no roles are provided for the registration
+     */
     @Override
     public Boolean register(RegisterRequest request) {
+        logger.info("Attempting to register user: {}", request.getUsername());
         if (this.userRepository.existsByUsernameAndDeletedIsFalse(request.getUsername())) {
+            logger.warn("Username is already taken: {}", request.getUsername());
             throw new UsernameTakenException("Username is already taken! Username: " + request.getUsername());
         }
         if (request.getRoles().isEmpty()) {
+            logger.warn("No roles found for registration for user: {}", request.getUsername());
             throw new NoRolesException("No role found for registration!");
         }
         User user = User.builder()
@@ -62,28 +77,46 @@ public class UserManager implements UserService {
             roleOptional.ifPresent(roles::add);
         }
         if (roles.isEmpty()) {
+            logger.warn("No valid roles found for user: {}", request.getUsername());
             throw new NoRolesException("No valid roles found");
         }
         this.userRepository.save(user);
+        logger.info("User registered successfully: {}", request.getUsername());
         return true;
     }
 
+    /**
+     * Authenticates a user with the given authentication request.
+     *
+     * @param request the authentication request containing the username and password
+     * @return an authentication response containing the JWT token if authentication is successful
+     * @throws InvalidAuthenticationException if the authentication fails
+     */
     @Override
     public AuthenticationResponse login(AuthenticationRequest request) {
+        logger.info("Attempting to authenticate user: {}", request.getUsername());
         try {
             this.authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
             );
         } catch (AuthenticationException e) {
+            logger.error("Authentication failed for user: {}", request.getUsername());
             throw new InvalidAuthenticationException("Authentication failed! Username or password is incorrect");
         }
         User user = this.userRepository.findByUsernameAndDeletedIsFalse(request.getUsername()).orElseThrow();
         var jwt = this.jwtService.generateToken(user);
         revokeUserTokens(user);
         saveUserToken(user, jwt);
+        logger.info("User authenticated successfully: {}", request.getUsername());
         return AuthenticationResponse.builder().token(jwt).build();
     }
 
+    /**
+     * Saves the given JWT token for the specified user.
+     *
+     * @param user the user for whom the token is to be saved
+     * @param jwt the JWT token to be saved
+     */
     private void saveUserToken(User user, String jwt) {
         String tokenId = this.jwtService.extractTokenId(jwt);
         Date currentDate = new Date();
@@ -94,17 +127,33 @@ public class UserManager implements UserService {
                 .revoked(false)
                 .build();
         this.tokenRepository.save(token);
+        logger.info("Token saved for user: {}", user.getUsername());
     }
 
+    /**
+     * Revokes all valid tokens for the specified user.
+     *
+     * @param user the user for whom the tokens are to be revoked
+     */
     private void revokeUserTokens(User user) {
         List<Token> tokens = this.tokenRepository.findAllValidTokensByUser(user.getId());
         tokens.forEach(token -> token.setRevoked(true));
         this.tokenRepository.saveAll(tokens);
+        logger.info("All tokens revoked for user: {}", user.getUsername());
     }
 
+    /**
+     * Logs out the user by revoking the specified JWT token.
+     *
+     * @param jwt the JWT token to be revoked
+     * @throws InvalidBearerToken if the token is invalid or not provided
+     * @throws UserNotFoundException if no user is found with the provided token
+     */
     @Override
     public void logout(String jwt) {
+        logger.info("Attempting to logout user with token: {}", jwt);
         if (jwt == null || !jwt.startsWith("Bearer ")) {
+            logger.warn("Invalid bearer token provided for logout");
             throw new InvalidBearerToken("User has no bearer token or an invalid token");
         }
         String authHeader = jwt.substring(7);
@@ -114,28 +163,51 @@ public class UserManager implements UserService {
             Token token = optionalToken.get();
             token.setRevoked(true);
             this.tokenRepository.save(token);
+            logger.info("User logged out successfully");
         } else {
+            logger.warn("No user found with the provided token for logout");
             throw new UserNotFoundException("No user found with the provided token");
         }
     }
 
+    /**
+     * Deletes the user with the specified username.
+     *
+     * @param username the username of the user to be deleted
+     * @return true if the user is deleted successfully, false otherwise
+     * @throws UserNotFoundException if no user is found with the provided username
+     */
     @Override
     public Boolean deleteUsername(String username) {
+        logger.info("Attempting to delete user: {}", username);
         Optional<User> optionalUser = this.userRepository.findByUsernameAndDeletedIsFalse(username);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             user.setDeleted(true);
             this.userRepository.save(user);
             revokeUserTokens(user);
+            logger.info("User deleted successfully: {}", username);
             return true;
         } else {
+            logger.warn("User not found: {}", username);
             throw new UserNotFoundException("User not found");
         }
      }
 
+    /**
+     * Updates the username of an existing user.
+     *
+     * @param newUsername the new username to be set
+     * @param oldUsername the current username of the user
+     * @return true if the username is updated successfully, false otherwise
+     * @throws UsernameTakenException if the new username is already taken
+     * @throws UserNotFoundException if no user is found with the current username
+     */
     @Override
     public Boolean updateUsername(String newUsername, String oldUsername) {
+        logger.info("Attempting to update username from {} to {}", oldUsername, newUsername);
         if (this.userRepository.existsByUsernameAndDeletedIsFalse(newUsername)) {
+            logger.warn("New username is already taken: {}", newUsername);
             throw new UsernameTakenException("Username is already taken! Username: " + newUsername);
         }
         Optional<User> optionalUser = this.userRepository.findByUsernameAndDeletedIsFalse(oldUsername);
@@ -144,16 +216,31 @@ public class UserManager implements UserService {
             user.setUsername(newUsername);
             this.userRepository.save(user);
             revokeUserTokens(user);
+            logger.info("Username updated successfully from {} to {}", oldUsername, newUsername);
             return true;
         } else {
+            logger.warn("Old username not found: {}", oldUsername);
             throw new UserNotFoundException("Username not found");
         }
     }
 
+    /**
+     * Changes the password of the currently authenticated user.
+     *
+     * @param request the HTTP request containing the JWT token
+     * @param passwordRequest the password request containing the old and new passwords
+     * @return true if the password is changed successfully, false otherwise
+     * @throws IncorrectPasswordException if the old password is incorrect
+     * @throws UserNotFoundException if no user is found with the provided token
+     */
     @Override
     public boolean changePassword(HttpServletRequest request, PasswordRequest passwordRequest) {
+        logger.info("Attempting to change password for user");
         String authHeader = extractToken(request);
-        if (authHeader == null) return false;
+        if (authHeader == null) {
+            logger.warn("No valid token found for password change");
+            return false;
+        }
         String username = this.jwtService.extractUsername(authHeader);
 
         Optional<User> optionalUser = this.userRepository.findByUsernameAndDeletedIsFalse(username);
@@ -163,17 +250,26 @@ public class UserManager implements UserService {
                 user.setPassword(this.passwordEncoder.encode(passwordRequest.getNewPassword()));
                 this.userRepository.save(user);
                 revokeUserTokens(user);
+                logger.info("Password changed successfully for user: {}", username);
                 return true;
             } else {
+                logger.warn("Incorrect old password provided for user: {}", username);
                 throw new IncorrectPasswordException("Password is incorrect");
             }
         } else {
+            logger.warn("User not found for password change: {}", username);
             throw new UserNotFoundException("User not found! User may not be logged in");
         }
     }
 
+    /**
+     * Verifies the current authenticated user.
+     *
+     * @return a map containing the user's roles and username
+     */
     @Override
     public Map<String, String> verify() {
+        logger.info("Verifying current user");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Map<String, String> map = authentication.getAuthorities().stream()
                 .collect(Collectors.toMap(
@@ -184,8 +280,18 @@ public class UserManager implements UserService {
         return map;
     }
 
+    /**
+     * Adds the specified role to the user with the given username.
+     *
+     * @param username the username of the user to whom the role is to be added
+     * @param role the role to be added
+     * @return true if the role is added successfully, false otherwise
+     * @throws RoleNotFoundException if the role is not found
+     * @throws UserNotFoundException if no user is found with the provided username
+     */
     @Override
     public boolean addRole(String username, String role) {
+        logger.info("Attempting to add role {} to user {}", role, username);
         Optional<User> optionalUser = this.userRepository.findByUsernameAndDeletedIsFalse(username);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
@@ -193,16 +299,29 @@ public class UserManager implements UserService {
             if (optionalRole.isPresent()) {
                 user.getRoles().add(optionalRole.get());
                 this.userRepository.save(user);
+                logger.info("Role {} added successfully to user {}", role, username);
                 return true;
             } else {
+                logger.warn("Role not found: {}", role);
                 throw new RoleNotFoundException("Role not found");
             }
         }
+        logger.warn("User not found: {}", username);
         throw new UserNotFoundException("User not found");
     }
 
+    /**
+     * Removes the specified role from the user with the given username.
+     *
+     * @param username the username of the user from whom the role is to be removed
+     * @param role the role to be removed
+     * @return true if the role is removed successfully, false otherwise
+     * @throws RoleNotFoundException if the role is not found
+     * @throws UserNotFoundException if no user is found with the provided username
+     */
     @Override
     public boolean removeRole(String username, String role) {
+        logger.info("Attempting to remove role {} from user {}", role, username);
         Optional<User> optionalUser = this.userRepository.findByUsernameAndDeletedIsFalse(username);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
@@ -210,14 +329,23 @@ public class UserManager implements UserService {
             if (optionalRole.isPresent()) {
                 user.getRoles().remove(optionalRole.get());
                 this.userRepository.save(user);
+                logger.info("Role {} removed successfully from user {}", role, username);
                 return true;
             } else {
+                logger.warn("Role not found: {}", role);
                 throw new RoleNotFoundException("Role not found");
             }
         }
+        logger.warn("User not found: {}", username);
         throw new UserNotFoundException("User not found");
     }
 
+    /**
+     * Extracts the JWT token from the HTTP request.
+     *
+     * @param request the HTTP request
+     * @return the extracted JWT token, or null if no valid token is found
+     */
     private String extractToken(HttpServletRequest request) {
         String authorizationHeader = request.getHeader("Authorization");
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {

@@ -274,7 +274,7 @@ public class UserManager implements UserService {
                         .map(user, GetAllUsersResponse.class)).toList();
         logger.debug("Mapped {} users to response objects.", responses.size());
 
-        return new PageImpl<>(responses, pageable, pageUser.getTotalElements());
+        return pageUser.map(user -> this.modelMapperService.forResponse().map(user, GetAllUsersResponse.class));
     }
 
     /**

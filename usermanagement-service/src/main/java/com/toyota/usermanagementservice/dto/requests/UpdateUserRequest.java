@@ -26,9 +26,5 @@ public class UpdateUserRequest {
     private String username;
     @Email(message = "It must be a valid email")
     private String email;
-    @Size(min = 8, message = "Password must have at least 8 characters")
-    private String password;
-    @Size(min = 1, message = "User must have at least one role")
-    private Set<Role> roles;
     private Gender gender;
 }
