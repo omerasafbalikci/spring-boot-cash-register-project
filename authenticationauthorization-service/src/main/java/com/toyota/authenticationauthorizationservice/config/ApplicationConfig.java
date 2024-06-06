@@ -14,12 +14,23 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+/**
+ * Configuration class for setting up application-wide authentication and authorization settings.
+ */
+
 @Configuration
 @RequiredArgsConstructor
 public class ApplicationConfig {
     private final UserRepository userRepository;
+    @Value("${application.security.jwt.secret-key}")
+    private String SECRET_KEY;
     @Value("${application.security.jwt.expiration-time}")
     private long jwtExpiration;
+
+    @Bean
+    public String getSecretKey() {
+        return this.SECRET_KEY;
+    }
 
     @Bean
     public long getJwtExpiration() {

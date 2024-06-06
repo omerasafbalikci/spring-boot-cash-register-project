@@ -64,7 +64,7 @@ public class SalesController {
      * @param change      the change on sale
      * @return a PaginationResponse containing the filtered sales records
      */
-    @GetMapping()
+    @GetMapping("/get-all")
     public PaginationResponse<GetAllSalesResponse> getSalesFiltered(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "3") int size,

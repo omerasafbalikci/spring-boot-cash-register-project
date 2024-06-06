@@ -28,7 +28,7 @@ public class ProductCategoryController {
      *
      * @return a ResponseEntity containing the list of all product categories
      */
-    @GetMapping()
+    @GetMapping("/get-all")
     public ResponseEntity<List<GetAllProductCategoriesResponse>> getAllCategories() {
         List<GetAllProductCategoriesResponse> responses = this.productCategoryService.getAllCategories();
         return new ResponseEntity<>(responses, HttpStatus.OK);

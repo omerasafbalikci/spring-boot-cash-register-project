@@ -36,7 +36,7 @@ public class ProductController {
      * @param state optional filter by state
      * @return a TreeMap containing the filtered products
      */
-    @GetMapping()
+    @GetMapping("/get-all")
     public ResponseEntity<TreeMap<String, Object>> getProductFiltered(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "3") int size,

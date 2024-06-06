@@ -56,7 +56,7 @@ public class ReportManager implements ReportService {
         logger.info("Requesting sales report page with parameters - page: {}, size: {}, sort: {}, id: {}, salesNumber: {}, salesDate: {}, createdBy: {}, paymentType: {}, totalPrice: {}, money: {}, change: {}",
                 page, size, sort, id, salesNumber, salesDate, createdBy, paymentType, totalPrice, money, change);
         return this.webClientBuilder.build().get()
-                .uri("http://sales-service/api/sales", uriBuilder ->
+                .uri("http://sales-service/api/sales/get-all", uriBuilder ->
                         uriBuilder
                                 .queryParam("page", page)
                                 .queryParam("size", size)

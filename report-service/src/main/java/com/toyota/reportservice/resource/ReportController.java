@@ -40,7 +40,7 @@ public class ReportController {
      * @param change      the change amount to filter by, optional
      * @return a Mono emitting the paginated response with the list of sales reports
      */
-    @GetMapping()
+    @GetMapping("/get-all")
     public Mono<PaginationResponse<GetAllReportsResponse>> getAllSalesPage(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "3") int size,

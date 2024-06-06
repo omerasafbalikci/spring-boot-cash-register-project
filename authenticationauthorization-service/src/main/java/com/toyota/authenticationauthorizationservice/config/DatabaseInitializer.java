@@ -13,6 +13,10 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Component for initializing the database with default roles and admin user.
+ */
+
 @Component
 @AllArgsConstructor
 public class DatabaseInitializer {

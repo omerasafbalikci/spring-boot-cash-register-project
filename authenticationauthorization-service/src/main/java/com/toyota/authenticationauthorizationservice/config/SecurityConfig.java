@@ -11,6 +11,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+/**
+ * Security configuration class for setting up JWT-based authentication and authorization.
+ */
+
 @Configuration
 @EnableMethodSecurity
 @RequiredArgsConstructor

@@ -27,7 +27,7 @@ public class CampaignController {
      *
      * @return a ResponseEntity containing a list of all campaigns
      */
-    @GetMapping()
+    @GetMapping("/get-all")
     public ResponseEntity<List<GetAllCampaignsResponse>> getAllCampaigns() {
         List<GetAllCampaignsResponse> responses = this.campaignService.getAllCampaigns();
         return new ResponseEntity<>(responses, HttpStatus.OK);
