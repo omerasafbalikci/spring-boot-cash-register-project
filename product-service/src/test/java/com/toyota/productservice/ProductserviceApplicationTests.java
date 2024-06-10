@@ -1,10 +1,10 @@
-package com.toyota.authenticationauthorizationservice;
+package com.toyota.productservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class VerificationauthorizationserviceApplicationTests {
+class ProductserviceApplicationTests {
 
 	@Test
 	void contextLoads() {
