@@ -169,7 +169,7 @@ public class GlobalExceptionHandlerTest {
         // Given
         MethodArgumentNotValidException exception = mock(MethodArgumentNotValidException.class);
         BindingResult bindingResult = mock(BindingResult.class);
-        FieldError fieldError = new FieldError("vehicle", "model", "error");
+        FieldError fieldError = new FieldError("user", "username", "error");
         ServletWebRequest servletWebRequest = mock(ServletWebRequest.class);
         HttpServletRequest httpServletRequest = mock(HttpServletRequest.class);
 
@@ -202,8 +202,6 @@ public class GlobalExceptionHandlerTest {
         Assertions.assertEquals(fieldError.getObjectName(), responseFieldErr.getObject());
         Assertions.assertEquals(fieldError.getField(), responseFieldErr.getField());
         Assertions.assertEquals(fieldError.getDefaultMessage(), responseFieldErr.getMessage());
-
-
     }
 
     @Test
