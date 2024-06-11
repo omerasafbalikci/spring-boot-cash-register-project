@@ -265,7 +265,6 @@ public class ProductManager implements ProductService {
                 product.setQuantity(existingProduct.getQuantity() + createProductRequest.getQuantity());
                 this.productRepository.deleteById(existingProduct.getId());
                 logger.debug("Existing product found with name '{}'. Updating quantity and deleting old product.", createProductRequest.getName());
-                logger.debug("Old product '{}' with different unit price deleted successfully.", createProductRequest.getName());
             } else {
                 logger.warn("Product with name '{}' already exists with different unit price.", createProductRequest.getName());
                 throw new EntityAlreadyExistsException("Product already exists");
@@ -307,6 +306,7 @@ public class ProductManager implements ProductService {
             return new EntityNotFoundException("Product not found");
         });
         Product product = this.modelMapperService.forRequest().map(updateProductRequest, Product.class);
+        logger.info("Check if the product name is available?");
         this.productBusinessRules.checkUpdate(product, existingProduct);
         logger.info("Product name does not exist. Proceeding with creating the product.");
         product.setBarcodeNumber(existingProduct.getBarcodeNumber());

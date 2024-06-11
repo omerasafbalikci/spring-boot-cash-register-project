@@ -26,14 +26,6 @@ public interface ProductCategoryService {
     List<GetAllProductCategoriesResponse> getCategoriesByNameContaining(String name);
 
     /**
-     * Retrieves a product category by its category number.
-     *
-     * @param categoryNumber the category number to search for.
-     * @return the {@link GetAllProductCategoriesResponse} representing the found product category.
-     */
-    GetAllProductCategoriesResponse getCategoryByCategoryNumber(String categoryNumber);
-
-    /**
      * Retrieves a product category by its ID.
      *
      * @param id the ID of the category to retrieve.

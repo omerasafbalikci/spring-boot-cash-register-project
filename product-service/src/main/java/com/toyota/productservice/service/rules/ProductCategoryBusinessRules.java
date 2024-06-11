@@ -2,9 +2,12 @@ package com.toyota.productservice.service.rules;
 
 import com.toyota.productservice.dao.ProductCategoryRepository;
 import com.toyota.productservice.domain.ProductCategory;
+import com.toyota.productservice.dto.requests.UpdateProductCategoryRequest;
 import com.toyota.productservice.utilities.exceptions.EntityAlreadyExistsException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 /**
  * Service for handling business rules related to product categories.
@@ -28,21 +31,24 @@ public class ProductCategoryBusinessRules {
     }
 
     /**
-     * Updates the given product category's attributes. If any attribute is null,
-     * it will be set to the corresponding value from the existing product category.
+     * Updates the attributes of the given product category based on the provided
+     * update request. If any attribute in the update request is null, the corresponding
+     * value from the existing product category will be retained.
      *
-     * @param productCategory the product category to update
-     * @param existingProductCategory the existing product category with current attributes
+     * @param updateProductCategoryRequest the request containing new attribute values for the product category
+     * @param productCategory the product category to be updated
      */
-    public void checkUpdate(ProductCategory productCategory, ProductCategory existingProductCategory) {
-        if (productCategory.getName() == null) {
-            productCategory.setName(existingProductCategory.getName());
+    public void checkUpdate(UpdateProductCategoryRequest updateProductCategoryRequest, ProductCategory productCategory) {
+        if (updateProductCategoryRequest.getName() != null) {
+            productCategory.setName(updateProductCategoryRequest.getName());
         }
-        if (productCategory.getDescription() == null) {
-            productCategory.setDescription(existingProductCategory.getDescription());
+        if (updateProductCategoryRequest.getDescription() != null) {
+            productCategory.setDescription(updateProductCategoryRequest.getDescription());
         }
-        if (productCategory.getImageUrl() == null) {
-            productCategory.setImageUrl(existingProductCategory.getImageUrl());
+        if (updateProductCategoryRequest.getImageUrl() != null) {
+            productCategory.setImageUrl(updateProductCategoryRequest.getImageUrl());
         }
+        productCategory.setCreatedBy(updateProductCategoryRequest.getCreatedBy());
+        productCategory.setUpdatedAt(LocalDateTime.now());
     }
 }

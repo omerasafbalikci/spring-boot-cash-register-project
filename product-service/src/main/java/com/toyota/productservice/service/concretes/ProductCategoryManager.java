@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -71,25 +72,6 @@ public class ProductCategoryManager implements ProductCategoryService {
         } else {
             logger.warn("No product categories found by name containing '{}'.", name);
             throw new EntityNotFoundException("Product category not found for name: " + name);
-        }
-    }
-
-    /**
-     * Fetches a product category by its category number.
-     *
-     * @param categoryNumber the category number to search for
-     * @return a GetAllProductCategoriesResponse object
-     */
-    @Override
-    public GetAllProductCategoriesResponse getCategoryByCategoryNumber(String categoryNumber) {
-        logger.info("Fetching product category by category number '{}'.", categoryNumber);
-        ProductCategory productCategory = this.productCategoryRepository.findByCategoryNumber(categoryNumber);
-        if (productCategory != null) {
-            logger.debug("Retrieved product category with category number '{}'.", categoryNumber);
-            return this.modelMapperService.forResponse().map(productCategory, GetAllProductCategoriesResponse.class);
-        } else {
-            logger.warn("No product category found with category number '{}'.", categoryNumber);
-            throw new EntityNotFoundException("Product category not found for category number: " + categoryNumber);
         }
     }
 
@@ -163,22 +145,22 @@ public class ProductCategoryManager implements ProductCategoryService {
     @Override
     public GetAllProductCategoriesResponse updateCategory(UpdateProductCategoryRequest updateProductCategoryRequest) {
         logger.info("Updating product category with id '{}'.", updateProductCategoryRequest.getId());
-        ProductCategory existingProductCategory = this.productCategoryRepository.findById(updateProductCategoryRequest.getId()).orElseThrow(() -> {
+        Optional<ProductCategory> optionalProductCategory = this.productCategoryRepository.findById(updateProductCategoryRequest.getId());
+        if (optionalProductCategory.isPresent()) {
+            ProductCategory productCategory = optionalProductCategory.get();
+            if (this.productCategoryRepository.existsByNameIgnoreCase(updateProductCategoryRequest.getName()) && !productCategory.getName().equals(updateProductCategoryRequest.getName())) {
+                logger.warn("Product category name '{}' already exists.", productCategory.getName());
+                throw new EntityAlreadyExistsException("Product category name already exists");
+            }
+            this.productCategoryBusinessRules.checkUpdate(updateProductCategoryRequest, productCategory);
+            logger.info("Product category name does not exist. Proceeding with updating the product category.");
+            this.productCategoryRepository.save(productCategory);
+            logger.debug("Product category updated with id '{}'.", updateProductCategoryRequest.getId());
+            return this.modelMapperService.forResponse().map(productCategory, GetAllProductCategoriesResponse.class);
+        } else {
             logger.warn("No product category found with id '{}'.", updateProductCategoryRequest.getId());
-            return new EntityNotFoundException("Product category not found");
-        });
-        ProductCategory productCategory = this.modelMapperService.forRequest().map(updateProductCategoryRequest, ProductCategory.class);
-        this.productCategoryBusinessRules.checkUpdate(productCategory, existingProductCategory);
-        if (this.productCategoryRepository.existsByNameIgnoreCase(productCategory.getName()) && !existingProductCategory.getName().equals(productCategory.getName())) {
-            logger.warn("Product category name '{}' already exists.", productCategory.getName());
-            throw new EntityAlreadyExistsException("Product category name already exists");
+            throw new EntityNotFoundException("Product category not found");
         }
-        logger.info("Product category name does not exist. Proceeding with updating the product category.");
-        productCategory.setCategoryNumber(existingProductCategory.getCategoryNumber());
-        productCategory.setUpdatedAt(LocalDateTime.now());
-        this.productCategoryRepository.save(productCategory);
-        logger.debug("Product category updated with id '{}'.", updateProductCategoryRequest.getId());
-        return this.modelMapperService.forResponse().map(productCategory, GetAllProductCategoriesResponse.class);
     }
 
     /**

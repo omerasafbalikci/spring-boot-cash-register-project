@@ -47,18 +47,6 @@ public class ProductCategoryController {
     }
 
     /**
-     * Retrieves a product category by its category number.
-     *
-     * @param categoryNumber the category number of the product category to retrieve
-     * @return a ResponseEntity containing the matching product category
-     */
-    @GetMapping("/category-number")
-    public ResponseEntity<GetAllProductCategoriesResponse> getCategoryByCategoryNumber(@RequestParam() String categoryNumber) {
-        GetAllProductCategoriesResponse response = this.productCategoryService.getCategoryByCategoryNumber(categoryNumber);
-        return ResponseEntity.ok(response);
-    }
-
-    /**
      * Retrieves a product category by its ID.
      *
      * @param id the ID of the product category to retrieve

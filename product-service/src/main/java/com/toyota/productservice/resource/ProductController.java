@@ -142,5 +142,4 @@ public class ProductController {
         GetAllProductsResponse response = this.productService.deleteProduct(id);
         return ResponseEntity.ok(response);
     }
-
 }
