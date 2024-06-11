@@ -1,6 +1,6 @@
-package com.toyota.usermanagementservice.advice;
+package com.toyota.authenticationauthorizationservice.advice;
 
-import com.toyota.usermanagementservice.utilities.exceptions.*;
+import com.toyota.authenticationauthorizationservice.utilities.exceptions.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,6 +30,28 @@ public class GlobalExceptionHandlerTest {
     }
 
     @Test
+    void handleUsernameTakenException() {
+        // Given
+        String message = "Username taken";
+        UsernameTakenException usernameTakenException = new UsernameTakenException(message);
+
+        // When
+        String path = "/test";
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        Mockito.when(request.getRequestURI()).thenReturn(path);
+        ResponseEntity<Object> response = globalExceptionHandler.handleUsernameTakenException(usernameTakenException, request);
+
+        // Then
+        ErrorResponse errorResponse = (ErrorResponse) response.getBody();
+        Assertions.assertNotNull(errorResponse);
+        Assertions.assertTrue(HttpStatus.CONFLICT.getReasonPhrase().equalsIgnoreCase(errorResponse.getError()),
+                "Expected error: " + HttpStatus.CONFLICT.getReasonPhrase() + ", but got: " + errorResponse.getError());
+        Assertions.assertEquals(HttpStatus.CONFLICT.value(), errorResponse.getStatus());
+        Assertions.assertEquals(message, errorResponse.getMessage());
+        Assertions.assertEquals(path, errorResponse.getPath());
+    }
+
+    @Test
     void handleUserNotFoundException() {
         // Given
         String message = "User not found";
@@ -52,60 +74,38 @@ public class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void handleUnexpectedException() {
+    void handleInvalidBearerToken() {
         // Given
-        String message = "Unexpected exception";
-        UnexpectedException unexpectedException = new UnexpectedException(message);
+        String message = "Bearer not found";
+        InvalidBearerToken invalidBearerToken = new InvalidBearerToken(message);
 
         // When
         String path = "/test";
         HttpServletRequest request = mock(HttpServletRequest.class);
         Mockito.when(request.getRequestURI()).thenReturn(path);
-        ResponseEntity<Object> response = globalExceptionHandler.handleUnexpectedException(unexpectedException, request);
+        ResponseEntity<Object> response = this.globalExceptionHandler.handleInvalidBearerToken(invalidBearerToken, request);
 
         // Then
         ErrorResponse errorResponse = (ErrorResponse) response.getBody();
         Assertions.assertNotNull(errorResponse);
-        Assertions.assertTrue(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase().equalsIgnoreCase(errorResponse.getError()),
-                "Expected error: " + HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase() + ", but got: " + errorResponse.getError());
-        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), errorResponse.getStatus());
+        Assertions.assertTrue(HttpStatus.NOT_FOUND.getReasonPhrase().equalsIgnoreCase(errorResponse.getError()),
+                "Expected error: " + HttpStatus.NOT_FOUND.getReasonPhrase() + ", but got: " + errorResponse.getError());
+        Assertions.assertEquals(HttpStatus.NOT_FOUND.value(), errorResponse.getStatus());
         Assertions.assertEquals(message, errorResponse.getMessage());
         Assertions.assertEquals(path, errorResponse.getPath());
     }
 
     @Test
-    void handleUserAlreadyExistsException() {
+    void handleNoRolesException() {
         // Given
-        String message = "User already exists";
-        UserAlreadyExistsException userAlreadyExistsException = new UserAlreadyExistsException(message);
+        String message = "No roles exception";
+        NoRolesException noRolesException = new NoRolesException(message);
 
         // When
         String path = "/test";
         HttpServletRequest request = mock(HttpServletRequest.class);
         Mockito.when(request.getRequestURI()).thenReturn(path);
-        ResponseEntity<Object> response = globalExceptionHandler.handleUserAlreadyExistsException(userAlreadyExistsException, request);
-
-        // Then
-        ErrorResponse errorResponse = (ErrorResponse) response.getBody();
-        Assertions.assertNotNull(errorResponse);
-        Assertions.assertTrue(HttpStatus.CONFLICT.getReasonPhrase().equalsIgnoreCase(errorResponse.getError()),
-                "Expected error: " + HttpStatus.CONFLICT.getReasonPhrase() + ", but got: " + errorResponse.getError());
-        Assertions.assertEquals(HttpStatus.CONFLICT.value(), errorResponse.getStatus());
-        Assertions.assertEquals(message, errorResponse.getMessage());
-        Assertions.assertEquals(path, errorResponse.getPath());
-    }
-
-    @Test
-    void handleSingleRoleRemovalException() {
-        // Given
-        String message = "Cannot remove role. User must have at least one role!";
-        SingleRoleRemovalException singleRoleRemovalException = new SingleRoleRemovalException(message);
-
-        // When
-        String path = "/test";
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        Mockito.when(request.getRequestURI()).thenReturn(path);
-        ResponseEntity<Object> response = globalExceptionHandler.handleSingleRoleRemovalException(singleRoleRemovalException, request);
+        ResponseEntity<Object> response = globalExceptionHandler.handleNoRolesException(noRolesException, request);
 
         // Then
         ErrorResponse errorResponse = (ErrorResponse) response.getBody();
@@ -113,28 +113,6 @@ public class GlobalExceptionHandlerTest {
         Assertions.assertTrue(HttpStatus.BAD_REQUEST.getReasonPhrase().equalsIgnoreCase(errorResponse.getError()),
                 "Expected error: " + HttpStatus.BAD_REQUEST.getReasonPhrase() + ", but got: " + errorResponse.getError());
         Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
-        Assertions.assertEquals(message, errorResponse.getMessage());
-        Assertions.assertEquals(path, errorResponse.getPath());
-    }
-
-    @Test
-    void handleRoleAlreadyExistsException() {
-        // Given
-        String message = "Role already exists";
-        RoleAlreadyExistsException roleAlreadyExistsException = new RoleAlreadyExistsException(message);
-
-        // When
-        String path = "/test";
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        Mockito.when(request.getRequestURI()).thenReturn(path);
-        ResponseEntity<Object> response = globalExceptionHandler.handleRoleAlreadyExistsException(roleAlreadyExistsException, request);
-
-        // Then
-        ErrorResponse errorResponse = (ErrorResponse) response.getBody();
-        Assertions.assertNotNull(errorResponse);
-        Assertions.assertTrue(HttpStatus.CONFLICT.getReasonPhrase().equalsIgnoreCase(errorResponse.getError()),
-                "Expected error: " + HttpStatus.CONFLICT.getReasonPhrase() + ", but got: " + errorResponse.getError());
-        Assertions.assertEquals(HttpStatus.CONFLICT.value(), errorResponse.getStatus());
         Assertions.assertEquals(message, errorResponse.getMessage());
         Assertions.assertEquals(path, errorResponse.getPath());
     }
@@ -142,21 +120,65 @@ public class GlobalExceptionHandlerTest {
     @Test
     void handleRoleNotFoundException() {
         // Given
-        String message = "Role not Found";
+        String message = "Role not found";
         RoleNotFoundException roleNotFoundException = new RoleNotFoundException(message);
 
         // When
         String path = "/test";
         HttpServletRequest request = mock(HttpServletRequest.class);
         Mockito.when(request.getRequestURI()).thenReturn(path);
-        ResponseEntity<Object> response = globalExceptionHandler.handleRoleNotFoundException(roleNotFoundException, request);
+        ResponseEntity<Object> response = this.globalExceptionHandler.handleRoleNotFoundException(roleNotFoundException, request);
 
         // Then
         ErrorResponse errorResponse = (ErrorResponse) response.getBody();
         Assertions.assertNotNull(errorResponse);
-        Assertions.assertTrue(HttpStatus.BAD_REQUEST.getReasonPhrase().equalsIgnoreCase(errorResponse.getError()),
-                "Expected error: " + HttpStatus.BAD_REQUEST.getReasonPhrase() + ", but got: " + errorResponse.getError());
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
+        Assertions.assertTrue(HttpStatus.NOT_FOUND.getReasonPhrase().equalsIgnoreCase(errorResponse.getError()),
+                "Expected error: " + HttpStatus.NOT_FOUND.getReasonPhrase() + ", but got: " + errorResponse.getError());
+        Assertions.assertEquals(HttpStatus.NOT_FOUND.value(), errorResponse.getStatus());
+        Assertions.assertEquals(message, errorResponse.getMessage());
+        Assertions.assertEquals(path, errorResponse.getPath());
+    }
+
+    @Test
+    void handleIncorrectPasswordException() {
+        // Given
+        String message = "Incorrect password";
+        IncorrectPasswordException incorrectPasswordException = new IncorrectPasswordException(message);
+
+        // When
+        String path = "/test";
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        Mockito.when(request.getRequestURI()).thenReturn(path);
+        ResponseEntity<Object> response = this.globalExceptionHandler.handleIncorrectPasswordException(incorrectPasswordException, request);
+
+        // Then
+        ErrorResponse errorResponse = (ErrorResponse) response.getBody();
+        Assertions.assertNotNull(errorResponse);
+        Assertions.assertTrue(HttpStatus.UNAUTHORIZED.getReasonPhrase().equalsIgnoreCase(errorResponse.getError()),
+                "Expected error: " + HttpStatus.UNAUTHORIZED.getReasonPhrase() + ", but got: " + errorResponse.getError());
+        Assertions.assertEquals(HttpStatus.UNAUTHORIZED.value(), errorResponse.getStatus());
+        Assertions.assertEquals(message, errorResponse.getMessage());
+        Assertions.assertEquals(path, errorResponse.getPath());
+    }
+
+    @Test
+    void handleInvalidAuthenticationException() {
+        // Given
+        String message = "Authentication failed! The provided username or password is incorrect.";
+        InvalidAuthenticationException invalidAuthenticationException = new InvalidAuthenticationException(message);
+
+        // When
+        String path = "/test";
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        Mockito.when(request.getRequestURI()).thenReturn(path);
+        ResponseEntity<Object> response = this.globalExceptionHandler.handleInvalidAuthenticationException(invalidAuthenticationException, request);
+
+        // Then
+        ErrorResponse errorResponse = (ErrorResponse) response.getBody();
+        Assertions.assertNotNull(errorResponse);
+        Assertions.assertTrue(HttpStatus.UNAUTHORIZED.getReasonPhrase().equalsIgnoreCase(errorResponse.getError()),
+                "Expected error: " + HttpStatus.UNAUTHORIZED.getReasonPhrase() + ", but got: " + errorResponse.getError());
+        Assertions.assertEquals(HttpStatus.UNAUTHORIZED.value(), errorResponse.getStatus());
         Assertions.assertEquals(message, errorResponse.getMessage());
         Assertions.assertEquals(path, errorResponse.getPath());
     }

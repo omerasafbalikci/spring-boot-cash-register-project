@@ -62,7 +62,7 @@ public class UserManagerTest {
     }
 
     @Test
-    void createUser_Success() {
+    void createUser_success() {
         // Given
         CreateUserRequest createUserRequest = new CreateUserRequest("firstname", "lastname", "username",
                 "email@gmail.com", "abcdef1", Set.of(Role.CASHIER), Gender.FEMALE);
@@ -114,7 +114,7 @@ public class UserManagerTest {
     }
 
     @Test
-    void createUser_Fail() {
+    void createUser_fail() {
         // Given
         CreateUserRequest createUserRequest = new CreateUserRequest("firstname", "lastname", "username",
                 "email@gmail.com", "abcdef1", Set.of(Role.CASHIER), Gender.FEMALE);
@@ -141,7 +141,7 @@ public class UserManagerTest {
     }
 
     @Test
-    void createUser_UsernameAlreadyExists() {
+    void createUser_usernameAlreadyExists() {
         // Given
         CreateUserRequest createUserRequest = new CreateUserRequest("firstname", "lastname", "username",
                 "email@gmail.com", "abcdef1", Set.of(Role.CASHIER), Gender.FEMALE);
@@ -155,7 +155,7 @@ public class UserManagerTest {
     }
 
     @Test
-    void createUser_EmailAlreadyExists() {
+    void createUser_emailAlreadyExists() {
         // Given
         CreateUserRequest createUserRequest = new CreateUserRequest("firstname", "lastname", "username",
                 "email@gmail.com", "abcdef1", Set.of(Role.CASHIER), Gender.FEMALE);
@@ -169,7 +169,7 @@ public class UserManagerTest {
     }
 
     @Test
-    void updateUser_Success() {
+    void updateUser_success() {
         // Given
         UpdateUserRequest updateUserRequest = new UpdateUserRequest(1L, "firstname", "lastname", "username",
                 "email@gmail.com", Gender.FEMALE);
@@ -209,7 +209,7 @@ public class UserManagerTest {
     }
 
     @Test
-    void updateUser_UnexpectedFail() {
+    void updateUser_unexpectedFail() {
         // Given
         UpdateUserRequest updateUserRequest = new UpdateUserRequest(1L, "firstname", "lastname", "username",
                 "email@gmail.com", Gender.FEMALE);
@@ -235,7 +235,7 @@ public class UserManagerTest {
     }
 
     @Test
-    void updateUser_UserNotFound() {
+    void updateUser_userNotFound() {
         // Given
         UpdateUserRequest updateUserRequest = new UpdateUserRequest();
 
@@ -247,7 +247,7 @@ public class UserManagerTest {
     }
 
     @Test
-    void updateUser_UsernameTaken() {
+    void updateUser_usernameTaken() {
         // Given
         UpdateUserRequest updateUserRequest = new UpdateUserRequest();
         updateUserRequest.setUsername("Username");
@@ -263,7 +263,7 @@ public class UserManagerTest {
     }
 
     @Test
-    void updateUser_EmailTaken() {
+    void updateUser_emailTaken() {
         // Given
         UpdateUserRequest updateUserRequest = new UpdateUserRequest();
         updateUserRequest.setEmail("email");
@@ -279,7 +279,7 @@ public class UserManagerTest {
     }
 
     @Test
-    void deleteUser_Success() {
+    void deleteUser_success() {
         // Given
         User existingUser = new User(1L, "test", "test", "test",
                 "test@gmail.com", Set.of(Role.CASHIER), Gender.MALE, false);
@@ -311,7 +311,7 @@ public class UserManagerTest {
     }
 
     @Test
-    void deleteUser_UserNotFound() {
+    void deleteUser_userNotFound() {
         // Given
         Long userId = 1L;
 
@@ -325,7 +325,7 @@ public class UserManagerTest {
     }
 
     @Test
-    void deleteUser_UnexpectedFail() {
+    void deleteUser_unexpectedFail() {
         // Given
         User existingUser = new User(1L, "test", "test", "test",
                 "test@gmail.com", Set.of(Role.CASHIER), Gender.MALE, false);
@@ -350,7 +350,7 @@ public class UserManagerTest {
     }
 
     @Test
-    void getAllUsersPage_Asc() {
+    void getAllUsersPage_asc() {
         // Given
         Long id = 1L;
         String firstname = "firstname";
@@ -390,7 +390,7 @@ public class UserManagerTest {
     }
 
     @Test
-    void getAllUsersPage_Desc() {
+    void getAllUsersPage_desc() {
         // Given
         Long id = 1L;
         String firstname = "firstname";
@@ -430,7 +430,7 @@ public class UserManagerTest {
     }
 
     @Test
-    void addRole_Success() {
+    void addRole_success() {
         // Given
         Set<Role> roles = new HashSet<>();
         roles.add(Role.CASHIER);
@@ -475,7 +475,7 @@ public class UserManagerTest {
     }
 
     @Test
-    void addRole_UnexpectedFail() {
+    void addRole_unexpectedFail() {
         // Given
         Set<Role> roles = new HashSet<>();
         roles.add(Role.CASHIER);
@@ -503,7 +503,7 @@ public class UserManagerTest {
     }
 
     @Test
-    void addRole_AlreadyExists() {
+    void addRole_alreadyExists() {
         // Given
         Set<Role> roles = new HashSet<>();
         roles.add(Role.CASHIER);
@@ -521,7 +521,7 @@ public class UserManagerTest {
     }
 
     @Test
-    void addRole_UserNotFound() {
+    void addRole_userNotFound() {
         // Given
         Long userId = 1L;
 
@@ -535,7 +535,7 @@ public class UserManagerTest {
     }
 
     @Test
-    void removeRole_Success() {
+    void removeRole_success() {
         // Given
         Set<Role> roles = new HashSet<>();
         roles.add(Role.CASHIER);
@@ -583,7 +583,7 @@ public class UserManagerTest {
     }
 
     @Test
-    void removeRole_UnexpectedFail() {
+    void removeRole_unexpectedFail() {
         // Given
         Set<Role> roles = new HashSet<>();
         roles.add(Role.CASHIER);
@@ -612,7 +612,7 @@ public class UserManagerTest {
     }
 
     @Test
-    void removeRole_SingleRemovalFail() {
+    void removeRole_singleRemovalFail() {
         // Given
         Set<Role> roles = new HashSet<>();
         roles.add(Role.CASHIER);
@@ -629,7 +629,7 @@ public class UserManagerTest {
     }
 
     @Test
-    void removeRole_RoleNotFound() {
+    void removeRole_roleNotFound() {
         // Given
         Set<Role> roles = new HashSet<>();
         roles.add(Role.CASHIER);
@@ -647,7 +647,7 @@ public class UserManagerTest {
     }
 
     @Test
-    void removeRole_UserNotFound() {
+    void removeRole_userNotFound() {
         // Given
         Long userId = 1L;
 
