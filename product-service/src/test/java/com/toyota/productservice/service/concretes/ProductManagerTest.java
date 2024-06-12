@@ -64,8 +64,8 @@ public class ProductManagerTest {
         int size = 3;
         String[] sort = {"id,asc"};
 
-        Product product1 = new Product(1L, "1234567890123", "Product1", "Description1", 10, 100.0, true, "imageUrl1", "createdBy1", LocalDateTime.now(), null);
-        Product product2 = new Product(2L, "1234567890124", "Product2", "Description2", 20, 200.0, true, "imageUrl2", "createdBy2", LocalDateTime.now(), null);
+        Product product1 = new Product(1L, "1234567890123", "Product1", "Description1", 10, 100.0, true, "imageUrl1", "Asaf", LocalDateTime.now(), null);
+        Product product2 = new Product(2L, "1234567890124", "Product2", "Description2", 20, 200.0, true, "imageUrl2", "Can", LocalDateTime.now(), null);
         List<Product> productList = Arrays.asList(product1, product2);
 
         Page<Product> productPage = new PageImpl<>(productList, PageRequest.of(page, size, Sort.by(Sort.Order.asc("id"))), productList.size());
@@ -97,8 +97,8 @@ public class ProductManagerTest {
         int size = 3;
         String[] sort = {"id,desc"};
 
-        Product product1 = new Product(1L, "1234567890123", "Product1", "Description1", 10, 100.0, true, "imageUrl1", "createdBy1", LocalDateTime.now(), null);
-        Product product2 = new Product(2L, "1234567890124", "Product2", "Description2", 20, 200.0, true, "imageUrl2", "createdBy2", LocalDateTime.now(), null);
+        Product product1 = new Product(1L, "1234567890123", "Product1", "Description1", 10, 100.0, true, "imageUrl1", "Asaf", LocalDateTime.now(), null);
+        Product product2 = new Product(2L, "1234567890124", "Product2", "Description2", 20, 200.0, true, "imageUrl2", "Can", LocalDateTime.now(), null);
         List<Product> productList = Arrays.asList(product1, product2);
 
         Page<Product> productPage = new PageImpl<>(productList, PageRequest.of(page, size, Sort.by(Sort.Order.asc("id"))), productList.size());
@@ -131,8 +131,8 @@ public class ProductManagerTest {
         int size = 3;
         String[] sort = {"id,asc"};
 
-        Product product1 = new Product(1L, "1234567890123", "Product1", "Description1", 10, 100.0, true, "imageUrl1", "createdBy1", LocalDateTime.now(), null);
-        Product product2 = new Product(2L, "1234567890124", "Product2", "Description2", 20, 200.0, true, "imageUrl2", "createdBy2", LocalDateTime.now(), null);
+        Product product1 = new Product(1L, "1234567890123", "Product1", "Description1", 10, 100.0, true, "imageUrl1", "Asaf", LocalDateTime.now(), null);
+        Product product2 = new Product(2L, "1234567890124", "Product2", "Description2", 20, 200.0, true, "imageUrl2", "Can", LocalDateTime.now(), null);
         List<Product> productList = Arrays.asList(product1, product2);
 
         Page<Product> productPage = new PageImpl<>(productList, PageRequest.of(page, size, Sort.by(Sort.Order.asc("id"))), productList.size());
@@ -169,8 +169,8 @@ public class ProductManagerTest {
         int size = 3;
         String[] sort = {"id,asc"};
 
-        Product product1 = new Product(1L, "1234567890123", "Product1", "Description1", 10, 100.0, true, "imageUrl1", "createdBy1", LocalDateTime.now(), null);
-        Product product2 = new Product(2L, "1234567890124", "Product2", "Description2", 20, 200.0, true, "imageUrl2", "createdBy2", LocalDateTime.now(), null);
+        Product product1 = new Product(1L, "1234567890123", "Product1", "Description1", 10, 100.0, true, "imageUrl1", "Asaf", LocalDateTime.now(), null);
+        Product product2 = new Product(2L, "1234567890124", "Product2", "Description2", 20, 200.0, true, "imageUrl2", "Can", LocalDateTime.now(), null);
         List<Product> productList = Arrays.asList(product1, product2);
 
         Page<Product> productPage = new PageImpl<>(productList, PageRequest.of(page, size, Sort.by(Sort.Order.asc("id"))), productList.size());
@@ -318,7 +318,7 @@ public class ProductManagerTest {
         request.setDescription("New Product Description");
         request.setState(true);
         request.setImageUrl("http://image.url");
-        request.setCreatedBy("User");
+        request.setCreatedBy("Asaf");
         request.setProductCategoryId(1L);
 
         ProductCategory productCategory = new ProductCategory();
@@ -351,7 +351,7 @@ public class ProductManagerTest {
         request.setDescription("Updated Description");
         request.setState(true);
         request.setImageUrl("http://image.url");
-        request.setCreatedBy("User");
+        request.setCreatedBy("Asaf");
         request.setProductCategoryId(1L);
 
         Product existingProduct = new Product();
@@ -369,7 +369,7 @@ public class ProductManagerTest {
         when(productRepository.save(any(Product.class))).thenReturn(product);
 
         GetAllProductsResponse response = new GetAllProductsResponse();
-        response.setProductCategoryName("CategoryName"); // Mocking the category name
+        response.setProductCategoryName("CategoryName");
         when(modelMapperService.forResponse().map(any(Product.class), eq(GetAllProductsResponse.class))).thenReturn(response);
 
         // When
@@ -392,7 +392,7 @@ public class ProductManagerTest {
         request.setDescription("Updated Description");
         request.setState(true);
         request.setImageUrl("http://image.url");
-        request.setCreatedBy("User");
+        request.setCreatedBy("Asaf");
         request.setProductCategoryId(1L);
 
         Product existingProduct = new Product();
@@ -418,7 +418,7 @@ public class ProductManagerTest {
         request.setDescription("New Product Description");
         request.setState(true);
         request.setImageUrl("http://image.url");
-        request.setCreatedBy("User");
+        request.setCreatedBy("Asaf");
         request.setProductCategoryId(1L);
 
         when(productCategoryRepository.findById(anyLong())).thenReturn(Optional.empty());
@@ -509,7 +509,7 @@ public class ProductManagerTest {
         updateProductRequest.setState(false);
         updateProductRequest.setImageUrl("http://updated.image.url");
         updateProductRequest.setProductCategoryId(1L);
-        updateProductRequest.setCreatedBy("User");
+        updateProductRequest.setCreatedBy("Asaf");
         return updateProductRequest;
     }
 

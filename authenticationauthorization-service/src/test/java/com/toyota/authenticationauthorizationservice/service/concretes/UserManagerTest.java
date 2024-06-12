@@ -59,7 +59,7 @@ public class UserManagerTest {
     @Test
     void register_success() {
         // Given
-        RegisterRequest registerRequest = new RegisterRequest("Ahmet", "test", Set.of(""));
+        RegisterRequest registerRequest = new RegisterRequest("Asaf", "test", Set.of(""));
         Role existingRole = new Role();
 
         // When
@@ -78,7 +78,7 @@ public class UserManagerTest {
     @Test
     void register_userAlreadyExists() {
         // Given
-        RegisterRequest registerRequest = new RegisterRequest("Ahmet", "test", Set.of(""));
+        RegisterRequest registerRequest = new RegisterRequest("Asaf", "test", Set.of(""));
 
         // When
         when(userRepository.existsByUsernameAndDeletedIsFalse(anyString())).thenReturn(true);
@@ -90,7 +90,7 @@ public class UserManagerTest {
     @Test
     void register_noRolesEntered() {
         // Given
-        RegisterRequest registerRequest = new RegisterRequest("Ahmet", "test", Collections.emptySet());
+        RegisterRequest registerRequest = new RegisterRequest("Asaf", "test", Collections.emptySet());
 
         // Then
         assertThrows(NoRolesException.class, () -> userManager.register(registerRequest));
@@ -99,7 +99,7 @@ public class UserManagerTest {
     @Test
     void register_noValidRolesEntered() {
         // Given
-        RegisterRequest registerRequest = new RegisterRequest("Ahmet", "test", Set.of(""));
+        RegisterRequest registerRequest = new RegisterRequest("Asaf", "test", Set.of(""));
 
         // When
         when(passwordEncoder.encode(anyString())).thenReturn("...");
@@ -112,8 +112,8 @@ public class UserManagerTest {
     @Test
     void login_success() {
         // Given
-        AuthenticationRequest authenticationRequest = new AuthenticationRequest("tim", "test");
-        User user = new User(1L, "tim", "test", false, Set.of(new Role()), List.of(new Token()));
+        AuthenticationRequest authenticationRequest = new AuthenticationRequest("Asaf", "test");
+        User user = new User(1L, "Asaf", "test", false, Set.of(new Role()), List.of(new Token()));
 
         // When
         when(userRepository.findByUsernameAndDeletedIsFalse(anyString())).thenReturn(Optional.of(user));
@@ -128,7 +128,7 @@ public class UserManagerTest {
     @Test
     void login_fail() {
         // Given
-        AuthenticationRequest authenticationRequest = new AuthenticationRequest("tim", "test");
+        AuthenticationRequest authenticationRequest = new AuthenticationRequest("Asaf", "test");
         AuthenticationException authenticationException = new AuthenticationException("Failed Authentication") {};
 
         // When
