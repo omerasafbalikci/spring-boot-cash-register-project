@@ -68,25 +68,6 @@ public class ProductController {
     }
 
     /**
-     * Retrieves products by their initial letter.
-     *
-     * @param initialLetter the initial letter to filter by
-     * @param page the page number to retrieve (default is 0)
-     * @param size the size of the page (default is 3)
-     * @param sort the sort criteria (default is "id,asc")
-     * @return a TreeMap containing the products starting with the specified initial letter
-     */
-    @GetMapping("/letter")
-    public ResponseEntity<TreeMap<String, Object>> getProductsByInitialLetter(
-            @RequestParam() String initialLetter,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "3") int size,
-            @RequestParam(defaultValue = "id,asc") String[] sort) {
-        TreeMap<String, Object> response = this.productService.getProductsByInitialLetter(initialLetter, page, size, sort);
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-    /**
      * Checks the inventory for a list of products.
      *
      * @param inventoryRequests the list of inventory requests to check

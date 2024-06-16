@@ -39,17 +39,6 @@ public interface ProductService {
     TreeMap<String, Object> getProductsByNameContaining(String name, int page, int size, String[] sort);
 
     /**
-     * Retrieves products whose names start with the specified initial letter.
-     *
-     * @param initialLetter the initial letter to filter product names by.
-     * @param page the page number for pagination.
-     * @param size the number of items per page.
-     * @param sort the sorting criteria.
-     * @return a {@link TreeMap} containing the products matching the initial letter criteria and additional pagination information.
-     */
-    TreeMap<String, Object> getProductsByInitialLetter(String initialLetter, int page, int size, String[] sort);
-
-    /**
      * Checks the availability of products in the inventory.
      *
      * @param inventoryRequests a list of {@link InventoryRequest} objects representing the products to check.

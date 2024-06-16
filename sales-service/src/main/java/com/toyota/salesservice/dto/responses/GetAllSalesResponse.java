@@ -1,5 +1,6 @@
 package com.toyota.salesservice.dto.responses;
 
+import com.toyota.salesservice.domain.PaymentType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,7 +20,7 @@ public class GetAllSalesResponse {
     private String salesNumber;
     private LocalDateTime salesDate;
     private String createdBy;
-    private String paymentType;
+    private PaymentType paymentType;
     private Double totalPrice;
     private Double money;
     private Double change;

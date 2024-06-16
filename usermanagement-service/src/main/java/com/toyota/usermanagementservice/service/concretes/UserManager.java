@@ -63,7 +63,7 @@ public class UserManager implements UserService {
 
         logger.info("Sending request to authentication-authorization-service for user signup.");
         Boolean response = this.webClientBuilder.build().post()
-                .uri("http://authenticationauthorization-service/auth/signup")
+                .uri("http://authentication-authorization-service/auth/signup")
                 .bodyValue(new RegisterRequest(createUserRequest.getUsername(), createUserRequest.getPassword(), roles))
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, clientResponse -> {
@@ -121,7 +121,7 @@ public class UserManager implements UserService {
                     throw new UserAlreadyExistsException("Username is taken");
                 }
                 Boolean updated = webClientBuilder.build().put()
-                        .uri("http://authenticationauthorization-service/auth/update/{old-username}",
+                        .uri("http://authentication-authorization-service/auth/update/{old-username}",
                                 user.getUsername())
                         .bodyValue(updateUserRequest.getUsername())
                         .retrieve()
@@ -183,7 +183,7 @@ public class UserManager implements UserService {
             User user = optionalUser.get();
             logger.info("User found: {}.", user);
             Boolean deleteFromAuth = this.webClientBuilder.build().put()
-                    .uri("http://authenticationauthorization-service/auth/delete")
+                    .uri("http://authentication-authorization-service/auth/delete")
                     .bodyValue(user.getUsername())
                     .retrieve()
                     .onStatus(HttpStatusCode::isError, clientResponse -> {
@@ -302,7 +302,7 @@ public class UserManager implements UserService {
             }
             logger.info("Sending request to add role: {} to user: {}.", role, user.getUsername());
             Boolean success = this.webClientBuilder.build().put()
-                    .uri("http://authenticationauthorization-service/auth/add-role/{username}",
+                    .uri("http://authentication-authorization-service/auth/add-role/{username}",
                             user.getUsername())
                     .bodyValue(role.toString())
                     .retrieve()
@@ -366,7 +366,7 @@ public class UserManager implements UserService {
             }
             logger.info("Sending request to remove role: {} from user: {}.", role, user.getUsername());
             Boolean success = this.webClientBuilder.build().put()
-                    .uri("http://authenticationauthorization-service/auth/remove-role/{username}",
+                    .uri("http://authentication-authorization-service/auth/remove-role/{username}",
                             user.getUsername())
                     .bodyValue(role.toString())
                     .retrieve()

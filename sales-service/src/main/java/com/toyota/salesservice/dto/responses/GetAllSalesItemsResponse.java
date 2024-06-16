@@ -1,5 +1,6 @@
 package com.toyota.salesservice.dto.responses;
 
+import com.toyota.salesservice.domain.PaymentType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,6 @@ public class GetAllSalesItemsResponse {
     private Double unitPrice;
     private Boolean state;
     private Double totalPrice;
-    private String paymentType;
+    private PaymentType paymentType;
     private String campaignName;
 }

@@ -60,7 +60,7 @@ public class ReportManager implements ReportService {
                         uriBuilder
                                 .queryParam("page", page)
                                 .queryParam("size", size)
-                                .queryParam("sort", sort)
+                                .queryParam("sort", (Object[]) sort)
                                 .queryParam("id", id)
                                 .queryParam("salesNumber", salesNumber)
                                 .queryParam("salesDate", salesDate)

@@ -5,6 +5,9 @@ import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 /**
  * Component for creating specifications to filter Sales entities based on various criteria.
  */
@@ -35,7 +38,8 @@ public class SalesSpecification {
                 predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("salesNumber"), salesNumber));
             }
             if (salesDate != null && !salesDate.isEmpty()) {
-                predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("salesDate"), salesDate));
+                LocalDateTime dateTime = LocalDateTime.parse(salesDate, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"));
+                predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("salesDate"), dateTime));
             }
             if (createdBy != null && !createdBy.isEmpty()) {
                 predicate = criteriaBuilder.and(predicate, criteriaBuilder.like(root.get("createdBy"), "%" + createdBy + "%"));

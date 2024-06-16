@@ -112,7 +112,7 @@ public class SalesManager implements SalesService {
             Sales sales = this.salesRepository.findBySalesNumber(createReturnRequest.getSalesNumber());
             if (sales == null) {
                 logger.error("Sales not found for sales number '{}'.", createReturnRequest.getSalesNumber());
-                throw new SalesNotFoundException("Sales not found");
+                throw new SalesNotFoundException("Sales not found: " + createReturnRequest.getSalesNumber());
             }
             LocalDateTime salesDate = sales.getSalesDate();
             LocalDateTime returnDate = createReturnRequest.getReturnDate();
@@ -128,13 +128,13 @@ public class SalesManager implements SalesService {
             }
             if (!hasBarcodeNumber) {
                 logger.error("Sales items not found for barcode number '{}'.", createReturnRequest.getBarcodeNumber());
-                throw new SalesItemsNotFoundException("Sales items not found");
+                throw new SalesItemsNotFoundException("Sales items not found: " + createReturnRequest.getBarcodeNumber());
             }
             int returnQuantity = createReturnRequest.getQuantity();
             if (salesItem.getQuantity() < returnQuantity) {
                 logger.error("Quantity incorrect entry for barcode number '{}'. Requested: {}, Available: {}.",
                         createReturnRequest.getBarcodeNumber(), returnQuantity, salesItem.getQuantity());
-                throw new QuantityIncorrectEntryException("Quantity incorrect entry");
+                throw new QuantityIncorrectEntryException("Quantity incorrect entry: " + salesItem.getName());
             }
             InventoryRequest inventoryRequest = new InventoryRequest();
             inventoryRequest.setBarcodeNumber(createReturnRequest.getBarcodeNumber());
@@ -212,7 +212,7 @@ public class SalesManager implements SalesService {
         Pageable pagingSort = PageRequest.of(page, size, Sort.by(getOrder(sort)));
         Specification<Sales> specification = SalesSpecification.filterByCriteria(id, salesNumber, salesDate, createdBy, paymentType, totalPrice, money, change);
         Page<Sales> pageSales = salesRepository.findAll(specification, pagingSort);
-
+        logger.debug("Total sales fetched: {}. Total pages: {}.", pageSales.getTotalElements(), pageSales.getTotalPages());
         List<GetAllSalesResponse> responses = pageSales.getContent().stream()
                 .map(sales -> this.modelMapperService.forResponse()
                         .map(sales, GetAllSalesResponse.class)).toList();

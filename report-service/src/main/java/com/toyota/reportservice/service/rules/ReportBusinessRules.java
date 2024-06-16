@@ -11,6 +11,7 @@ import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Service for handling business rules related to reports.
@@ -29,6 +30,11 @@ public class ReportBusinessRules {
      */
     public void pdf(GetAllReportsResponse report, PDDocument document, PDPage page) throws IOException {
         PDType0Font font = PDType0Font.load(document, ReportManager.class.getResourceAsStream("/org/apache/pdfbox/resources/ttf/LiberationSans-Regular.ttf"));
+        if (report.getPaymentType() == null) {
+            report.setPaymentType("CARD, CASH");
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+        String formattedDate = report.getSalesDate().format(formatter);
         try (PDPageContentStream contentStream = new PDPageContentStream(document, page)) {
             contentStream.beginText();
             contentStream.setFont(font, 12);
@@ -36,7 +42,7 @@ public class ReportBusinessRules {
             contentStream.showText("             SATIS RAPORU");
             contentStream.newLineAtOffset(0, -20);
             contentStream.setFont(font, 10);
-            contentStream.showText("TARIH : " + report.getSalesDate());
+            contentStream.showText("TARIH : " + formattedDate);
             contentStream.newLineAtOffset(0, -15);
             contentStream.showText("SATIS NO : " + report.getSalesNumber());
             contentStream.newLineAtOffset(0, -15);

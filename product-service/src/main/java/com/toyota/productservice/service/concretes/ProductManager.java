@@ -141,35 +141,6 @@ public class ProductManager implements ProductService {
     }
 
     /**
-     * Fetches products by initial letter with pagination and sorting.
-     *
-     * @param initialLetter the initial letter to search for
-     * @param page          the page number to fetch
-     * @param size          the number of products per page
-     * @param sort          the sort parameters
-     * @return a TreeMap containing the products and pagination information
-     */
-    @Override
-    public TreeMap<String, Object> getProductsByInitialLetter(String initialLetter, int page, int size, String[] sort) {
-        logger.info("Fetching products by initial letter '{}', with pagination. Page: {}, Size: {}, Sort: {}.", initialLetter, page, size, Arrays.toString(sort));
-        Pageable pagingSort = PageRequest.of(page, size, Sort.by(getOrder(sort)));
-        Page<Product> pagePro = this.productRepository.findByInitialLetterIgnoreCase(initialLetter, pagingSort);
-
-        List<GetAllProductsResponse> responses = pagePro.getContent().stream()
-                .map(product -> this.modelMapperService.forResponse()
-                        .map(product, GetAllProductsResponse.class)).collect(Collectors.toList());
-        logger.debug("Mapped products to response DTOs. Number of products: {}", responses.size());
-
-        TreeMap<String, Object> response = new TreeMap<>();
-        response.put("products", responses);
-        response.put("currentPage", pagePro.getNumber());
-        response.put("totalItems", pagePro.getTotalElements());
-        response.put("totalPages", pagePro.getTotalPages());
-        logger.debug("Retrieved {} products for page {}. Total items: {}. Total pages: {}.", responses.size(), pagePro.getNumber(), pagePro.getTotalElements(), pagePro.getTotalPages());
-        return response;
-    }
-
-    /**
      * Checks the availability of products in the inventory.
      *
      * @param inventoryRequests a list of inventory requests
@@ -192,11 +163,11 @@ public class ProductManager implements ProductService {
                     this.productRepository.save(product);
                 } else {
                     logger.warn("Insufficient quantity available for product '{}'", barcodeNumber);
-                    throw new ProductIsNotInStockException("Product is not in stock");
+                    throw new ProductIsNotInStockException("Product is not in stock: " + barcodeNumber);
                 }
             } else {
                 logger.warn("Product not found in inventory for barcodeNumber '{}'", barcodeNumber);
-                throw new EntityNotFoundException("Product not found");
+                throw new EntityNotFoundException("Product not found: " + barcodeNumber);
             }
             InventoryResponse inventoryResponse = getInventoryResponse(product, quantity);
             inventoryResponses.add(inventoryResponse);

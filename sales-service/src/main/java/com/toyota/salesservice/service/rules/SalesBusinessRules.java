@@ -1,5 +1,7 @@
 package com.toyota.salesservice.service.rules;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.toyota.salesservice.dao.CampaignRepository;
 import com.toyota.salesservice.domain.Campaign;
 import com.toyota.salesservice.domain.PaymentType;
@@ -48,15 +50,15 @@ public class SalesBusinessRules {
      */
     public void validatePaymentType(Sales sales, CreateSalesRequest createSalesRequest) {
         logger.info("Validating payment type for sales record created by '{}'.", createSalesRequest.getCreatedBy());
-        List<Optional<String>> paymentTypes = createSalesRequest.getCreateSalesItemsRequests().stream()
+        List<Optional<PaymentType>> paymentTypes = createSalesRequest.getCreateSalesItemsRequests().stream()
                 .map(request -> Optional.ofNullable(request.getPaymentType())).toList();
 
-        if ((createSalesRequest.getPaymentType() == null) && (paymentTypes.stream().allMatch(Optional::isEmpty) || paymentTypes.stream().anyMatch(Optional::isEmpty))) {
+        if ((createSalesRequest.getPaymentType() == null) && (paymentTypes.stream().anyMatch(Optional::isEmpty))) {
             logger.error("Payment type not entered.");
             throw new PaymentTypeNotEnteredException("Payment type not entered");
         }
         if (createSalesRequest.getPaymentType() != null) {
-            sales.setPaymentType(PaymentType.valueOf(createSalesRequest.getPaymentType().toUpperCase()));
+            sales.setPaymentType(createSalesRequest.getPaymentType());
         }
     }
 
@@ -76,10 +78,13 @@ public class SalesBusinessRules {
                         clientResponse.bodyToMono(String.class).flatMap(errorBody -> {
                             logger.error("Client error: {}.", errorBody);
                             if (errorBody.contains("Product is not in stock")) {
-                                return Mono.error(new ProductIsNotInStockException("Product is not in stock"));
+                                logger.warn("Product is not in stock for barcode: {}", extractProductBarcodeNumber(errorBody));
+                                return Mono.error(new ProductIsNotInStockException("Product is not in stock: " + extractProductBarcodeNumber(errorBody)));
                             } else if (errorBody.contains("Product not found")) {
-                                return Mono.error(new ProductNotFoundException("Product not found"));
+                                logger.warn("Product not found for barcode: {}", extractProductBarcodeNumber(errorBody));
+                                return Mono.error(new ProductNotFoundException("Product not found: " + extractProductBarcodeNumber(errorBody)));
                             } else {
+                                logger.warn("Unexpected client error: {}", errorBody);
                                 return Mono.error(new UnexpectedException("Unexpected exception in product-service"));
                             }
                         })
@@ -98,6 +103,26 @@ public class SalesBusinessRules {
     }
 
     /**
+     * Extracts the product barcode number from a JSON error message.
+     *
+     * @param errorBody the error message body from which to extract the barcode number
+     * @return the extracted barcode number or "Unknown Product" if not found
+     */
+    private String extractProductBarcodeNumber(String errorBody) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(errorBody);
+            String message = rootNode.path("message").asText();
+            if (message.contains(":")) {
+                return message.substring(message.indexOf(":") + 2).trim();
+            }
+        } catch (Exception e) {
+            logger.error("Error parsing error body JSON: {}", e.getMessage());
+        }
+        return "Unknown Product";
+    }
+
+    /**
      * Creates sales items for a sales record.
      *
      * @param createSalesRequest  the sales request data
@@ -111,7 +136,7 @@ public class SalesBusinessRules {
                 .map(CreateSalesItemsRequest::getBarcodeNumber).toList();
         List<Optional<Long>> campaignIds = createSalesRequest.getCreateSalesItemsRequests().stream()
                 .map(request -> Optional.ofNullable(request.getCampaignId())).toList();
-        List<Optional<String>> paymentTypes = createSalesRequest.getCreateSalesItemsRequests().stream()
+        List<Optional<PaymentType>> paymentTypes = createSalesRequest.getCreateSalesItemsRequests().stream()
                 .map(request -> Optional.ofNullable(request.getPaymentType())).toList();
 
         List<SalesItems> salesItems = IntStream.range(0, inventoryResponses.size())
@@ -130,8 +155,7 @@ public class SalesBusinessRules {
                         logger.info("Set campaign for sales item with barcode '{}'.", barcodeNumbers.get(i));
                     });
                     paymentTypes.get(i).ifPresent(paymentType -> {
-                        PaymentType type = PaymentType.valueOf(paymentType.toUpperCase());
-                        salesItem.setPaymentType(type);
+                        salesItem.setPaymentType(paymentType);
                         logger.info("Set payment type '{}' for sales item with barcode '{}'.", paymentType, barcodeNumbers.get(i));
                     });
                     logger.debug("Created sales item: {}.", salesItem);
@@ -165,8 +189,12 @@ public class SalesBusinessRules {
             if (campaign != null && campaign.getState()) {
                 applyCampaignDiscount(salesItem);
                 logger.info("Applied campaign discount for sales item with barcode '{}'.", salesItem.getBarcodeNumber());
+            } else if (campaign != null) {
+                updateInventory(inventoryRequests);
+                logger.error("Campaign status false for item '{}'.", salesItem.getName());
+                throw new CampaignStateFalseException("Campaign state is false: " + campaign.getName());
             }
-            logger.debug("Updated sales item: {}.", salesItem);
+            logger.debug("Updated sales item: {}.", salesItem.getName());
         }
         logger.info("Updated all sales items for sales record with sales number '{}'.", sales.getSalesNumber());
     }

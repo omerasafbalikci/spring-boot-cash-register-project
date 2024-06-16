@@ -162,44 +162,6 @@ public class ProductManagerTest {
     }
 
     @Test
-    void getProductsByInitialLetter() {
-        // Given
-        String initialLetter = "P";
-        int page = 0;
-        int size = 3;
-        String[] sort = {"id,asc"};
-
-        Product product1 = new Product(1L, "1234567890123", "Product1", "Description1", 10, 100.0, true, "imageUrl1", "Asaf", LocalDateTime.now(), null);
-        Product product2 = new Product(2L, "1234567890124", "Product2", "Description2", 20, 200.0, true, "imageUrl2", "Can", LocalDateTime.now(), null);
-        List<Product> productList = Arrays.asList(product1, product2);
-
-        Page<Product> productPage = new PageImpl<>(productList, PageRequest.of(page, size, Sort.by(Sort.Order.asc("id"))), productList.size());
-
-        when(productRepository.findByInitialLetterIgnoreCase(eq(initialLetter), any(Pageable.class))).thenReturn(productPage);
-        when(modelMapper.map(any(Product.class), eq(GetAllProductsResponse.class)))
-                .thenAnswer(invocation -> {
-                    Product product = invocation.getArgument(0);
-                    if (product == null) {
-                        return null;
-                    }
-                    return new GetAllProductsResponse(product.getId(), product.getBarcodeNumber(), product.getName(), product.getDescription(), product.getQuantity(), product.getUnitPrice(), product.getState(), product.getImageUrl(), product.getCreatedBy(), product.getUpdatedAt(), null);
-                });
-
-        // When
-        TreeMap<String, Object> response = productManager.getProductsByInitialLetter(initialLetter, page, size, sort);
-
-        // Then
-        @SuppressWarnings("unchecked")
-        List<GetAllProductsResponse> products = (List<GetAllProductsResponse>) response.get("products");
-
-        assertNotNull(response);
-        assertEquals(2, products.size());
-        assertEquals(0, response.get("currentPage"));
-        assertEquals(2L, response.get("totalItems"));
-        assertEquals(1, response.get("totalPages"));
-    }
-
-    @Test
     void checkProductInInventory_sufficientQuantity() {
         // Given
         Product product = new Product();
@@ -329,7 +291,7 @@ public class ProductManagerTest {
         when(productRepository.save(any(Product.class))).thenReturn(product);
 
         GetAllProductsResponse response = new GetAllProductsResponse();
-        response.setProductCategoryName("CategoryName"); // Mocking the category name
+        response.setProductCategoryName("CategoryName");
         when(modelMapperService.forResponse().map(any(Product.class), eq(GetAllProductsResponse.class))).thenReturn(response);
 
         // When

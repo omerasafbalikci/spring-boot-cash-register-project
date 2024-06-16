@@ -36,7 +36,7 @@ public class UserController {
      * @param gender optional gender to filter by
      * @return a page of users
      */
-    @GetMapping()
+    @GetMapping("/get-all")
     public Page<GetAllUsersResponse> getAllUsersPage(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "3") int size,

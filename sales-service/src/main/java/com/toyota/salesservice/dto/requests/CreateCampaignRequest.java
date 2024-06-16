@@ -1,5 +1,6 @@
 package com.toyota.salesservice.dto.requests;
 
+import com.toyota.salesservice.validation.OneOfFields;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -15,6 +16,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@OneOfFields
 public class CreateCampaignRequest {
     @NotNull(message = "Name must not be null")
     @NotBlank(message = "Name must not be blank")

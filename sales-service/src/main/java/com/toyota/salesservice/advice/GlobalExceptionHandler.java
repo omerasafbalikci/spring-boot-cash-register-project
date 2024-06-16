@@ -67,6 +67,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     /**
+     * Handles CampaignStateFalseException by returning a BAD_REQUEST response.
+     *
+     * @param exception the exception that was thrown
+     * @param request   the HttpServletRequest representing the current request
+     * @return a ResponseEntity containing an ErrorResponse with details about the exception
+     */
+    @ExceptionHandler(CampaignStateFalseException.class)
+    public ResponseEntity<Object> handleCampaignStateFalseException(CampaignStateFalseException exception, HttpServletRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
+        errorResponse.setPath(request.getRequestURI());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
      * Handles FetchInventoryResponseException by returning an INTERNAL_SERVER_ERROR response.
      *
      * @param exception the exception that was thrown

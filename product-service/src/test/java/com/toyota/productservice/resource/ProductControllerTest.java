@@ -58,21 +58,6 @@ public class ProductControllerTest {
     }
 
     @Test
-    void getProductsByInitialLetter() {
-        // Given
-        String initialLetter = "P";
-        TreeMap<String, Object> response = new TreeMap<>();
-        when(productService.getProductsByInitialLetter(initialLetter, 0, 3, new String[]{"id", "asc"})).thenReturn(response);
-
-        // When
-        ResponseEntity<TreeMap<String, Object>> result = productController.getProductsByInitialLetter(initialLetter, 0, 3, new String[]{"id", "asc"});
-
-        // Then
-        assertEquals(HttpStatus.OK, result.getStatusCode());
-        assertEquals(response, result.getBody());
-    }
-
-    @Test
     void checkProductInInventory() {
         // Given
         List<InventoryRequest> inventoryRequests = new ArrayList<>();

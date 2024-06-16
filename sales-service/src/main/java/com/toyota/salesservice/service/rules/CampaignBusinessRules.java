@@ -4,9 +4,12 @@ import com.toyota.salesservice.dao.CampaignRepository;
 import com.toyota.salesservice.domain.Campaign;
 import com.toyota.salesservice.dto.requests.CreateCampaignRequest;
 import com.toyota.salesservice.dto.requests.UpdateCampaignRequest;
+import com.toyota.salesservice.service.abstracts.CampaignService;
 import com.toyota.salesservice.utilities.exceptions.CampaignAlreadyExistsException;
 import com.toyota.salesservice.utilities.exceptions.CampaignDetailsAreIncorrectException;
 import lombok.AllArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.util.regex.Pattern;
@@ -19,6 +22,7 @@ import java.util.regex.Pattern;
 @AllArgsConstructor
 public class CampaignBusinessRules {
     private final CampaignRepository campaignRepository;
+    private final Logger logger = LogManager.getLogger(CampaignService.class);
 
     /**
      * Validates the details of a campaign, ensuring that the buy-pay entry is in the correct format.
@@ -30,7 +34,8 @@ public class CampaignBusinessRules {
         if (campaign.getBuyPay() != null) {
             Pattern pattern = Pattern.compile("^\\d+,\\d+$");
             if (!pattern.matcher(campaign.getBuyPay()).matches()) {
-                throw new CampaignDetailsAreIncorrectException("Incorrect buy-pay entry");
+                logger.error("Incorrect buy-pay entry. Campaign ID: {}. Please enter buyPay in the format 'integer,integer'. For example, '3,2'.", campaign.getId());
+                throw new CampaignDetailsAreIncorrectException("Incorrect buy-pay entry. Please enter buyPay in the format 'integer,integer'. For example, '3,2'.");
             }
 
             String[] parts = campaign.getBuyPay().split(",");
@@ -38,7 +43,8 @@ public class CampaignBusinessRules {
             int buyPayPartTwo = Integer.parseInt(parts[1]);
 
             if (buyPayPartOne < 0 || buyPayPartTwo < 0) {
-                throw new CampaignDetailsAreIncorrectException("Incorrect buy-pay entry");
+                logger.error("Incorrect buy-pay entry. Campaign ID: {}. Values must be non-negative integers.", campaign.getId());
+                throw new CampaignDetailsAreIncorrectException("Incorrect buy-pay entry. Values must be non-negative integers.");
             }
 
             campaign.setBuyPayPartOne(buyPayPartOne);
@@ -55,6 +61,7 @@ public class CampaignBusinessRules {
      */
     public void addCampaignType(Campaign campaign, CreateCampaignRequest createCampaignRequest) {
         if (createCampaignRequest.getBuyPay() == null && createCampaignRequest.getPercent() == null && createCampaignRequest.getMoneyDiscount() == null) {
+            logger.error("Campaign details not entered. Campaign ID: {}.", campaign.getId());
             throw new CampaignDetailsAreIncorrectException("Campaign details not entered");
         }
         if (createCampaignRequest.getBuyPay() != null) {
@@ -74,15 +81,16 @@ public class CampaignBusinessRules {
      * @throws CampaignDetailsAreIncorrectException if no campaign details are provided
      */
     public void updateCampaignType(Campaign campaign, UpdateCampaignRequest updateCampaignRequest) {
-        if (updateCampaignRequest.getBuyPay() == null && updateCampaignRequest.getPercent() == null && updateCampaignRequest.getMoneyDiscount() == null) {
-            throw new CampaignDetailsAreIncorrectException("Campaign details not entered");
-        }
         if (updateCampaignRequest.getBuyPay() != null) {
             campaign.setCampaignType(1);
         } else if (updateCampaignRequest.getPercent() != null) {
             campaign.setCampaignType(2);
-        } else {
+        } else if (updateCampaignRequest.getMoneyDiscount() != null) {
             campaign.setCampaignType(3);
+        }
+        if (campaign.getBuyPay() == null && campaign.getPercent() == null && campaign.getMoneyDiscount() == null) {
+            logger.error("Campaign details not entered. Campaign ID: {}.", campaign.getId());
+            throw new CampaignDetailsAreIncorrectException("Campaign details not entered");
         }
     }
 
@@ -115,6 +123,7 @@ public class CampaignBusinessRules {
         }
 
         if (this.campaignRepository.existsByNameIgnoreCase(campaign.getName()) && !existingCampaign.getName().equals(campaign.getName())) {
+            logger.error("Campaign with the same name already exists. Campaign Name: {}. Campaign ID: {}.", campaign.getName(), campaign.getId());
             throw new CampaignAlreadyExistsException("Campaign already exists");
         }
     }
