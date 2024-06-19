@@ -172,12 +172,16 @@ public class ProductCategoryManager implements ProductCategoryService {
     @Override
     public GetAllProductCategoriesResponse deleteCategory(Long id) {
         logger.info("Deleting product category with id '{}'.", id);
-        ProductCategory productCategory = this.productCategoryRepository.findById(id).orElseThrow(() -> {
+        Optional<ProductCategory> optionalProductCategory = this.productCategoryRepository.findById(id);
+
+        if (optionalProductCategory.isPresent()) {
+            ProductCategory productCategory = optionalProductCategory.get();
+            this.productCategoryRepository.deleteById(id);
+            logger.debug("Product category deleted with id '{}'.", id);
+            return this.modelMapperService.forResponse().map(productCategory, GetAllProductCategoriesResponse.class);
+        } else {
             logger.warn("No product category found with id '{}'.", id);
-            return new EntityNotFoundException("Product category not found");
-        });
-        this.productCategoryRepository.deleteById(id);
-        logger.debug("Product category deleted with id '{}'.", id);
-        return this.modelMapperService.forResponse().map(productCategory, GetAllProductCategoriesResponse.class);
+            throw new EntityNotFoundException("Product category not found");
+        }
     }
 }

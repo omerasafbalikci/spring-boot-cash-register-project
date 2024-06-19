@@ -40,8 +40,6 @@ public class ProductCategoryManagerTest {
     @BeforeEach
     void setUp() {
         modelMapperService = mock(ModelMapperService.class);
-        lenient().when(modelMapperService.forResponse()).thenReturn(modelMapper);
-        lenient().when(modelMapperService.forRequest()).thenReturn(modelMapper);
         productCategoryManager = new ProductCategoryManager(productCategoryRepository, modelMapperService, productCategoryBusinessRules);
     }
 
@@ -166,6 +164,7 @@ public class ProductCategoryManagerTest {
 
         when(modelMapper.map(product1, GetAllProductsResponse.class)).thenReturn(response1);
         when(modelMapper.map(product2, GetAllProductsResponse.class)).thenReturn(response2);
+        when(modelMapperService.forResponse()).thenReturn(modelMapper);
 
         // When
         List<GetAllProductsResponse> result = productCategoryManager.getProductsByCategoryId(categoryId);
@@ -196,6 +195,8 @@ public class ProductCategoryManagerTest {
         ProductCategory productCategory = new ProductCategory(null, null, "TestCategory", "Description", "ImageURL", "Admin", null, null);
         GetAllProductCategoriesResponse response = new GetAllProductCategoriesResponse(1L, "CategoryNumber", "TestCategory", "Description", "ImageURL", "Admin", LocalDateTime.now());
 
+        when(modelMapperService.forResponse()).thenReturn(modelMapper);
+        when(modelMapperService.forRequest()).thenReturn(modelMapper);
         when(modelMapperService.forRequest().map(request, ProductCategory.class)).thenReturn(productCategory);
         when(productCategoryRepository.save(productCategory)).thenReturn(productCategory);
         when(modelMapperService.forResponse().map(productCategory, GetAllProductCategoriesResponse.class)).thenReturn(response);
@@ -233,6 +234,7 @@ public class ProductCategoryManagerTest {
         ProductCategory existingProductCategory = new ProductCategory(categoryId, "Category Number", "Existing Category", "Existing Description", "Existing ImageURL", "Admin", LocalDateTime.now(), null);
 
         // Repository mock
+        when(modelMapperService.forResponse()).thenReturn(modelMapper);
         when(productCategoryRepository.save(any(ProductCategory.class))).thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
         when(productCategoryRepository.findById(any())).thenReturn(Optional.of(existingProductCategory));
 
@@ -290,6 +292,7 @@ public class ProductCategoryManagerTest {
 
         GetAllProductCategoriesResponse productCategoriesResponse = new GetAllProductCategoriesResponse(categoryId, "Category Number", "Existing Category", "Existing Description", "Existing ImageURL", "Admin", LocalDateTime.now());
 
+        when(modelMapperService.forResponse()).thenReturn(modelMapper);
         when(productCategoryRepository.findById(categoryId)).thenReturn(Optional.of(existingProductCategory));
         when(modelMapper.map(existingProductCategory, GetAllProductCategoriesResponse.class)).thenReturn(productCategoriesResponse);
 

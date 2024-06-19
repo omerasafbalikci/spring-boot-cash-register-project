@@ -2,8 +2,11 @@ package com.toyota.productservice.service.rules;
 
 import com.toyota.productservice.dao.ProductRepository;
 import com.toyota.productservice.domain.Product;
+import com.toyota.productservice.service.abstracts.ProductService;
 import com.toyota.productservice.utilities.exceptions.EntityAlreadyExistsException;
 import lombok.AllArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 /**
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class ProductBusinessRules {
     private final ProductRepository productRepository;
+    private final Logger logger = LogManager.getLogger(ProductService.class);
 
     /**
      * Checks and updates the given product's attributes. If any attribute is null,
@@ -47,6 +51,7 @@ public class ProductBusinessRules {
         }
 
         if (this.productRepository.existsByNameIgnoreCase(product.getName()) && !existingProduct.getName().equals(product.getName())) {
+            logger.warn("Product name already exists: " + product.getName());
             throw new EntityAlreadyExistsException("Product name already exists");
         }
     }

@@ -64,7 +64,6 @@ public class JwtAuthenticationFilterTest {
         Mockito.verify(jwtService, times(1)).isTokenValid(jwt, userDetails);
         Mockito.verify(userDetailsService, times(1)).loadUserByUsername(username);
         Mockito.verify(filterChain, times(1)).doFilter(request, response);
-
     }
 
     @Test
@@ -81,6 +80,5 @@ public class JwtAuthenticationFilterTest {
 
         // Then
         Mockito.verify(filterChain, times(1)).doFilter(request, response);
-
     }
 }

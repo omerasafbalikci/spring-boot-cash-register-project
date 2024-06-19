@@ -10,14 +10,12 @@ import com.toyota.salesservice.dto.requests.CreateSalesRequest;
 import com.toyota.salesservice.dto.requests.InventoryRequest;
 import com.toyota.salesservice.utilities.exceptions.PaymentTypeNotEnteredException;
 import com.toyota.salesservice.utilities.exceptions.ReturnPeriodExpiredException;
-import com.toyota.salesservice.utilities.mappers.ModelMapperService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.modelmapper.ModelMapper;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.LocalDateTime;
@@ -25,7 +23,6 @@ import java.time.Month;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class SalesBusinessRulesTest {
@@ -33,10 +30,6 @@ public class SalesBusinessRulesTest {
     private CampaignRepository campaignRepository;
     @Mock
     private WebClient.Builder webClientBuilder;
-    @Mock
-    private ModelMapperService modelMapperService;
-    @Mock
-    private ModelMapper modelMapper;
     @InjectMocks
     private SalesBusinessRules salesBusinessRules;
     private Sales sales;
@@ -44,9 +37,6 @@ public class SalesBusinessRulesTest {
 
     @BeforeEach
     void setUp() {
-        modelMapperService = mock(ModelMapperService.class);
-        lenient().when(modelMapperService.forResponse()).thenReturn(modelMapper);
-        lenient().when(modelMapperService.forRequest()).thenReturn(modelMapper);
         salesBusinessRules = new SalesBusinessRules(campaignRepository, webClientBuilder);
         sales = new Sales();
         createSalesRequest = new CreateSalesRequest();
@@ -54,7 +44,7 @@ public class SalesBusinessRulesTest {
 
     @Test
     public void testValidatePaymentType_WithPaymentTypeInRequest() {
-        createSalesRequest.setPaymentType("CASH");
+        createSalesRequest.setPaymentType(PaymentType.CASH);
         createSalesRequest.setCreateSalesItemsRequests(Collections.emptyList());
 
         salesBusinessRules.validatePaymentType(sales, createSalesRequest);
@@ -65,7 +55,7 @@ public class SalesBusinessRulesTest {
     @Test
     public void testValidatePaymentType_WithPaymentTypeInItems() {
         CreateSalesItemsRequest itemRequest = new CreateSalesItemsRequest();
-        itemRequest.setPaymentType("CARD");
+        itemRequest.setPaymentType(PaymentType.CARD);
         createSalesRequest.setCreateSalesItemsRequests(Collections.singletonList(itemRequest));
         createSalesRequest.setPaymentType(null);
 
@@ -77,7 +67,9 @@ public class SalesBusinessRulesTest {
     @Test
     public void testValidatePaymentType_ThrowsPaymentTypeNotEnteredException_WhenNoPaymentType() {
         createSalesRequest.setPaymentType(null);
-        createSalesRequest.setCreateSalesItemsRequests(Collections.emptyList());
+        CreateSalesItemsRequest createSalesItemsRequest = new CreateSalesItemsRequest();
+        createSalesItemsRequest.setPaymentType(null);
+        createSalesRequest.setCreateSalesItemsRequests(Collections.singletonList(createSalesItemsRequest));
 
         Exception exception = assertThrows(PaymentTypeNotEnteredException.class, () -> salesBusinessRules.validatePaymentType(sales, createSalesRequest));
 
@@ -86,7 +78,7 @@ public class SalesBusinessRulesTest {
 
     @Test
     public void testValidatePaymentType_DoesNotThrowException_WhenPaymentTypeIsPresentInRequest() {
-        createSalesRequest.setPaymentType("CARD");
+        createSalesRequest.setPaymentType(PaymentType.CARD);
         createSalesRequest.setCreateSalesItemsRequests(Collections.emptyList());
 
         assertDoesNotThrow(() -> salesBusinessRules.validatePaymentType(sales, createSalesRequest));

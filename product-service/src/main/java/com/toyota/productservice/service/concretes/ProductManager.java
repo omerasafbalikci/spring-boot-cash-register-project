@@ -154,8 +154,10 @@ public class ProductManager implements ProductService {
             Integer quantity = request.getQuantity();
 
             logger.info("Checking product in inventory for barcodeNumber '{}'", barcodeNumber);
-            Product product = this.productRepository.findByBarcodeNumber(barcodeNumber);
-            if (product != null) {
+            Optional<Product> optionalProduct = this.productRepository.findByBarcodeNumber(barcodeNumber);
+            Product product;
+            if (optionalProduct.isPresent()) {
+                product = optionalProduct.get();
                 logger.debug("Product found in inventory for barcodeNumber '{}'", barcodeNumber);
                 if (product.getQuantity() >= quantity) {
                     logger.debug("Sufficient quantity available for product '{}'", barcodeNumber);
@@ -205,14 +207,16 @@ public class ProductManager implements ProductService {
             Integer quantity = request.getQuantity();
 
             logger.info("Updating product in inventory for barcodeNumber '{}'", barcodeNumber);
-            Product product = this.productRepository.findByBarcodeNumber(barcodeNumber);
-            if (product != null) {
+            Optional<Product> optionalProduct = this.productRepository.findByBarcodeNumber(barcodeNumber);
+            Product product;
+            if (optionalProduct.isPresent()) {
+                product = optionalProduct.get();
                 logger.debug("Product found in inventory for barcodeNumber '{}'", barcodeNumber);
                 product.setQuantity(product.getQuantity() + quantity);
                 this.productRepository.save(product);
             } else {
                 logger.warn("Product not found in inventory for barcodeNumber '{}'", barcodeNumber);
-                throw new EntityNotFoundException("Product not found");
+                throw new EntityNotFoundException("Product not found: " + barcodeNumber);
             }
         }
     }
@@ -226,9 +230,10 @@ public class ProductManager implements ProductService {
     @Override
     public GetAllProductsResponse addProduct(CreateProductRequest createProductRequest) {
         logger.info("Adding new product: '{}'.", createProductRequest.getName());
-        Product existingProduct = this.productRepository.findByNameIgnoreCase(createProductRequest.getName());
+        Optional<Product> optionalProduct = this.productRepository.findByNameIgnoreCase(createProductRequest.getName());
         Product product = new Product();
-        if (existingProduct != null) {
+        if (optionalProduct.isPresent()) {
+            Product existingProduct = optionalProduct.get();
             double existingUnitPrice = existingProduct.getUnitPrice();
             double requestUnitPrice = createProductRequest.getUnitPrice();
             double epsilon = 0.0001;
@@ -296,12 +301,16 @@ public class ProductManager implements ProductService {
     @Override
     public GetAllProductsResponse deleteProduct(Long id) {
         logger.info("Deleting product with id '{}'.", id);
-        Product product = this.productRepository.findById(id).orElseThrow(() -> {
+        Optional<Product> optionalProduct = this.productRepository.findById(id);
+
+        if (optionalProduct.isPresent()) {
+            Product product = optionalProduct.get();
+            this.productRepository.deleteById(id);
+            logger.debug("Product with id '{}' deleted successfully.", id);
+            return this.modelMapperService.forResponse().map(product, GetAllProductsResponse.class);
+        } else {
             logger.warn("No product found with id '{}'.", id);
-            return new EntityNotFoundException("Product not found");
-        });
-        this.productRepository.deleteById(id);
-        logger.debug("Product with id '{}' deleted successfully.", id);
-        return this.modelMapperService.forResponse().map(product, GetAllProductsResponse.class);
+            throw new EntityNotFoundException("Product not found");
+        }
     }
 }

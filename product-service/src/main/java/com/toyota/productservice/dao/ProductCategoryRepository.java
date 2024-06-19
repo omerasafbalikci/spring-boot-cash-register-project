@@ -14,5 +14,4 @@ import java.util.List;
 public interface ProductCategoryRepository extends JpaRepository<ProductCategory, Long> {
     Boolean existsByNameIgnoreCase(String name);
     List<ProductCategory> findByNameContainingIgnoreCase(String name);
-    ProductCategory findByCategoryNumber(String categoryNumber);
 }

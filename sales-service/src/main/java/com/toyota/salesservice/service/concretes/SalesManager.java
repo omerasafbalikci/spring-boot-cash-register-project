@@ -109,11 +109,12 @@ public class SalesManager implements SalesService {
         for (CreateReturnRequest createReturnRequest : createReturnRequests) {
             logger.info("Processing return request for sales number '{}', barcode number '{}'.",
                     createReturnRequest.getSalesNumber(), createReturnRequest.getBarcodeNumber());
-            Sales sales = this.salesRepository.findBySalesNumber(createReturnRequest.getSalesNumber());
-            if (sales == null) {
+            Optional<Sales> optionalSales = this.salesRepository.findBySalesNumber(createReturnRequest.getSalesNumber());
+            if (optionalSales.isEmpty()) {
                 logger.error("Sales not found for sales number '{}'.", createReturnRequest.getSalesNumber());
                 throw new SalesNotFoundException("Sales not found: " + createReturnRequest.getSalesNumber());
             }
+            Sales sales = optionalSales.get();
             LocalDateTime salesDate = sales.getSalesDate();
             LocalDateTime returnDate = createReturnRequest.getReturnDate();
             this.salesBusinessRules.validateReturnPeriod(salesDate, returnDate);

@@ -40,8 +40,6 @@ public class CampaignManagerTest {
     @BeforeEach
     void setUp() {
         modelMapperService = mock(ModelMapperService.class);
-        lenient().when(modelMapperService.forResponse()).thenReturn(modelMapper);
-        lenient().when(modelMapperService.forRequest()).thenReturn(modelMapper);
         campaignManager = new CampaignManager(campaignRepository, modelMapperService, campaignBusinessRules);
     }
 
@@ -50,6 +48,7 @@ public class CampaignManagerTest {
         List<Campaign> campaigns = List.of(new Campaign(), new Campaign());
         when(campaignRepository.findAll()).thenReturn(campaigns);
         when(modelMapper.map(any(Campaign.class), eq(GetAllCampaignsResponse.class))).thenReturn(new GetAllCampaignsResponse());
+        when(modelMapperService.forResponse()).thenReturn(modelMapper);
 
         List<GetAllCampaignsResponse> responses = campaignManager.getAllCampaigns();
 
@@ -62,8 +61,9 @@ public class CampaignManagerTest {
         String campaignNumber = "12345678";
         Campaign campaign = new Campaign();
         campaign.setCampaignNumber(campaignNumber);
-        when(campaignRepository.findByCampaignNumber(campaignNumber)).thenReturn(campaign);
+        when(campaignRepository.findByCampaignNumber(campaignNumber)).thenReturn(Optional.of(campaign));
         when(modelMapper.map(any(Campaign.class), eq(GetAllCampaignsResponse.class))).thenReturn(new GetAllCampaignsResponse());
+        when(modelMapperService.forResponse()).thenReturn(modelMapper);
 
         GetAllCampaignsResponse response = campaignManager.getCampaignByCampaignNumber(campaignNumber);
 
@@ -74,7 +74,7 @@ public class CampaignManagerTest {
     @Test
     void getCampaignByCampaignNumber_shouldThrowCampaignNotFoundException() {
         String campaignNumber = "12345678";
-        when(campaignRepository.findByCampaignNumber(campaignNumber)).thenReturn(null);
+        when(campaignRepository.findByCampaignNumber(campaignNumber)).thenReturn(Optional.empty());
 
         assertThrows(CampaignNotFoundException.class, () -> campaignManager.getCampaignByCampaignNumber(campaignNumber));
     }
@@ -90,6 +90,8 @@ public class CampaignManagerTest {
         campaign.setCampaignNumber(UUID.randomUUID().toString().substring(0, 8));
         campaign.setUpdatedAt(LocalDateTime.now());
 
+        when(modelMapperService.forResponse()).thenReturn(modelMapper);
+        when(modelMapperService.forRequest()).thenReturn(modelMapper);
         when(campaignRepository.existsByNameIgnoreCase(createCampaignRequest.getName())).thenReturn(false);
         when(modelMapper.map(any(CreateCampaignRequest.class), eq(Campaign.class))).thenReturn(campaign);
         when(campaignRepository.save(any(Campaign.class))).thenReturn(campaign);
@@ -125,6 +127,8 @@ public class CampaignManagerTest {
         updatedCampaign.setId(1L);
         updatedCampaign.setName("Updated Campaign");
 
+        when(modelMapperService.forResponse()).thenReturn(modelMapper);
+        when(modelMapperService.forRequest()).thenReturn(modelMapper);
         when(campaignRepository.findById(1L)).thenReturn(Optional.of(existingCampaign));
         when(modelMapper.map(any(UpdateCampaignRequest.class), eq(Campaign.class))).thenReturn(updatedCampaign);
         when(campaignRepository.save(any(Campaign.class))).thenReturn(updatedCampaign);
@@ -151,6 +155,7 @@ public class CampaignManagerTest {
         Campaign campaign = new Campaign();
         campaign.setId(1L);
 
+        when(modelMapperService.forResponse()).thenReturn(modelMapper);
         when(campaignRepository.findById(1L)).thenReturn(Optional.of(campaign));
         when(modelMapperService.forResponse().map(any(Campaign.class), eq(GetAllCampaignsResponse.class))).thenReturn(new GetAllCampaignsResponse());
 

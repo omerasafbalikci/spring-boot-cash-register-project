@@ -57,7 +57,6 @@ public class UserManagerTest {
     @BeforeEach
     void setUp() {
         modelMapperService = mock(ModelMapperService.class);
-        lenient().when(modelMapperService.forResponse()).thenReturn(modelMapper);
         userManager = new UserManager(userRepository, webClientBuilder, modelMapperService);
     }
 
@@ -180,7 +179,7 @@ public class UserManagerTest {
         // WebClient mock
         when(webClientBuilder.build()).thenReturn(webClient);
         when(webClient.put()).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri(anyString(), (Object) any())).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString(), any(Object[].class))).thenReturn(requestBodyUriSpec);
         doReturn(requestHeadersSpec).when(requestBodyUriSpec).bodyValue(anyString());
         when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
@@ -189,7 +188,9 @@ public class UserManagerTest {
         when(responseSpec.bodyToMono(Boolean.class)).thenReturn(monoSpy);
         // Repository mock
         when(userRepository.save(any(User.class))).thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
-        when(userRepository.findById(any())).thenReturn(Optional.of(existingUser));
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(existingUser));
+
+        when(modelMapperService.forResponse()).thenReturn(modelMapper);
 
         // ModelMapper mock
         GetAllUsersResponse getAllUsersResponse = new GetAllUsersResponse(1L, "firstname", "lastname", "username",
@@ -301,6 +302,8 @@ public class UserManagerTest {
         when(userRepository.save(any(User.class))).thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
         when(modelMapper.map(any(User.class), eq(GetAllUsersResponse.class))).thenReturn(getAllUsersResponse);
 
+        when(modelMapperService.forResponse()).thenReturn(modelMapper);
+
         GetAllUsersResponse response = userManager.deleteUser(1L);
 
         // Then
@@ -373,6 +376,8 @@ public class UserManagerTest {
         when(modelMapper.map(any(User.class), eq(GetAllUsersResponse.class)))
                 .thenReturn(new GetAllUsersResponse(id, firstname, lastname, username, email, deleted, roles, Gender.valueOf(gender.toUpperCase())));
 
+        when(modelMapperService.forResponse()).thenReturn(modelMapper);
+
         Page<GetAllUsersResponse> response = userManager.getAllUsersPage(page, size, sort, id, firstname, lastname, username, email, gender);
 
         // Then
@@ -412,6 +417,8 @@ public class UserManagerTest {
         doReturn(pageMock).when(userRepository).findAll(ArgumentMatchers.<Specification<User>>any(), any(Pageable.class));
         when(modelMapper.map(any(User.class), eq(GetAllUsersResponse.class)))
                 .thenReturn(new GetAllUsersResponse(id, firstname, lastname, username, email, deleted, roles, Gender.valueOf(gender.toUpperCase())));
+
+        when(modelMapperService.forResponse()).thenReturn(modelMapper);
 
         Page<GetAllUsersResponse> response = userManager.getAllUsersPage(page, size, sort, id, firstname, lastname, username, email, gender);
 
@@ -462,6 +469,9 @@ public class UserManagerTest {
         Mono<Boolean> mono = Mono.just(true);
         Mono<Boolean> monoSpy = Mockito.spy(mono);
         when(responseSpec.bodyToMono(Boolean.class)).thenReturn(monoSpy);
+
+        when(modelMapperService.forResponse()).thenReturn(modelMapper);
+
         // Repository mock
         when(userRepository.save(any(User.class))).thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
         when(userRepository.findById(any())).thenReturn(Optional.of(existingUser));
@@ -558,6 +568,7 @@ public class UserManagerTest {
         when(userRepository.save(any(User.class))).thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
         when(userRepository.findById(any())).thenReturn(Optional.of(existingUser));
 
+        when(modelMapperService.forResponse()).thenReturn(modelMapper);
         // ModelMapper mock
         GetAllUsersResponse mockResponse = new GetAllUsersResponse();
         mockResponse.setId(existingUser.getId());

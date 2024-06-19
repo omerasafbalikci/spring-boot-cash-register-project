@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -60,8 +61,9 @@ public class CampaignManager implements CampaignService {
     @Override
     public GetAllCampaignsResponse getCampaignByCampaignNumber(String campaignNumber) {
         logger.info("Fetching campaign by campaign number '{}'.", campaignNumber);
-        Campaign campaign = this.campaignRepository.findByCampaignNumber(campaignNumber);
-        if (campaign != null) {
+        Optional<Campaign> optionalCampaign = this.campaignRepository.findByCampaignNumber(campaignNumber);
+        if (optionalCampaign.isPresent()) {
+            Campaign campaign = optionalCampaign.get();
             logger.debug("Retrieved campaign with campaign number '{}'.", campaignNumber);
             return this.modelMapperService.forResponse().map(campaign, GetAllCampaignsResponse.class);
         } else {
@@ -138,13 +140,17 @@ public class CampaignManager implements CampaignService {
     @Override
     public GetAllCampaignsResponse deleteCampaign(Long id) {
         logger.info("Deleting campaign with id '{}'.", id);
-        Campaign campaign = this.campaignRepository.findById(id).orElseThrow(() -> {
+        Optional<Campaign> optionalCampaign = this.campaignRepository.findById(id);
+
+        if (optionalCampaign.isPresent()) {
+            Campaign campaign = optionalCampaign.get();
+            this.campaignRepository.deleteById(id);
+            logger.debug("Campaign with id '{}' deleted successfully.", id);
+            return this.modelMapperService.forResponse().map(campaign, GetAllCampaignsResponse.class);
+        } else {
             logger.warn("No campaign found with id '{}'.", id);
-            return new CampaignNotFoundException("Campaign not found");
-        });
-        this.campaignRepository.deleteById(id);
-        logger.debug("Campaign with id '{}' deleted successfully.", id);
-        return this.modelMapperService.forResponse().map(campaign, GetAllCampaignsResponse.class);
+            throw new CampaignNotFoundException("Campaign not found");
+        }
     }
 
     /**

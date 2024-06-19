@@ -4,6 +4,8 @@ import com.toyota.salesservice.domain.Campaign;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 /**
  * Repository interface for accessing campaign table in database.
  */
@@ -11,5 +13,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CampaignRepository extends JpaRepository<Campaign, Long> {
     Boolean existsByNameIgnoreCase(String name);
-    Campaign findByCampaignNumber(String campaignNumber);
+    Optional<Campaign> findByCampaignNumber(String campaignNumber);
 }

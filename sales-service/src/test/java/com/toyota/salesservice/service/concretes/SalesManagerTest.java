@@ -41,16 +41,13 @@ public class SalesManagerTest {
     @BeforeEach
     void setUp() {
         modelMapperService = mock(ModelMapperService.class);
-        lenient().when(modelMapperService.forResponse()).thenReturn(modelMapper);
-        lenient().when(modelMapperService.forRequest()).thenReturn(modelMapper);
         salesManager = new SalesManager(salesRepository, modelMapperService, salesBusinessRules);
     }
 
     @Test
     public void testToReturn_SuccessfulReturn() {
         List<CreateReturnRequest> createReturnRequests = new ArrayList<>();
-        createReturnRequests.add(new CreateReturnRequest("123", "ABC123", 2, LocalDateTime.now())); // updated to include LocalDateTime
-
+        createReturnRequests.add(new CreateReturnRequest("123", "ABC123", 2, LocalDateTime.now()));
         Sales sales1 = Sales.builder()
                 .id(1L)
                 .salesNumber("123")
@@ -69,7 +66,9 @@ public class SalesManagerTest {
         salesItem1.setTotalPrice(100.0);
         sales1.getSalesItemsList().add(salesItem1);
 
-        when(salesRepository.findBySalesNumber("123")).thenReturn(sales1);
+        when(modelMapperService.forResponse()).thenReturn(modelMapper);
+
+        when(salesRepository.findBySalesNumber("123")).thenReturn(Optional.of(sales1));
 
         GetAllSalesItemsResponse mockResponse = new GetAllSalesItemsResponse();
         when(modelMapperService.forResponse().map(any(SalesItems.class), eq(GetAllSalesItemsResponse.class))).thenReturn(mockResponse);
@@ -87,9 +86,9 @@ public class SalesManagerTest {
     @Test
     public void testToReturn_SalesNotFoundException() {
         List<CreateReturnRequest> createReturnRequests = new ArrayList<>();
-        createReturnRequests.add(new CreateReturnRequest("456", "DEF456", 3, LocalDateTime.now())); // updated to include LocalDateTime
+        createReturnRequests.add(new CreateReturnRequest("456", "DEF456", 3, LocalDateTime.now()));
 
-        when(salesRepository.findBySalesNumber("456")).thenReturn(null);
+        when(salesRepository.findBySalesNumber("456")).thenReturn(Optional.empty());
 
         assertThrows(SalesNotFoundException.class, () -> salesManager.toReturn(createReturnRequests));
 
@@ -125,6 +124,7 @@ public class SalesManagerTest {
         Page<Sales> pageMock = new PageImpl<>(mockSales, pageable, 1);
 
         // When
+        when(modelMapperService.forResponse()).thenReturn(modelMapper);
         when(salesRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(pageMock);
 
         PaginationResponse<GetAllSalesResponse> result = salesManager.getSalesFiltered(page, size, sort, id, salesNumber,

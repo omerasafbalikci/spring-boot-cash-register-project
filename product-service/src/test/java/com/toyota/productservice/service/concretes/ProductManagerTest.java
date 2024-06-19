@@ -33,7 +33,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
 public class ProductManagerTest {
@@ -52,8 +51,6 @@ public class ProductManagerTest {
     @BeforeEach
     void setUp() {
         modelMapperService = mock(ModelMapperService.class);
-        lenient().when(modelMapperService.forResponse()).thenReturn(modelMapper);
-        lenient().when(modelMapperService.forRequest()).thenReturn(modelMapper);
         productManager = new ProductManager(productRepository, productCategoryRepository, modelMapperService, productBusinessRules);
     }
 
@@ -77,6 +74,7 @@ public class ProductManagerTest {
                     Product product = invocation.getArgument(0);
                     return new GetAllProductsResponse(product.getId(), product.getBarcodeNumber(), product.getName(), product.getDescription(), product.getQuantity(), product.getUnitPrice(), product.getState(), product.getImageUrl(), product.getCreatedBy(), product.getUpdatedAt(), null);
                 });
+        when(modelMapperService.forResponse()).thenReturn(modelMapper);
 
         TreeMap<String, Object> response = productManager.getProductFiltered(page, size, sort, null, null, null);
 
@@ -110,6 +108,7 @@ public class ProductManagerTest {
                     Product product = invocation.getArgument(0);
                     return new GetAllProductsResponse(product.getId(), product.getBarcodeNumber(), product.getName(), product.getDescription(), product.getQuantity(), product.getUnitPrice(), product.getState(), product.getImageUrl(), product.getCreatedBy(), product.getUpdatedAt(), null);
                 });
+        when(modelMapperService.forResponse()).thenReturn(modelMapper);
 
         TreeMap<String, Object> response = productManager.getProductFiltered(page, size, sort, null, null, null);
 
@@ -146,6 +145,7 @@ public class ProductManagerTest {
                     }
                     return new GetAllProductsResponse(product.getId(), product.getBarcodeNumber(), product.getName(), product.getDescription(), product.getQuantity(), product.getUnitPrice(), product.getState(), product.getImageUrl(), product.getCreatedBy(), product.getUpdatedAt(), null);
                 });
+        when(modelMapperService.forResponse()).thenReturn(modelMapper);
 
         // When
         TreeMap<String, Object> response = productManager.getProductsByNameContaining(name, page, size, sort);
@@ -173,7 +173,7 @@ public class ProductManagerTest {
 
         InventoryRequest request = new InventoryRequest("1234567890123", 5);
 
-        when(productRepository.findByBarcodeNumber(anyString())).thenReturn(product);
+        when(productRepository.findByBarcodeNumber(anyString())).thenReturn(Optional.of(product));
 
         // When
         List<InventoryResponse> responses = productManager.checkProductInInventory(List.of(request));
@@ -204,12 +204,12 @@ public class ProductManagerTest {
 
         InventoryRequest request = new InventoryRequest("1234567890123", 5);
 
-        when(productRepository.findByBarcodeNumber(anyString())).thenReturn(product);
+        when(productRepository.findByBarcodeNumber(anyString())).thenReturn(Optional.of(product));
 
         // When / Then
         ProductIsNotInStockException thrown = assertThrows(ProductIsNotInStockException.class, () -> productManager.checkProductInInventory(List.of(request)));
 
-        assertEquals("Product is not in stock", thrown.getMessage());
+        assertEquals("Product is not in stock: " + product.getBarcodeNumber(), thrown.getMessage());
 
         verify(productRepository, times(1)).findByBarcodeNumber("1234567890123");
         verify(productRepository, times(0)).save(any(Product.class));
@@ -220,12 +220,12 @@ public class ProductManagerTest {
         // Given
         InventoryRequest request = new InventoryRequest("1234567890123", 5);
 
-        when(productRepository.findByBarcodeNumber(anyString())).thenReturn(null);
+        when(productRepository.findByBarcodeNumber(anyString())).thenReturn(Optional.empty());
 
         // When / Then
         EntityNotFoundException thrown = assertThrows(EntityNotFoundException.class, () -> productManager.checkProductInInventory(List.of(request)));
 
-        assertEquals("Product not found", thrown.getMessage());
+        assertEquals("Product not found: 1234567890123", thrown.getMessage());
 
         verify(productRepository, times(1)).findByBarcodeNumber("1234567890123");
         verify(productRepository, times(0)).save(any(Product.class));
@@ -243,7 +243,7 @@ public class ProductManagerTest {
 
         InventoryRequest request = new InventoryRequest("1234567890123", 5);
 
-        when(productRepository.findByBarcodeNumber(anyString())).thenReturn(product);
+        when(productRepository.findByBarcodeNumber(anyString())).thenReturn(Optional.of(product));
 
         // When
         productManager.updateProductInInventory(List.of(request));
@@ -259,12 +259,12 @@ public class ProductManagerTest {
         // Given
         InventoryRequest request = new InventoryRequest("1234567890123", 5);
 
-        when(productRepository.findByBarcodeNumber(anyString())).thenReturn(null);
+        when(productRepository.findByBarcodeNumber(anyString())).thenReturn(Optional.empty());
 
         // When / Then
         EntityNotFoundException thrown = assertThrows(EntityNotFoundException.class, () -> productManager.updateProductInInventory(List.of(request)));
 
-        assertEquals("Product not found", thrown.getMessage());
+        assertEquals("Product not found: 1234567890123", thrown.getMessage());
 
         verify(productRepository, times(1)).findByBarcodeNumber("1234567890123");
         verify(productRepository, times(0)).save(any(Product.class));
@@ -283,6 +283,7 @@ public class ProductManagerTest {
         request.setCreatedBy("Asaf");
         request.setProductCategoryId(1L);
 
+        when(modelMapperService.forResponse()).thenReturn(modelMapper);
         ProductCategory productCategory = new ProductCategory();
         productCategory.setName("CategoryName");
         when(productCategoryRepository.findById(anyLong())).thenReturn(Optional.of(productCategory));
@@ -324,12 +325,13 @@ public class ProductManagerTest {
 
         ProductCategory productCategory = new ProductCategory();
         productCategory.setName("CategoryName");
-        when(productRepository.findByNameIgnoreCase(anyString())).thenReturn(existingProduct);
+        when(productRepository.findByNameIgnoreCase(anyString())).thenReturn(Optional.of(existingProduct));
         when(productCategoryRepository.findById(anyLong())).thenReturn(Optional.of(productCategory));
 
         Product product = new Product();
         when(productRepository.save(any(Product.class))).thenReturn(product);
 
+        when(modelMapperService.forResponse()).thenReturn(modelMapper);
         GetAllProductsResponse response = new GetAllProductsResponse();
         response.setProductCategoryName("CategoryName");
         when(modelMapperService.forResponse().map(any(Product.class), eq(GetAllProductsResponse.class))).thenReturn(response);
@@ -361,7 +363,7 @@ public class ProductManagerTest {
         existingProduct.setName("Existing Product");
         existingProduct.setUnitPrice(100.0);
 
-        when(productRepository.findByNameIgnoreCase(anyString())).thenReturn(existingProduct);
+        when(productRepository.findByNameIgnoreCase(anyString())).thenReturn(Optional.of(existingProduct));
 
         // When / Then
         EntityAlreadyExistsException thrown = assertThrows(EntityAlreadyExistsException.class, () -> productManager.addProduct(request));
@@ -423,6 +425,8 @@ public class ProductManagerTest {
         updatedProduct.setBarcodeNumber("12345678");
         updatedProduct.setProductCategory(productCategory);
 
+        when(modelMapperService.forResponse()).thenReturn(modelMapper);
+        when(modelMapperService.forRequest()).thenReturn(modelMapper);
         when(productRepository.findById(anyLong())).thenReturn(Optional.of(existingProduct));
         when(modelMapper.map(any(UpdateProductRequest.class), eq(Product.class))).thenReturn(updatedProduct);
         when(productRepository.save(any(Product.class))).thenReturn(updatedProduct);
@@ -501,8 +505,9 @@ public class ProductManagerTest {
         existingProduct.setId(1L);
         existingProduct.setName("Existing Product");
 
+        when(modelMapperService.forRequest()).thenReturn(modelMapper);
         when(productRepository.findById(anyLong())).thenReturn(Optional.of(existingProduct));
-        when(modelMapper.map(any(UpdateProductRequest.class), eq(Product.class))).thenReturn(existingProduct);
+        when(modelMapperService.forRequest().map(any(UpdateProductRequest.class), eq(Product.class))).thenReturn(existingProduct);
         doThrow(new EntityAlreadyExistsException("Product name already exists")).when(productBusinessRules).checkUpdate(any(Product.class), any(Product.class));
 
         // When / Then
@@ -529,6 +534,7 @@ public class ProductManagerTest {
         when(modelMapper.map(any(Product.class), eq(GetAllProductsResponse.class))).thenReturn(response);
 
         // When
+        when(modelMapperService.forResponse()).thenReturn(modelMapper);
         GetAllProductsResponse result = productManager.deleteProduct(productId);
 
         // Then
