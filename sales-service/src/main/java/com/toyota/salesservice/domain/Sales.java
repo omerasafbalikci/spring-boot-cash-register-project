@@ -30,7 +30,7 @@ public class Sales {
     @Column(name = "sales_number", unique = true, nullable = false)
     private String salesNumber;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     @Column(name = "sales_date")
     private LocalDateTime salesDate;
 

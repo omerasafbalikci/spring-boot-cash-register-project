@@ -7,6 +7,9 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Component for creating specifications to filter Sales entities based on various criteria.
@@ -38,8 +41,23 @@ public class SalesSpecification {
                 predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("salesNumber"), salesNumber));
             }
             if (salesDate != null && !salesDate.isEmpty()) {
-                LocalDateTime dateTime = LocalDateTime.parse(salesDate, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"));
-                predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("salesDate"), dateTime));
+                List<DateTimeFormatter> formatters = Arrays.asList(
+                        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSS"),
+                        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")
+                );
+                boolean parsed = false;
+                for (DateTimeFormatter formatter : formatters) {
+                    try {
+                        LocalDateTime dateTime = LocalDateTime.parse(salesDate, formatter);
+                        predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("salesDate"), dateTime));
+                        parsed = true;
+                        break;
+                    } catch (DateTimeParseException ignored) {
+                    }
+                }
+                if (!parsed) {
+                    throw new IllegalArgumentException("Invalid date format: " + salesDate);
+                }
             }
             if (createdBy != null && !createdBy.isEmpty()) {
                 predicate = criteriaBuilder.and(predicate, criteriaBuilder.like(root.get("createdBy"), "%" + createdBy + "%"));

@@ -1,15 +1,11 @@
 package com.toyota.usermanagementservice.dto.requests;
 
 import com.toyota.usermanagementservice.domain.Gender;
-import com.toyota.usermanagementservice.domain.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Set;
 
 /**
  * DTO to update user.
