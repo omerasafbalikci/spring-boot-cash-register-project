@@ -76,6 +76,8 @@ This project is a Spring Boot based microservice project that provides market ch
     - Endpoints for sales:
         - Add Sales: `POST /api/sales/add`
         - Return Sale: `POST /api/sales/return`
+        - Delete Sale: `DELETE /api/sales/delete`
+        - Get Sales Statistics: `DELETE /api/sales/statistics`
 
 
 4. **Report Service:** It performs functions such as listing sales and creating a PDF receipt for the desired sale.
@@ -874,6 +876,78 @@ Response:
       "campaignName": null
     }
 ]
+```
+
+#### Delete sales
+
+Endpoint: `DELETE /api/sales/delete`   
+Description: Deletes the sale from the database.
+
+Request Parameters:
+
+| Key           | Value      |
+|---------------|------------|
+| `salesNumber` | `0fc31194` |
+
+Response:
+
+```json
+{
+    "id": 2,
+    "salesNumber": "0fc31194",
+    "salesDate": "2024-06-25T02:21:42.20881",
+    "createdBy": "Ömer Asaf Balıkçı",
+    "paymentType": "CASH",
+    "totalPrice": 2050.0,
+    "money": 2100.0,
+    "change": 50.0,
+    "salesItemsList": [
+      {
+        "id": 3,
+        "barcodeNumber": "c12d30cb",
+        "name": "Ekmek",
+        "quantity": 5,
+        "unitPrice": 10.0,
+        "state": true,
+        "totalPrice": 50.0,
+        "paymentType": "CASH",
+        "campaignName": null
+      },
+      {
+        "id": 4,
+        "barcodeNumber": "43e1c32f",
+        "name": "Et",
+        "quantity": 6,
+        "unitPrice": 500.0,
+        "state": true,
+        "totalPrice": 2000.0,
+        "paymentType": "CASH",
+        "campaignName": "3 AL 2 ÖDE!"
+      }
+    ]
+}
+```
+
+#### Get sales statistics
+
+Endpoint: `GET /api/sales/statistics`   
+Description: Returns some sales statistics within the specified date range.
+
+Request Parameters:
+
+| Key         | Value                 |
+|-------------|-----------------------|
+| `startDate` | `2024-06-25 02:18:37` |
+| `endDate`   | `2024-06-25 02:21:43` |
+
+Response:
+
+```json
+{
+    "averageSales": 1550.0,
+    "totalSales": 3100.0,
+    "totalSalesCount": 2
+}
 ```
 
 ### Report Service

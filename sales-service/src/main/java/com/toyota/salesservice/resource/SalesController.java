@@ -8,11 +8,14 @@ import com.toyota.salesservice.dto.responses.PaginationResponse;
 import com.toyota.salesservice.service.abstracts.SalesService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.TreeMap;
 
 /**
  * REST controller for managing sales.
@@ -46,6 +49,35 @@ public class SalesController {
     public ResponseEntity<List<GetAllSalesItemsResponse>> toReturn(@RequestBody @Valid List<CreateReturnRequest> createReturnRequests) {
         List<GetAllSalesItemsResponse> response = this.salesService.toReturn(createReturnRequests);
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Deletes a sales record by its sales number.
+     *
+     * @param salesNumber the sales number
+     * @return the response containing the deleted sales data
+     */
+    @DeleteMapping("/delete")
+    public ResponseEntity<GetAllSalesResponse> deleteSales(@RequestParam String salesNumber) {
+        GetAllSalesResponse response = this.salesService.deleteSales(salesNumber);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Endpoint to retrieve sales statistics for a given period.
+     *
+     * @param startDate the start date of the period (format: yyyy-MM-dd HH:mm:ss)
+     * @param endDate the end date of the period (format: yyyy-MM-dd HH:mm:ss)
+     * @return ResponseEntity with the sales statistics in a TreeMap format
+     */
+    @GetMapping("/statistics")
+    public ResponseEntity<TreeMap<String, Object>> getSalesStatistics(
+            @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime startDate,
+            @RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime endDate) {
+
+        TreeMap<String, Object> salesStatistics = this.salesService.getSalesStatistics(startDate, endDate);
+
+        return new ResponseEntity<>(salesStatistics, HttpStatus.OK);
     }
 
     /**

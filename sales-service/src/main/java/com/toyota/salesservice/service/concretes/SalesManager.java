@@ -1,5 +1,6 @@
 package com.toyota.salesservice.service.concretes;
 
+import com.toyota.salesservice.dao.SalesItemRepository;
 import com.toyota.salesservice.dao.SalesRepository;
 import com.toyota.salesservice.dao.SalesSpecification;
 import com.toyota.salesservice.domain.Sales;
@@ -38,6 +39,7 @@ import java.util.*;
 @AllArgsConstructor
 public class SalesManager implements SalesService {
     private final SalesRepository salesRepository;
+    private final SalesItemRepository salesItemRepository;
     private final Logger logger = LogManager.getLogger(SalesService.class);
     private final ModelMapperService modelMapperService;
     private final SalesBusinessRules salesBusinessRules;
@@ -61,7 +63,7 @@ public class SalesManager implements SalesService {
         List<InventoryRequest> inventoryRequests = createSalesRequest.getCreateSalesItemsRequests().stream()
                 .map(salesItem -> this.modelMapperService.forRequest().map(salesItem, InventoryRequest.class)).toList();
 
-        List<InventoryResponse> inventoryResponses = this.salesBusinessRules.webClientRequest(inventoryRequests);
+        List<InventoryResponse> inventoryResponses = this.salesBusinessRules.checkInInventory(inventoryRequests);
         logger.debug("Received {} inventory responses for sales record created by '{}'.", inventoryResponses.size(), createSalesRequest.getCreatedBy());
 
         if (!inventoryResponses.isEmpty()) {
@@ -154,6 +156,69 @@ public class SalesManager implements SalesService {
         this.salesBusinessRules.updateInventory(inventoryRequests);
         logger.info("Inventory updated for returned items.");
         return responses;
+    }
+
+    /**
+     * Deletes a sales record by its sales number.
+     *
+     * @param salesNumber the sales number
+     * @return the response containing the deleted sales data
+     * @throws SalesNotFoundException if the sales record is not found
+     */
+    @Override
+    public GetAllSalesResponse deleteSales(String salesNumber) {
+        logger.info("Attempting to delete sales record with sales number '{}'.", salesNumber);
+        Optional<Sales> optionalSales = this.salesRepository.findBySalesNumber(salesNumber);
+        if (optionalSales.isPresent()) {
+            Sales sales = optionalSales.get();
+            logger.debug("Sales record found with sales number '{}', proceeding with deletion.", salesNumber);
+
+            List<SalesItems> salesItems = sales.getSalesItemsList();
+            List<InventoryRequest> inventoryRequests = salesItems.stream()
+                    .map(salesItem -> this.modelMapperService.forRequest().map(salesItem, InventoryRequest.class)).toList();
+            logger.debug("Updating inventory for {} sales items.", salesItems.size());
+
+            this.salesBusinessRules.updateInventory(inventoryRequests);
+            logger.debug("Inventory updated successfully for sales number '{}'.", salesNumber);
+
+            this.salesItemRepository.deleteBySalesId(sales.getId());
+            logger.debug("Sales items deleted for sales number '{}'.", salesNumber);
+
+            this.salesRepository.deleteById(sales.getId());
+            logger.info("Sales record deleted successfully with sales number '{}'.", salesNumber);
+
+            return this.modelMapperService.forResponse().map(sales, GetAllSalesResponse.class);
+        } else {
+            logger.error("Sales record not found for sales number '{}'.", salesNumber);
+            throw new SalesNotFoundException("Sales not found: " + salesNumber);
+        }
+    }
+
+    /**
+     * Retrieves sales statistics for a given period.
+     *
+     * @param startDate the start date of the period
+     * @param endDate the end date of the period
+     * @return a TreeMap containing the sales statistics:
+     *         - "totalSales": the total sales amount within the specified period
+     *         - "averageSales": the average sales amount per transaction within the specified period (0.0 if no sales)
+     *         - "totalSalesCount": the total number of sales transactions within the specified period
+     */
+    @Override
+    public TreeMap<String, Object> getSalesStatistics(LocalDateTime startDate, LocalDateTime endDate) {
+        logger.info("Getting sales statistics from '{}' to '{}'.", startDate, endDate);
+
+        List<Sales> salesList = this.salesRepository.findBySalesDateBetween(startDate, endDate);
+        double totalSales = salesList.stream().mapToDouble(Sales::getTotalPrice).sum();
+        double averageSales = salesList.isEmpty() ? 0.0 : totalSales / salesList.size();
+        long totalSalesCount = salesList.size();
+
+        TreeMap<String, Object> response = new TreeMap<>();
+        response.put("totalSales", totalSales);
+        response.put("averageSales", averageSales);
+        response.put("totalSalesCount", totalSalesCount);
+        logger.debug("Retrieved sales statistics: Total Sales = {}, Average Sales = {}, Total Sales Count = {}", totalSales, averageSales, totalSalesCount);
+        return response;
     }
 
     /**

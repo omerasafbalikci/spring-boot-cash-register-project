@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -14,4 +16,5 @@ import java.util.Optional;
 @Repository
 public interface SalesRepository extends JpaRepository<Sales, Long>, JpaSpecificationExecutor<Sales> {
     Optional<Sales> findBySalesNumber(String salesNumber);
+    List<Sales> findBySalesDateBetween(LocalDateTime startDate, LocalDateTime endDate);
 }

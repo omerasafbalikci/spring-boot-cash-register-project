@@ -1,5 +1,6 @@
 package com.toyota.salesservice.service.concretes;
 
+import com.toyota.salesservice.dao.SalesItemRepository;
 import com.toyota.salesservice.dao.SalesRepository;
 import com.toyota.salesservice.domain.PaymentType;
 import com.toyota.salesservice.domain.Sales;
@@ -31,6 +32,8 @@ public class SalesManagerTest {
     @Mock
     private SalesRepository salesRepository;
     @Mock
+    private SalesItemRepository salesItemRepository;
+    @Mock
     private ModelMapperService modelMapperService;
     @Mock
     private ModelMapper modelMapper;
@@ -41,7 +44,7 @@ public class SalesManagerTest {
     @BeforeEach
     void setUp() {
         modelMapperService = mock(ModelMapperService.class);
-        salesManager = new SalesManager(salesRepository, modelMapperService, salesBusinessRules);
+        salesManager = new SalesManager(salesRepository, salesItemRepository, modelMapperService, salesBusinessRules);
     }
 
     @Test
@@ -93,6 +96,78 @@ public class SalesManagerTest {
         assertThrows(SalesNotFoundException.class, () -> salesManager.toReturn(createReturnRequests));
 
         verify(salesRepository, times(1)).findBySalesNumber("456");
+    }
+
+    @Test
+    public void testDeleteSales_SuccessfulDeletion() {
+        String salesNumber = "123";
+
+        Sales sales = Sales.builder()
+                .id(1L)
+                .salesNumber(salesNumber)
+                .salesItemsList(new ArrayList<>())
+                .build();
+
+        Optional<Sales> optionalSales = Optional.of(sales);
+
+        List<SalesItems> salesItems = new ArrayList<>();
+        salesItems.add(new SalesItems());
+
+        GetAllSalesResponse mockResponse = new GetAllSalesResponse();
+
+        when(salesRepository.findBySalesNumber(salesNumber)).thenReturn(optionalSales);
+        when(modelMapperService.forResponse()).thenReturn(modelMapper);
+        when(modelMapperService.forResponse().map(sales, GetAllSalesResponse.class)).thenReturn(mockResponse);
+
+        doNothing().when(salesBusinessRules).updateInventory(anyList());
+
+        GetAllSalesResponse response = salesManager.deleteSales(salesNumber);
+
+        verify(salesRepository, times(1)).findBySalesNumber(salesNumber);
+        verify(salesRepository, times(1)).deleteById(sales.getId());
+        verify(salesItemRepository, times(1)).deleteBySalesId(sales.getId());
+
+        verify(salesBusinessRules, times(1)).updateInventory(anyList());
+
+        assertNotNull(response);
+        assertEquals(mockResponse, response);
+    }
+
+    @Test
+    public void testDeleteSales_SalesNotFoundException() {
+        String salesNumber = "456";
+
+        Optional<Sales> optionalSales = Optional.empty();
+
+        when(salesRepository.findBySalesNumber(salesNumber)).thenReturn(optionalSales);
+
+        assertThrows(SalesNotFoundException.class, () -> salesManager.deleteSales(salesNumber));
+
+        verify(salesRepository, times(1)).findBySalesNumber(salesNumber);
+        verify(salesRepository, never()).deleteById(anyLong());
+        verify(salesItemRepository, never()).deleteBySalesId(anyLong());
+        verify(salesBusinessRules, never()).updateInventory(anyList());
+    }
+
+    @Test
+    public void testGetSalesStatistics() {
+        LocalDateTime startDate = LocalDateTime.of(2024, 6, 25, 0, 0, 0);
+        LocalDateTime endDate = LocalDateTime.of(2024, 6, 25, 23, 59, 59);
+
+        List<Sales> salesList = new ArrayList<>();
+        salesList.add(Sales.builder().totalPrice(100.0).build());
+        salesList.add(Sales.builder().totalPrice(200.0).build());
+
+        when(salesRepository.findBySalesDateBetween(startDate, endDate)).thenReturn(salesList);
+
+        TreeMap<String, Object> salesStatistics = salesManager.getSalesStatistics(startDate, endDate);
+
+        assertNotNull(salesStatistics);
+        assertEquals(300.0, salesStatistics.get("totalSales"));
+        assertEquals(150.0, salesStatistics.get("averageSales"));
+        assertEquals(2L, salesStatistics.get("totalSalesCount"));
+
+        verify(salesRepository, times(1)).findBySalesDateBetween(startDate, endDate);
     }
 
     @SuppressWarnings("unchecked")

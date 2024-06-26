@@ -68,7 +68,7 @@ public class SalesBusinessRules {
      * @param inventoryRequests the list of inventory requests
      * @return the list of inventory responses
      */
-    public List<InventoryResponse> webClientRequest(List<InventoryRequest> inventoryRequests) {
+    public List<InventoryResponse> checkInInventory(List<InventoryRequest> inventoryRequests) {
         logger.info("Sending web client request to check product inventory.");
         Mono<List<InventoryResponse>> inventoryResponseMono = this.webClientBuilder.build().post()
                 .uri("http://product-service/api/products/check-product-in-inventory")
