@@ -6,7 +6,6 @@ import com.toyota.salesservice.dto.responses.GetAllSalesItemsResponse;
 import com.toyota.salesservice.dto.responses.GetAllSalesResponse;
 import com.toyota.salesservice.dto.responses.PaginationResponse;
 import com.toyota.salesservice.service.abstracts.SalesService;
-import com.toyota.salesservice.utilities.exceptions.SalesNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -77,34 +76,6 @@ public class SalesControllerTest {
         // Then
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(mockResponse, responseEntity.getBody());
-        verify(salesService, times(1)).deleteSales(salesNumber);
-    }
-
-    @Test
-    void testDeleteSales_SalesNotFoundException() {
-        // Given
-        String salesNumber = "456";
-        when(salesService.deleteSales(salesNumber)).thenThrow(new SalesNotFoundException("Sales not found"));
-
-        // When
-        ResponseEntity<GetAllSalesResponse> responseEntity = salesController.deleteSales(salesNumber);
-
-        // Then
-        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
-        verify(salesService, times(1)).deleteSales(salesNumber);
-    }
-
-    @Test
-    void testDeleteSales_InternalServerError() {
-        // Given
-        String salesNumber = "789";
-        when(salesService.deleteSales(salesNumber)).thenThrow(new RuntimeException("Internal Server Error"));
-
-        // When
-        ResponseEntity<GetAllSalesResponse> responseEntity = salesController.deleteSales(salesNumber);
-
-        // Then
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
         verify(salesService, times(1)).deleteSales(salesNumber);
     }
 

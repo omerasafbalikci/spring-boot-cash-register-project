@@ -18,7 +18,7 @@ public class PaginationResponse<T> {
     private List<T> content;
     private CustomPageable pageable;
 
-    public PaginationResponse(List<T> content, Page<T> page) {
+    public PaginationResponse(Page<T> page) {
         this.content = page.getContent();
         this.pageable = new CustomPageable(page.getPageable().getPageNumber(),
                 page.getPageable().getPageSize(), page.getTotalElements(), page.getTotalPages());

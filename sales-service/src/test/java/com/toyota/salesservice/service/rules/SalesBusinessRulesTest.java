@@ -85,6 +85,36 @@ public class SalesBusinessRulesTest {
     }
 
     @Test
+    public void testExtractProductBarcodeNumber_Success() {
+        String errorBody = "{\"message\": \"Product not found: 1234567890123\"}";
+        String expectedBarcode = "1234567890123";
+
+        String actualBarcode = salesBusinessRules.extractProductBarcodeNumber(errorBody);
+
+        assertEquals(expectedBarcode, actualBarcode);
+    }
+
+    @Test
+    public void testExtractProductBarcodeNumber_UnknownProduct() {
+        String errorBody = "{\"message\": \"Some other error\"}";
+        String expectedBarcode = "Unknown Product";
+
+        String actualBarcode = salesBusinessRules.extractProductBarcodeNumber(errorBody);
+
+        assertEquals(expectedBarcode, actualBarcode);
+    }
+
+    @Test
+    public void testExtractProductBarcodeNumber_InvalidJson() {
+        String errorBody = "Invalid JSON";
+        String expectedBarcode = "Unknown Product";
+
+        String actualBarcode = salesBusinessRules.extractProductBarcodeNumber(errorBody);
+
+        assertEquals(expectedBarcode, actualBarcode);
+    }
+
+    @Test
     public void testUpdateSalesItems() {
         Sales sales = new Sales();
         sales.setSalesNumber("12345");

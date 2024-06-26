@@ -108,7 +108,7 @@ public class SalesBusinessRules {
      * @param errorBody the error message body from which to extract the barcode number
      * @return the extracted barcode number or "Unknown Product" if not found
      */
-    private String extractProductBarcodeNumber(String errorBody) {
+    public String extractProductBarcodeNumber(String errorBody) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode rootNode = objectMapper.readTree(errorBody);
