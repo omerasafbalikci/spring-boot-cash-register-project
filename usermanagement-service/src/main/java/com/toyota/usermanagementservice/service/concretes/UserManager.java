@@ -105,7 +105,7 @@ public class UserManager implements UserService {
 
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            logger.info("User found {}.", user);
+            logger.info("User found {}.", user.getUsername());
             if (updateUserRequest.getEmail() != null && !user.getEmail().equals(updateUserRequest.getEmail())) {
                 logger.info("Updating email to: {}.", updateUserRequest.getEmail());
                 if (this.userRepository.existsByEmailAndDeletedIsFalse(updateUserRequest.getEmail())) {
@@ -181,7 +181,7 @@ public class UserManager implements UserService {
 
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            logger.info("User found: {}.", user);
+            logger.info("User found: {}.", user.getUsername());
             Boolean deleteFromAuth = this.webClientBuilder.build().put()
                     .uri("http://authentication-authorization-service/auth/delete")
                     .bodyValue(user.getUsername())
@@ -201,7 +201,7 @@ public class UserManager implements UserService {
                 logger.info("User deleted from authentication-authorization-service successfully.");
                 user.setDeleted(true);
                 User saved = this.userRepository.save(user);
-                logger.info("User marked as deleted in local repository: {}.", saved);
+                logger.info("User marked as deleted in local repository: {}.", saved.getUsername());
                 return this.modelMapperService.forResponse().map(saved, GetAllUsersResponse.class);
             } else {
                 logger.error("Failed to delete user from authentication-authorization-service! ID: {}", id);
@@ -325,7 +325,7 @@ public class UserManager implements UserService {
             if (success != null && success) {
                 user.getRoles().add(role);
                 this.userRepository.save(user);
-                logger.info("Role: {} added to user: {}.", role, user);
+                logger.info("Role: {} added to user: {}.", role, user.getUsername());
                 return this.modelMapperService.forResponse().map(user, GetAllUsersResponse.class);
             } else {
                 logger.error("Failed to add role in authentication-authorization-service.");
@@ -389,7 +389,7 @@ public class UserManager implements UserService {
             if (success != null && success) {
                 user.getRoles().remove(role);
                 this.userRepository.save(user);
-                logger.info("Role: {} removed from user: {}.", role, user);
+                logger.info("Role: {} removed from user: {}.", role, user.getUsername());
                 return this.modelMapperService.forResponse().map(user, GetAllUsersResponse.class);
             } else {
                 logger.error("Failed to remove role in authentication-authorization-service.");
