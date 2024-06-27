@@ -1282,7 +1282,7 @@ Response:
   "lastName": "Balıkçı",
   "username": "asaf",
   "email": "asaf@gmail.com",
-  "deleted": true,
+  "deleted": false,
   "roles": [
     "MANAGER"
   ],
