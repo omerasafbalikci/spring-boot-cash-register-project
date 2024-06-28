@@ -187,7 +187,7 @@ public class SalesBusinessRules {
             }
             Campaign campaign = salesItem.getCampaign();
             if (campaign != null && campaign.getState()) {
-                applyCampaignDiscount(salesItem);
+                applyCampaignDiscount(salesItem, inventoryRequests);
                 logger.info("Applied campaign discount for sales item with barcode '{}'.", salesItem.getBarcodeNumber());
             } else if (campaign != null) {
                 updateInventory(inventoryRequests);
@@ -204,7 +204,7 @@ public class SalesBusinessRules {
      *
      * @param salesItem the sales item
      */
-    public void applyCampaignDiscount(SalesItems salesItem) {
+    public void applyCampaignDiscount(SalesItems salesItem, List<InventoryRequest> inventoryRequests) {
         logger.info("Applying campaign discount for item '{}'.", salesItem.getName());
         int campaignType = salesItem.getCampaign().getCampaignType();
         int quantity = salesItem.getQuantity();
@@ -229,7 +229,9 @@ public class SalesBusinessRules {
                 logger.info("Applied percentage discount: discount percent = {}, discount amount = {}, new total price = {}.",
                         discountPercent, discountAmount, newTotalPrice);
             } else {
+                updateInventory(inventoryRequests);
                 logger.warn("Discount amount exceeds total price for item '{}'.", salesItem.getName());
+                throw new CampaignDiscountException("Discount amount exceeds total price for item: " + salesItem.getName());
             }
         } else if (campaignType == 3) {
             double discountAmount = salesItem.getCampaign().getMoneyDiscount();
@@ -239,10 +241,14 @@ public class SalesBusinessRules {
                 logger.info("Applied money discount: discount amount = {}, new total price = {}.",
                         discountAmount, newTotalPrice);
             } else {
+                updateInventory(inventoryRequests);
                 logger.warn("Discount amount exceeds total price for item '{}'.", salesItem.getName());
+                throw new CampaignDiscountException("Discount amount exceeds total price for item: " + salesItem.getName());
             }
         } else {
+            updateInventory(inventoryRequests);
             logger.warn("Unknown campaign type '{}' for item '{}'.", campaignType, salesItem.getName());
+            throw new CampaignDiscountException("Unknown campaign type " + campaignType + " for item " + salesItem.getName());
         }
     }
 

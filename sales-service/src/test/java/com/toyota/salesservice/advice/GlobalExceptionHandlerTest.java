@@ -96,6 +96,28 @@ public class GlobalExceptionHandlerTest {
     }
 
     @Test
+    void handleCampaignDiscountException() {
+        // Given
+        String message = "Campaign discount not applied";
+        CampaignDiscountException campaignDiscountException = new CampaignDiscountException(message);
+
+        // When
+        String path = "/test";
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        Mockito.when(request.getRequestURI()).thenReturn(path);
+        ResponseEntity<Object> response = this.globalExceptionHandler.handleCampaignDiscountException(campaignDiscountException, request);
+
+        // Then
+        ErrorResponse errorResponse = (ErrorResponse) response.getBody();
+        assertNotNull(errorResponse);
+        assertTrue(HttpStatus.BAD_REQUEST.getReasonPhrase().equalsIgnoreCase(errorResponse.getError()),
+                "Expected error: " + HttpStatus.BAD_REQUEST.getReasonPhrase() + ", but got: " + errorResponse.getError());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
+        assertEquals(message, errorResponse.getMessage());
+        assertEquals(path, errorResponse.getPath());
+    }
+
+    @Test
     void handleCampaignStateFalseException() {
         // Given
         String message = "Campaign state is false";

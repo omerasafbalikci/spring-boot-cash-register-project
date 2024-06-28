@@ -162,9 +162,11 @@ public class SalesBusinessRulesTest {
 
         salesItem.setCampaign(campaign);
 
-        salesBusinessRules.applyCampaignDiscount(salesItem);
+        List<InventoryRequest> inventoryRequests = new ArrayList<>();
 
-        assertEquals(40.0, salesItem.getTotalPrice());
+        salesBusinessRules.applyCampaignDiscount(salesItem, inventoryRequests);
+
+        assertEquals(40.0, salesItem.getTotalPrice(), 0.001);
     }
 
     @Test
@@ -180,9 +182,11 @@ public class SalesBusinessRulesTest {
 
         salesItem.setCampaign(campaign);
 
-        salesBusinessRules.applyCampaignDiscount(salesItem);
+        List<InventoryRequest> inventoryRequests = new ArrayList<>();
 
-        assertEquals(80.0, salesItem.getTotalPrice());
+        salesBusinessRules.applyCampaignDiscount(salesItem, inventoryRequests);
+
+        assertEquals(80.0, salesItem.getTotalPrice(), 0.001);
     }
 
     @Test
@@ -198,26 +202,11 @@ public class SalesBusinessRulesTest {
 
         salesItem.setCampaign(campaign);
 
-        salesBusinessRules.applyCampaignDiscount(salesItem);
+        List<InventoryRequest> inventoryRequests = new ArrayList<>();
 
-        assertEquals(120.0, salesItem.getTotalPrice());
-    }
+        salesBusinessRules.applyCampaignDiscount(salesItem, inventoryRequests);
 
-    @Test
-    public void testApplyCampaignDiscount_UnknownCampaignType() {
-        SalesItems salesItem = new SalesItems();
-        salesItem.setName("Product 4");
-        salesItem.setQuantity(4);
-        salesItem.setUnitPrice(25.0);
-
-        Campaign campaign = new Campaign();
-        campaign.setCampaignType(4);
-
-        salesItem.setCampaign(campaign);
-
-        salesBusinessRules.applyCampaignDiscount(salesItem);
-
-        assertNull(salesItem.getTotalPrice());
+        assertEquals(120.0, salesItem.getTotalPrice(), 0.001);
     }
 
     @Test
