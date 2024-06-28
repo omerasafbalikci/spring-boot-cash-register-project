@@ -42,9 +42,9 @@ public class CampaignBusinessRules {
             int buyPayPartOne = Integer.parseInt(parts[0]);
             int buyPayPartTwo = Integer.parseInt(parts[1]);
 
-            if (buyPayPartOne < 0 || buyPayPartTwo < 0) {
-                logger.error("Incorrect buy-pay entry. Campaign ID: {}. Values must be non-negative integers.", campaign.getId());
-                throw new CampaignDetailsAreIncorrectException("Incorrect buy-pay entry. Values must be non-negative integers.");
+            if (buyPayPartOne <= buyPayPartTwo) {
+                logger.error("Incorrect buy-pay entry. Campaign ID: " + campaign.getId() + ". 'Buy' value must be greater than 'Pay' value.");
+                throw new CampaignDetailsAreIncorrectException("Incorrect buy-pay entry. 'Buy' value must be greater than 'Pay' value.");
             }
 
             campaign.setBuyPayPartOne(buyPayPartOne);
