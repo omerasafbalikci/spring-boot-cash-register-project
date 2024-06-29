@@ -29,6 +29,7 @@ This project is a Spring Boot based microservice project that provides market ch
    - Endpoints:
        - Login: `POST /auth/login`
        - Logout: `POST /auth/logout`
+       - Forgot Password: `POST /auth/forgot-password`
        - Change Password: `PUT /auth/change-password`
        - Verify: `GET /auth/verify`
 
@@ -1226,15 +1227,15 @@ Request Body:
 
 ```json
 {
-  "firstName": "Asaf",
-  "lastName": "Balıkçı",
-  "username": "asa7",
-  "email": "asa7@gmail.com",
-  "password": "Fenerbahce1234",
-  "roles": [
-    "MANAGER"
-  ],
-  "gender": "MALE"
+    "firstName": "Asaf",
+    "lastName": "Balıkçı",
+    "username": "asa7",
+    "email": "asa7@gmail.com",
+    "password": "Fenerbahce1234",
+    "roles": [
+      "MANAGER"
+    ],
+    "gender": "MALE"
 }
 ```
 
@@ -1242,16 +1243,16 @@ Response:
 
 ```json
 {
-  "id": 5,
-  "firstName": "Asaf",
-  "lastName": "Balıkçı",
-  "username": "asa7",
-  "email": "asa7@gmail.com",
-  "deleted": false,
-  "roles": [
-    "MANAGER"
-  ],
-  "gender": "MALE"
+    "id": 5,
+    "firstName": "Asaf",
+    "lastName": "Balıkçı",
+    "username": "asa7",
+    "email": "asa7@gmail.com",
+    "deleted": false,
+    "roles": [
+      "MANAGER"
+    ],
+    "gender": "MALE"
 }
 ```
 
@@ -1264,12 +1265,12 @@ Request Body:
 
 ```json
 {
-  "id": 3,
-  "firstName": "Ömer Asaf",
-  "lastName": "Balıkçı",
-  "username": "asaf",
-  "email": "asaf@gmail.com",
-  "gender": "FEMALE"
+    "id": 3,
+    "firstName": "Ömer Asaf",
+    "lastName": "Balıkçı",
+    "username": "asaf",
+    "email": "asaf@gmail.com",
+    "gender": "FEMALE"
 }
 ```
 
@@ -1277,16 +1278,16 @@ Response:
 
 ```json
 {
-  "id": 3,
-  "firstName": "Ömer Asaf",
-  "lastName": "Balıkçı",
-  "username": "asaf",
-  "email": "asaf@gmail.com",
-  "deleted": false,
-  "roles": [
-    "MANAGER"
-  ],
-  "gender": "FEMALE"
+    "id": 3,
+    "firstName": "Ömer Asaf",
+    "lastName": "Balıkçı",
+    "username": "asaf",
+    "email": "asaf@gmail.com",
+    "deleted": false,
+    "roles": [
+      "MANAGER"
+    ],
+    "gender": "FEMALE"
 }
 ```
 
@@ -1305,16 +1306,16 @@ Response:
 
 ```json
 {
-  "id": 3,
-  "firstName": "Ömer Asaf",
-  "lastName": "Balıkçı",
-  "username": "asaf",
-  "email": "asaf@gmail.com",
-  "deleted": true,
-  "roles": [
-    "CASHIER"
-  ],
-  "gender": "FEMALE"
+    "id": 3,
+    "firstName": "Ömer Asaf",
+    "lastName": "Balıkçı",
+    "username": "asaf",
+    "email": "asaf@gmail.com",
+    "deleted": true,
+    "roles": [
+      "CASHIER"
+    ],
+    "gender": "FEMALE"
 }
 ```
 
@@ -1326,24 +1327,24 @@ Description: Adds role to user. Roles: ADMIN, CASHIER, MANAGER
 Request Body:
 
 ```json
-"CASHIER"
+  "CASHIER"
 ```
 
 Response:
 
 ```json
 {
-  "id": 5,
-  "firstName": "Asaf",
-  "lastName": "Balıkçı",
-  "username": "asaf",
-  "email": "asaf@gmail.com",
-  "deleted": false,
-  "roles": [
-    "CASHIER",
-    "MANAGER"
-  ],
-  "gender": "MALE"
+    "id": 5,
+    "firstName": "Asaf",
+    "lastName": "Balıkçı",
+    "username": "asaf",
+    "email": "asaf@gmail.com",
+    "deleted": false,
+    "roles": [
+      "CASHIER",
+      "MANAGER"
+    ],
+    "gender": "MALE"
 }
 ```
 
@@ -1355,23 +1356,23 @@ Description: Removes role from user. Roles: ADMIN, CASHIER, MANAGER
 Request Body:
 
 ```json
-"MANAGER"
+  "MANAGER"
 ```
 
 Response:
 
 ```json
 {
-  "id": 5,
-  "firstName": "Asaf",
-  "lastName": "Balıkçı",
-  "username": "asaf",
-  "email": "asaf@gmail.com",
-  "deleted": false,
-  "roles": [
-    "CASHIER"
-  ],
-  "gender": "MALE"
+    "id": 5,
+    "firstName": "Asaf",
+    "lastName": "Balıkçı",
+    "username": "asaf",
+    "email": "asaf@gmail.com",
+    "deleted": false,
+    "roles": [
+      "CASHIER"
+    ],
+    "gender": "MALE"
 }
 ```
 
@@ -1386,8 +1387,8 @@ Request Body:
 
 ```json
 {
-  "username": "admin",
-  "password": "admin"
+    "username": "admin",
+    "password": "admin"
 }
 ```
 
@@ -1395,7 +1396,7 @@ Response:
 
 ```json
 {
-  "token": "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJhNjc1ZGEzYi0yOWEzLTRlMjAtYTFhYy0xODQxZjU2Y2FmZjkiLCJzdWIiOiJhZG1pbiIsImlhdCI6MTY4OTUzNzMxMSwiZXhwIjoxNjg5NTQwOTExfQ.FotzY4QeIIJls8DRFcbZCP5uJEeUS4idzgLUU2SCGjU"
+    "token": "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJhNjc1ZGEzYi0yOWEzLTRlMjAtYTFhYy0xODQxZjU2Y2FmZjkiLCJzdWIiOiJhZG1pbiIsImlhdCI6MTY4OTUzNzMxMSwiZXhwIjoxNjg5NTQwOTExfQ.FotzY4QeIIJls8DRFcbZCP5uJEeUS4idzgLUU2SCGjU"
 }
 ```
 
@@ -1409,6 +1410,22 @@ Request: Uses token for logout.
 Response:
 `Status: 200 OK`
 
+#### Forgot Password
+
+Endpoint: `POST /auth/forgot-password`  
+Description: Function used when password is forgotten.
+
+Request Parameters:
+
+| Key     | Value            |
+|---------|------------------|
+| `email` | `asaf@gmail.com` |
+
+Response:
+```json
+  Password reset initiated successfully. Check your email.
+```
+
 #### Change Password
 
 Endpoint: `PUT /auth/change-password`  
@@ -1418,8 +1435,8 @@ Request Body:
 
 ```json
 {
-  "oldPassword": "admin",
-  "newPassword": "newPassword"
+    "oldPassword": "admin",
+    "newPassword": "newPassword"
 }
 ```
 
