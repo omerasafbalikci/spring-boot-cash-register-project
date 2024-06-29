@@ -20,7 +20,6 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Campaign {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
