@@ -5,7 +5,9 @@ import com.toyota.usermanagementservice.domain.Role;
 import com.toyota.usermanagementservice.dto.requests.CreateUserRequest;
 import com.toyota.usermanagementservice.dto.requests.UpdateUserRequest;
 import com.toyota.usermanagementservice.dto.responses.GetAllUsersResponse;
+import com.toyota.usermanagementservice.dto.responses.UserManagementResponse;
 import com.toyota.usermanagementservice.service.abstracts.UserService;
+import com.toyota.usermanagementservice.utilities.exceptions.UserNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,9 +21,9 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class UserControllerTest {
@@ -48,7 +50,7 @@ public class UserControllerTest {
 
         // When
         Page<GetAllUsersResponse> pageMock = new PageImpl<>(content, pageable, 1);
-        Mockito.when(userService.getAllUsersPage(page, size, sort, id, firstname, lastname, username
+        when(userService.getAllUsersPage(page, size, sort, id, firstname, lastname, username
                 , email, gender)).thenReturn(pageMock);
         Page<GetAllUsersResponse> pageResponse = userController.getAllUsersPage(page, size, sort, id, firstname,
                 lastname, username, email, gender);
@@ -61,6 +63,33 @@ public class UserControllerTest {
     }
 
     @Test
+    void getUserByEmail_Success() {
+        // Given
+        String email = "test@example.com";
+        UserManagementResponse expectedResponse = new UserManagementResponse("username", email);
+
+        when(userService.getUserByEmail(email)).thenReturn(expectedResponse);
+
+        // When
+        UserManagementResponse actualResponse = userController.getUserByEmail(email);
+
+        // Then
+        assertEquals(expectedResponse.getEmail(), actualResponse.getEmail());
+        assertEquals(expectedResponse.getUsername(), actualResponse.getUsername());
+    }
+
+    @Test
+    void getUserByEmail_UserNotFound() {
+        // Given
+        String email = "nonexistent@example.com";
+
+        when(userService.getUserByEmail(email)).thenThrow(new UserNotFoundException("User not found"));
+
+        // When / Then
+        assertThrows(UserNotFoundException.class, () -> userController.getUserByEmail(email));
+    }
+
+    @Test
     void createUser() {
         // Given
         CreateUserRequest createUserRequest = new CreateUserRequest("firstname", "lastname", "username",
@@ -69,7 +98,7 @@ public class UserControllerTest {
                 "email@gmail.com", false, Set.of(Role.CASHIER), Gender.FEMALE);
 
         // When
-        Mockito.when(userService.createUser(any(CreateUserRequest.class))).thenReturn(response);
+        when(userService.createUser(any(CreateUserRequest.class))).thenReturn(response);
         ResponseEntity<GetAllUsersResponse> result = userController.createUser(createUserRequest);
 
         // Then
@@ -87,7 +116,7 @@ public class UserControllerTest {
                 "updated@gmail.com", false, Set.of(Role.CASHIER), Gender.FEMALE);
 
         // When
-        Mockito.when(userService.updateUser(any(UpdateUserRequest.class))).thenReturn(response);
+        when(userService.updateUser(any(UpdateUserRequest.class))).thenReturn(response);
         ResponseEntity<GetAllUsersResponse> result = userController.updateUser(updateUserRequest);
 
         // Then
@@ -103,7 +132,7 @@ public class UserControllerTest {
         GetAllUsersResponse response = new GetAllUsersResponse();
 
         // When
-        Mockito.when(userService.addRole(Mockito.anyLong(), any())).thenReturn(response);
+        when(userService.addRole(Mockito.anyLong(), any())).thenReturn(response);
         ResponseEntity<GetAllUsersResponse> result = userController.addRole(1L, Role.ADMIN);
 
         // Then
@@ -117,7 +146,7 @@ public class UserControllerTest {
         GetAllUsersResponse response = new GetAllUsersResponse();
 
         // When
-        Mockito.when(userService.removeRole(Mockito.anyLong(), any())).thenReturn(response);
+        when(userService.removeRole(Mockito.anyLong(), any())).thenReturn(response);
         ResponseEntity<GetAllUsersResponse> result = userController.removeRole(1L, Role.ADMIN);
 
         // Then
@@ -131,7 +160,7 @@ public class UserControllerTest {
         GetAllUsersResponse response = new GetAllUsersResponse();
 
         // When
-        Mockito.when(userService.deleteUser(Mockito.anyLong())).thenReturn(response);
+        when(userService.deleteUser(Mockito.anyLong())).thenReturn(response);
         ResponseEntity<GetAllUsersResponse> result = userController.deleteUser(1L);
 
         // Then

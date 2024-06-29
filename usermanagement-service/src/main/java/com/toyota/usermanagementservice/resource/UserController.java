@@ -4,6 +4,7 @@ import com.toyota.usermanagementservice.domain.Role;
 import com.toyota.usermanagementservice.dto.requests.CreateUserRequest;
 import com.toyota.usermanagementservice.dto.requests.UpdateUserRequest;
 import com.toyota.usermanagementservice.dto.responses.GetAllUsersResponse;
+import com.toyota.usermanagementservice.dto.responses.UserManagementResponse;
 import com.toyota.usermanagementservice.service.abstracts.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -49,6 +50,17 @@ public class UserController {
             @RequestParam(defaultValue = "") String gender
     ) {
         return this.userService.getAllUsersPage(page, size, sort, id, firstName, lastName, username, email, gender);
+    }
+
+    /**
+     * Retrieves user details by email.
+     *
+     * @param email the email of the user to retrieve
+     * @return the user details
+     */
+    @GetMapping("/email")
+    public UserManagementResponse getUserByEmail (@RequestParam String email) {
+        return this.userService.getUserByEmail(email);
     }
 
     /**

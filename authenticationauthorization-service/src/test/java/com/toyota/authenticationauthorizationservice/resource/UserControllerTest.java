@@ -104,6 +104,64 @@ public class UserControllerTest {
     }
 
     @Test
+    void forgotPassword_success() {
+        // Given
+        String email = "test@example.com";
+        when(userManager.initiatePasswordReset(anyString())).thenReturn(true);
+
+        // When
+        ResponseEntity<String> response = userController.forgotPassword(email);
+
+        // Then
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Password reset initiated successfully. Check your email.", response.getBody());
+    }
+
+    @Test
+    void forgotPassword_failure() {
+        // Given
+        String email = "test@example.com";
+        when(userManager.initiatePasswordReset(anyString())).thenReturn(false);
+
+        // When
+        ResponseEntity<String> response = userController.forgotPassword(email);
+
+        // Then
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Failed to initiate password reset.", response.getBody());
+    }
+
+    @Test
+    void resetPassword_success() {
+        // Given
+        String token = "resetToken";
+        String newPassword = "newPassword";
+        when(userManager.handlePasswordReset(anyString(), anyString())).thenReturn("Password reset successfully.");
+
+        // When
+        ResponseEntity<String> response = userController.resetPassword(token, newPassword);
+
+        // Then
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Password reset successfully.", response.getBody());
+    }
+
+    @Test
+    void resetPassword_failure() {
+        // Given
+        String token = "resetToken";
+        String newPassword = "newPassword";
+        when(userManager.handlePasswordReset(anyString(), anyString())).thenReturn("Invalid token");
+
+        // When
+        ResponseEntity<String> response = userController.resetPassword(token, newPassword);
+
+        // Then
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Invalid token", response.getBody());
+    }
+
+    @Test
     void changePassword_success() {
         // Given
         HttpServletRequest request = mock(HttpServletRequest.class);

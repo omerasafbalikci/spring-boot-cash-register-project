@@ -49,6 +49,40 @@ public class UserController {
     }
 
     /**
+     * Initiates a password reset process for the user with the given email.
+     *
+     * @param email the email address of the user requesting a password reset
+     * @return a response entity with a message indicating the result of the password reset initiation
+     */
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@RequestParam("email") String email) {
+        boolean result = this.userService.initiatePasswordReset(email);
+        if (result) {
+            return ResponseEntity.ok("Password reset initiated successfully. Check your email.");
+        } else {
+            return ResponseEntity.badRequest().body("Failed to initiate password reset.");
+        }
+    }
+
+    /**
+     * Resets the password for the user with the given reset token.
+     *
+     * @param token the reset token sent to the user's email
+     * @param newPassword the new password to set for the user
+     * @return a response entity with a message indicating the result of the password reset
+     */
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestParam("token") String token,
+                                                @RequestParam("newPassword") String newPassword) {
+        String result = this.userService.handlePasswordReset(token, newPassword);
+        if ("Password reset successfully.".equals(result)) {
+            return ResponseEntity.ok(result);
+        } else {
+            return ResponseEntity.badRequest().body(result);
+        }
+    }
+
+    /**
      * Updates the username of an existing user.
      *
      * @param newUsername the new username to be set

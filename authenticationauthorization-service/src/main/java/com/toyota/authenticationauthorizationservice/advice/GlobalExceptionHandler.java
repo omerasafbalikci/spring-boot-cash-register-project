@@ -109,6 +109,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     /**
+     * Handles UnexpectedException and returns an INTERNAL_SERVER_ERROR response.
+     *
+     * @param exception the exception thrown
+     * @param request   the HTTP request
+     * @return the response entity with error details and INTERNAL_SERVER_ERROR status
+     */
+    @ExceptionHandler(UnexpectedException.class)
+    public ResponseEntity<Object> handleUnexpectedException(UnexpectedException exception, HttpServletRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
+        errorResponse.setPath(request.getRequestURI());
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    /**
      * Handles InvalidAuthenticationException by returning an UNAUTHORIZED response.
      *
      * @param exception the thrown exception

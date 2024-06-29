@@ -16,7 +16,7 @@ public class RouteValidator {
      * List of open API endpoints that do not require security.
      */
     public static final List<String> openApiEndpoints = List.of(
-            "/auth/login", "/auth/change-password", "/auth/logout"
+            "/auth/login", "/auth/change-password", "/auth/forgot-password", "/auth/reset-password", "/auth/logout"
     );
 
     /**

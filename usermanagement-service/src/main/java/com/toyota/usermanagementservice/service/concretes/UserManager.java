@@ -8,6 +8,7 @@ import com.toyota.usermanagementservice.dto.requests.CreateUserRequest;
 import com.toyota.usermanagementservice.dto.requests.RegisterRequest;
 import com.toyota.usermanagementservice.dto.requests.UpdateUserRequest;
 import com.toyota.usermanagementservice.dto.responses.GetAllUsersResponse;
+import com.toyota.usermanagementservice.dto.responses.UserManagementResponse;
 import com.toyota.usermanagementservice.service.abstracts.UserService;
 import com.toyota.usermanagementservice.utilities.exceptions.*;
 import com.toyota.usermanagementservice.utilities.mappers.ModelMapperService;
@@ -275,6 +276,30 @@ public class UserManager implements UserService {
         logger.debug("Mapped {} users to response objects.", responses.size());
 
         return pageUser.map(user -> this.modelMapperService.forResponse().map(user, GetAllUsersResponse.class));
+    }
+
+    /**
+     * Retrieves user details by email.
+     *
+     * @param email the email of the user to retrieve
+     * @return the user details
+     * @throws UserNotFoundException if no user is found with the provided email
+     */
+    @Override
+    public UserManagementResponse getUserByEmail(String email) {
+        logger.info("Attempting to retrieve user by email: {}", email);
+        Optional<User> optionalUser = this.userRepository.findByEmail(email);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            UserManagementResponse userManagementResponse = new UserManagementResponse();
+            userManagementResponse.setEmail(user.getEmail());
+            userManagementResponse.setUsername(user.getUsername());
+            logger.info("User found with email: {}", email);
+            return userManagementResponse;
+        } else {
+            logger.warn("No user found with email: {}", email);
+            throw new UserNotFoundException("No users registered to this email address were found: " + email);
+        }
     }
 
     /**

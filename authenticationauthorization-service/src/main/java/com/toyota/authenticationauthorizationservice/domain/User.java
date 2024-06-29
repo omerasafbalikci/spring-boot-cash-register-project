@@ -6,10 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Domain for User entity.
@@ -36,6 +33,12 @@ public class User implements UserDetails {
 
     @Column(name = "deleted")
     private boolean deleted;
+
+    @Column(name = "reset_token")
+    private String resetToken;
+
+    @Column(name = "reset_token_expiration")
+    private Date resetTokenExpiration;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

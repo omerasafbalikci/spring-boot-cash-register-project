@@ -1407,6 +1407,7 @@ Description: Logout for users.
 Request: Uses token for logout.
 
 Response:
+`Status: 200 OK`
 
 #### Change Password
 

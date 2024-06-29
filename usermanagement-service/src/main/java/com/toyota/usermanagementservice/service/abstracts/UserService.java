@@ -4,6 +4,7 @@ import com.toyota.usermanagementservice.domain.Role;
 import com.toyota.usermanagementservice.dto.requests.CreateUserRequest;
 import com.toyota.usermanagementservice.dto.requests.UpdateUserRequest;
 import com.toyota.usermanagementservice.dto.responses.GetAllUsersResponse;
+import com.toyota.usermanagementservice.dto.responses.UserManagementResponse;
 import org.springframework.data.domain.Page;
 
 /**
@@ -51,6 +52,14 @@ public interface UserService {
      */
     Page<GetAllUsersResponse> getAllUsersPage(int page, int size, String[] sort, Long id, String firstName,
                                               String lastName, String username, String email, String gender);
+
+    /**
+     * Retrieves user details by email.
+     *
+     * @param email the email of the user to retrieve
+     * @return the user details
+     */
+    UserManagementResponse getUserByEmail(String email);
 
     /**
      * Adds a role to a user.

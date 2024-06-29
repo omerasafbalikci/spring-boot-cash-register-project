@@ -7,6 +7,7 @@ import com.toyota.usermanagementservice.domain.User;
 import com.toyota.usermanagementservice.dto.requests.CreateUserRequest;
 import com.toyota.usermanagementservice.dto.requests.UpdateUserRequest;
 import com.toyota.usermanagementservice.dto.responses.GetAllUsersResponse;
+import com.toyota.usermanagementservice.dto.responses.UserManagementResponse;
 import com.toyota.usermanagementservice.utilities.exceptions.*;
 import com.toyota.usermanagementservice.utilities.mappers.ModelMapperService;
 import org.junit.jupiter.api.BeforeEach;
@@ -434,6 +435,43 @@ public class UserManagerTest {
         assertEquals(deleted, response.getContent().get(0).isDeleted());
         assertEquals(roles, response.getContent().get(0).getRoles());
         assertEquals(Gender.valueOf(gender.toUpperCase()), response.getContent().get(0).getGender());
+    }
+
+    @Test
+    void getUserByEmail_existingUser() {
+        // Given
+        String email = "test@example.com";
+        User user = new User();
+        user.setEmail(email);
+        user.setUsername("testuser");
+
+        UserManagementResponse expectedResponse = new UserManagementResponse();
+        expectedResponse.setEmail(user.getEmail());
+        expectedResponse.setUsername(user.getUsername());
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+
+        // When
+        UserManagementResponse actualResponse = userManager.getUserByEmail(email);
+
+        // Then
+        assertEquals(expectedResponse.getEmail(), actualResponse.getEmail());
+        assertEquals(expectedResponse.getUsername(), actualResponse.getUsername());
+    }
+
+    @Test
+    void getUserByEmail_userNotFound() {
+        // Given
+        String email = "nonexistent@example.com";
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+
+        // When / Then
+        try {
+            userManager.getUserByEmail(email);
+        } catch (UserNotFoundException e) {
+            assertEquals("No users registered to this email address were found: " + email, e.getMessage());
+        }
     }
 
     @Test

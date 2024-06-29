@@ -11,6 +11,7 @@ import com.toyota.authenticationauthorizationservice.dto.requests.PasswordReques
 import com.toyota.authenticationauthorizationservice.dto.requests.RegisterRequest;
 import com.toyota.authenticationauthorizationservice.dto.responses.AuthenticationResponse;
 import com.toyota.authenticationauthorizationservice.service.abstracts.JwtService;
+import com.toyota.authenticationauthorizationservice.service.abstracts.MailService;
 import com.toyota.authenticationauthorizationservice.utilities.exceptions.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +26,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.*;
 
@@ -49,11 +51,15 @@ public class UserManagerTest {
     private RoleRepository roleRepository;
     @Mock
     private TokenRepository tokenRepository;
+    @Mock
+    private WebClient.Builder webClientBuilder;
+    @Mock
+    private MailService mailService;
     private UserManager userManager;
 
     @BeforeEach
     void setUp() {
-        userManager = new UserManager(userRepository, authenticationManager, jwtService, passwordEncoder, roleRepository, tokenRepository, 3600000);
+        userManager = new UserManager(userRepository, authenticationManager, jwtService, passwordEncoder, roleRepository, tokenRepository, webClientBuilder, mailService, 3600000);
     }
 
     @Test
@@ -113,7 +119,7 @@ public class UserManagerTest {
     void login_success() {
         // Given
         AuthenticationRequest authenticationRequest = new AuthenticationRequest("Asaf", "test");
-        User user = new User(1L, "Asaf", "test", false, Set.of(new Role()), List.of(new Token()));
+        User user = new User(1L, "Asaf", "test", false, null, null, Set.of(new Role()), List.of(new Token()));
 
         // When
         when(userRepository.findByUsernameAndDeletedIsFalse(anyString())).thenReturn(Optional.of(user));
@@ -142,7 +148,7 @@ public class UserManagerTest {
     void deleteUsername_success() {
         // Given
         String username = "username";
-        User user = new User(1L, "username", "password", false, null, List.of(new Token()));
+        User user = new User(1L, "username", "password", false, null, null, null, List.of(new Token()));
 
         // When
         when(userRepository.findByUsernameAndDeletedIsFalse(username)).thenReturn(Optional.of(user));
@@ -168,7 +174,7 @@ public class UserManagerTest {
     @Test
     void updateUsername_success() {
         // Given
-        User user = new User(1L, "username", "password", false, null, List.of(new Token()));
+        User user = new User(1L, "username", "password", false, null, null, null, List.of(new Token()));
         String username = "username";
         String newUsername = "updatedUser";
 
@@ -207,12 +213,11 @@ public class UserManagerTest {
         assertThrows(UsernameTakenException.class, () -> userManager.updateUsername(newUsername, username));
     }
 
-
     @Test
     void changePassword_success() {
         // Given
         HttpServletRequest request = mock(HttpServletRequest.class);
-        User user = new User(1L, "username", "password", false, null, List.of(new Token()));
+        User user = new User(1L, "username", "password", false, null, null, null, List.of(new Token()));
         String username = "username";
         PasswordRequest passwordRequest = new PasswordRequest("password", "newPassword");
 
@@ -233,7 +238,7 @@ public class UserManagerTest {
     void changePassword_falsePassword() {
         // Given
         HttpServletRequest request = mock(HttpServletRequest.class);
-        User user = new User(1L, "username", "password", false, null, List.of(new Token()));
+        User user = new User(1L, "username", "password", false, null, null, null, List.of(new Token()));
         String username = "username";
         PasswordRequest passwordRequest = new PasswordRequest("passwords", "newPassword");
 
@@ -304,7 +309,7 @@ public class UserManagerTest {
         // Given
         Set<Role> roles = new HashSet<>();
         roles.add(new Role());
-        User user = new User(1L, "username", "password", false, roles, List.of(new Token()));
+        User user = new User(1L, "username", "password", false, null, null, roles, List.of(new Token()));
         Role role = new Role(1L, "Admin", "", null);
         String username = "username";
         String roleStr = "Admin";
@@ -334,7 +339,7 @@ public class UserManagerTest {
         // Given
         Set<Role> roles = new HashSet<>();
         roles.add(new Role());
-        User user = new User(1L, "username", "password", false, roles, List.of(new Token()));
+        User user = new User(1L, "username", "password", false, null, null, roles, List.of(new Token()));
         String username = "username";
         String roleStr = "Admin";
 
@@ -354,7 +359,7 @@ public class UserManagerTest {
         Role role = new Role(1L, "Admin", "", null);
         roles.add(new Role());
         roles.add(role);
-        User user = new User(1L, "username", "password", false, roles, List.of(new Token()));
+        User user = new User(1L, "username", "password", false, null, null, roles, List.of(new Token()));
         String username = "username";
         String roleStr = "Admin";
 
@@ -387,7 +392,7 @@ public class UserManagerTest {
         // Given
         Set<Role> roles = new HashSet<>();
         roles.add(new Role());
-        User user = new User(1L, "username", "password", false, roles, List.of(new Token()));
+        User user = new User(1L, "username", "password", false, null, null, roles, List.of(new Token()));
         String username = "username";
         String roleStr = "Admin";
 

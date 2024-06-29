@@ -30,6 +30,23 @@ public interface UserService {
     AuthenticationResponse login(AuthenticationRequest request);
 
     /**
+     * Initiates the password reset process for the user with the given email.
+     *
+     * @param email the email address of the user requesting the password reset
+     * @return true if the password reset process is successfully initiated, false otherwise
+     */
+    boolean initiatePasswordReset(String email);
+
+    /**
+     * Handles the password reset process for the user with the given token.
+     *
+     * @param token the reset token
+     * @param newPassword the new password to be set
+     * @return a message indicating the result of the password reset process
+     */
+    String handlePasswordReset(String token, String newPassword);
+
+    /**
      * Logs out a user by invalidating the provided JWT token.
      *
      * @param jwt the JWT token to invalidate

@@ -162,6 +162,28 @@ public class GlobalExceptionHandlerTest {
     }
 
     @Test
+    void handleUnexpectedException() {
+        // Given
+        String message = "Unexpected exception";
+        UnexpectedException unexpectedException = new UnexpectedException(message);
+
+        // When
+        String path = "/test";
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        Mockito.when(request.getRequestURI()).thenReturn(path);
+        ResponseEntity<Object> response = globalExceptionHandler.handleUnexpectedException(unexpectedException, request);
+
+        // Then
+        ErrorResponse errorResponse = (ErrorResponse) response.getBody();
+        Assertions.assertNotNull(errorResponse);
+        Assertions.assertTrue(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase().equalsIgnoreCase(errorResponse.getError()),
+                "Expected error: " + HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase() + ", but got: " + errorResponse.getError());
+        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), errorResponse.getStatus());
+        Assertions.assertEquals(message, errorResponse.getMessage());
+        Assertions.assertEquals(path, errorResponse.getPath());
+    }
+
+    @Test
     void handleInvalidAuthenticationException() {
         // Given
         String message = "Authentication failed! The provided username or password is incorrect.";

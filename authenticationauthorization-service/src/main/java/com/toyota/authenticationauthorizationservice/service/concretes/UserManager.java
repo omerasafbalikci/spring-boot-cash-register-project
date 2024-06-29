@@ -10,7 +10,9 @@ import com.toyota.authenticationauthorizationservice.dto.requests.Authentication
 import com.toyota.authenticationauthorizationservice.dto.requests.PasswordRequest;
 import com.toyota.authenticationauthorizationservice.dto.requests.RegisterRequest;
 import com.toyota.authenticationauthorizationservice.dto.responses.AuthenticationResponse;
+import com.toyota.authenticationauthorizationservice.dto.responses.UserManagementResponse;
 import com.toyota.authenticationauthorizationservice.service.abstracts.JwtService;
+import com.toyota.authenticationauthorizationservice.service.abstracts.MailService;
 import com.toyota.authenticationauthorizationservice.service.abstracts.UserService;
 import com.toyota.authenticationauthorizationservice.utilities.exceptions.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,6 +20,7 @@ import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -26,6 +29,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -43,6 +48,8 @@ public class UserManager implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
     private final TokenRepository tokenRepository;
+    private final WebClient.Builder webClientBuilder;
+    private final MailService mailService;
     private final Logger logger = LogManager.getLogger(UserService.class);
     @Value("${application.security.jwt.expiration-time}")
     private long jwtExpiration;
@@ -140,6 +147,125 @@ public class UserManager implements UserService {
         tokens.forEach(token -> token.setRevoked(true));
         this.tokenRepository.saveAll(tokens);
         logger.info("All tokens revoked for user: {}", user.getUsername());
+    }
+
+    /**
+     * Initiates a password reset process for the user with the given email.
+     *
+     * @param email the email address of the user requesting the password reset
+     * @return true if the password reset process is successfully initiated, false otherwise
+     * @throws UserNotFoundException if the user is not found either in the local database or the user management service
+     * @throws UnexpectedException if an unexpected error occurs while communicating with the user management service
+     */
+    @Override
+    public boolean initiatePasswordReset(String email) {
+        logger.info("Initiating password reset for user with email: {}", email);
+        UserManagementResponse userManagementResponse;
+        try {
+            userManagementResponse = this.webClientBuilder.build().get()
+                    .uri("http://user-management-service/api/user-management/email", uriBuilder ->
+                            uriBuilder.queryParam("email", email).build())
+                    .retrieve()
+                    .bodyToMono(UserManagementResponse.class)
+                    .block();
+        } catch (WebClientResponseException.NotFound ex) {
+            logger.warn("User not found in user management service with email: {}", email);
+            throw new UserNotFoundException("User not found in user management service with email: " + email);
+        } catch (Exception e) {
+            logger.error("Error occurred while calling user management service: {}", e.getMessage());
+            throw new UnexpectedException("Error occurred while calling user management service: " + e);
+        }
+
+        if (userManagementResponse != null && userManagementResponse.getUsername() != null) {
+            Optional<User> optionalUser = this.userRepository.findByUsernameAndDeletedIsFalse(userManagementResponse.getUsername());
+            if (optionalUser.isPresent()) {
+                User user = optionalUser.get();
+
+                String resetToken = generateResetToken();
+
+                user.setResetToken(resetToken);
+                user.setResetTokenExpiration(calculateResetTokenExpiration());
+                this.userRepository.save(user);
+
+                sendPasswordResetEmail(user.getUsername(), email, resetToken);
+
+                logger.info("Password reset initiated successfully for user with email: {}", email);
+                return true;
+            } else {
+                logger.warn("User not found in local database with email: {}", email);
+                throw new UserNotFoundException("User not found in local database with email: " + email);
+            }
+        } else {
+            logger.warn("User not found in user management service with email: {}", email);
+            throw new UserNotFoundException("User not found in user management service with email: " + email);
+        }
+    }
+
+    /**
+     * Generates a unique token for password reset.
+     *
+     * @return a unique reset token
+     */
+    private String generateResetToken() {
+        return UUID.randomUUID().toString();
+    }
+
+    /**
+     * Calculates the expiration date for the reset token.
+     *
+     * @return the expiration date of the reset token
+     */
+    private Date calculateResetTokenExpiration() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.HOUR, 1);
+        return calendar.getTime();
+    }
+
+    /**
+     * Sends a password reset email to the user.
+     *
+     * @param username the username of the user to whom the email is to be sent
+     * @param userMail the email address of the user
+     * @param resetToken the reset token to be included in the email
+     */
+    private void sendPasswordResetEmail(String username, String userMail, String resetToken) {
+        String resetUrl = "http://localhost:8080/auth/reset-password?token=" + resetToken;
+        String message = String.format("Hello %s,\n\nYou requested a password reset. Please use the following link to reset your password:\n%s\n\nIf you did not request this, please ignore this email.\n\nÖMER ASAF BALIKÇI", username, resetUrl);
+
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(userMail);
+        mailMessage.setSubject("Password Reset Request");
+        mailMessage.setText(message);
+        mailMessage.setFrom("asafmarket.ltd@gmail.com");
+
+        this.mailService.sendEmail(userMail, "Password Reset Request", message);
+        logger.info("Password reset email sent to: {}", userMail);
+    }
+
+    /**
+     * Handles the password reset process for the user with the given token.
+     *
+     * @param token the reset token
+     * @param newPassword the new password to be set
+     * @return a message indicating the result of the password reset process
+     */
+    @Override
+    public String handlePasswordReset(String token, String newPassword) {
+        logger.info("Handling password reset for token: {}", token);
+        Optional<User> optionalUser = this.userRepository.findByResetToken(token);
+
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            user.setPassword(this.passwordEncoder.encode(newPassword));
+            user.setResetToken(null);
+            user.setResetTokenExpiration(null);
+            this.userRepository.save(user);
+            logger.info("Password reset successfully for token: {}", token);
+            return "Password reset successfully.";
+        } else {
+            logger.warn("Invalid token: {}", token);
+            return "Invalid token";
+        }
     }
 
     /**
