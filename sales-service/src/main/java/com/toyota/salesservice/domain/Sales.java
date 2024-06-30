@@ -41,13 +41,13 @@ public class Sales {
     @Column(name = "payment_type")
     private PaymentType paymentType;
 
-    @Column(name = "total_price")
+    @Column(name = "total_price(tl)", columnDefinition = "numeric")
     private Double totalPrice;
 
-    @Column(name = "money", columnDefinition = "numeric")
+    @Column(name = "money(tl)", columnDefinition = "numeric")
     private Double money;
 
-    @Column(name = "change", columnDefinition = "numeric")
+    @Column(name = "change(tl)", columnDefinition = "numeric")
     private Double change;
 
     @OneToMany(mappedBy = "sales", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
