@@ -30,7 +30,7 @@ public class Product {
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "quantity")
+    @Column(name = "quantity(grain or kg)")
     private Integer quantity;
 
     @Column(name = "unit_price", columnDefinition = "numeric")
