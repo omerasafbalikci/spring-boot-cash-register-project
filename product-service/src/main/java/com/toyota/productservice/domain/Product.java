@@ -33,7 +33,7 @@ public class Product {
     @Column(name = "quantity(grain or kg)")
     private Integer quantity;
 
-    @Column(name = "unit_price", columnDefinition = "numeric")
+    @Column(name = "unit_price(tl)", columnDefinition = "numeric")
     private Double unitPrice;
 
     @Column(name = "state", columnDefinition = "BOOLEAN DEFAULT false", nullable = false)
