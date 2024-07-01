@@ -31,20 +31,11 @@ public class Campaign {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "buy_pay")
-    private String buyPay;
+    @Column(name = "campaign_types")
+    private CampaignType campaignTypes;
 
-    @Column(name = "buy_pay_part_one")
-    private Integer buyPayPartOne;
-
-    @Column(name = "buy_pay_part_two")
-    private Integer buyPayPartTwo;
-
-    @Column(name = "percent(%)")
-    private Integer percent;
-
-    @Column(name = "money_discount(tl)")
-    private Integer moneyDiscount;
+    @Column(name = "campaign_key((b,p), %, tl)")
+    private String campaignKey;
 
     @Column(name = "campaign_type")
     private Integer campaignType;

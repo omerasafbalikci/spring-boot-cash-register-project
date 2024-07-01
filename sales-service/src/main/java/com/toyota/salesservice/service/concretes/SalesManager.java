@@ -92,7 +92,7 @@ public class SalesManager implements SalesService {
                 throw new InsufficientBalanceException("Insufficient balance");
             }
         } else {
-            logger.error("Error while fetching inventory response for sales record created by '{}'.", createSalesRequest.getCreatedBy());
+            logger.warn("Error while fetching inventory response for sales record created by '{}'.", createSalesRequest.getCreatedBy());
             throw new FetchInventoryResponseException("Error while fetching inventory response");
         }
     }
@@ -113,7 +113,7 @@ public class SalesManager implements SalesService {
                     createReturnRequest.getSalesNumber(), createReturnRequest.getBarcodeNumber());
             Optional<Sales> optionalSales = this.salesRepository.findBySalesNumber(createReturnRequest.getSalesNumber());
             if (optionalSales.isEmpty()) {
-                logger.error("Sales not found for sales number '{}'.", createReturnRequest.getSalesNumber());
+                logger.warn("Sales not found for sales number '{}'.", createReturnRequest.getSalesNumber());
                 throw new SalesNotFoundException("Sales not found: " + createReturnRequest.getSalesNumber());
             }
             Sales sales = optionalSales.get();
@@ -130,12 +130,12 @@ public class SalesManager implements SalesService {
                 }
             }
             if (!hasBarcodeNumber) {
-                logger.error("Sales items not found for barcode number '{}'.", createReturnRequest.getBarcodeNumber());
+                logger.warn("Sales items not found for barcode number '{}'.", createReturnRequest.getBarcodeNumber());
                 throw new SalesItemsNotFoundException("Sales items not found: " + createReturnRequest.getBarcodeNumber());
             }
             int returnQuantity = createReturnRequest.getQuantity();
             if (salesItem.getQuantity() < returnQuantity) {
-                logger.error("Quantity incorrect entry for barcode number '{}'. Requested: {}, Available: {}.",
+                logger.warn("Quantity incorrect entry for barcode number '{}'. Requested: {}, Available: {}.",
                         createReturnRequest.getBarcodeNumber(), returnQuantity, salesItem.getQuantity());
                 throw new QuantityIncorrectEntryException("Quantity incorrect entry: " + salesItem.getName());
             }
@@ -189,7 +189,7 @@ public class SalesManager implements SalesService {
 
             return this.modelMapperService.forResponse().map(sales, GetAllSalesResponse.class);
         } else {
-            logger.error("Sales record not found for sales number '{}'.", salesNumber);
+            logger.warn("Sales record not found for sales number '{}'.", salesNumber);
             throw new SalesNotFoundException("Sales not found: " + salesNumber);
         }
     }

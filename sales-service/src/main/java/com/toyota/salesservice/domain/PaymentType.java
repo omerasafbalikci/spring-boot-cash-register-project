@@ -1,7 +1,7 @@
 package com.toyota.salesservice.domain;
 
 /**
- * Enum for paymentTypes of sales.
+ * Enum for payment types of sales.
  */
 
 public enum PaymentType {

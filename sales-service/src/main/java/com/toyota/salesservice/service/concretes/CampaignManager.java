@@ -90,8 +90,6 @@ public class CampaignManager implements CampaignService {
         Campaign campaign = this.modelMapperService.forRequest().map(createCampaignRequest, Campaign.class);
         logger.debug("Checking campaign details.");
         this.campaignBusinessRules.checkCampaignDetails(campaign);
-        logger.debug("Adding campaign type.");
-        this.campaignBusinessRules.addCampaignType(campaign, createCampaignRequest);
         campaign.setCampaignNumber(UUID.randomUUID().toString().substring(0, 8));
         campaign.setUpdatedAt(LocalDateTime.now());
         this.campaignRepository.save(campaign);
@@ -115,14 +113,10 @@ public class CampaignManager implements CampaignService {
         });
         logger.debug("Mapping CreateCampaignRequest to Campaign entity.");
         Campaign campaign = this.modelMapperService.forRequest().map(updateCampaignRequest, Campaign.class);
-        logger.debug("Checking update rules for the campaign.");
-        this.campaignBusinessRules.checkUpdate(campaign, existingCampaign);
-        logger.info("Campaign name does not exist. Proceeding with creating the campaign.");
         logger.debug("Checking campaign details.");
         this.campaignBusinessRules.checkCampaignDetails(campaign);
-        logger.debug("Updating campaign type.");
-        this.campaignBusinessRules.updateCampaignType(campaign, updateCampaignRequest);
-
+        logger.debug("Checking update rules for the campaign.");
+        this.campaignBusinessRules.checkUpdate(campaign, existingCampaign);
         campaign.setCampaignNumber(existingCampaign.getCampaignNumber());
         campaign.setUpdatedAt(LocalDateTime.now());
         this.campaignRepository.save(campaign);

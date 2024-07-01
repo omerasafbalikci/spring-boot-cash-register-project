@@ -29,7 +29,7 @@ public class SalesItems {
     @Column(name = "quantity(grain or kg)")
     private Integer quantity;
 
-    @Column(name = "unit_price", columnDefinition = "numeric")
+    @Column(name = "unit_price(tl)", columnDefinition = "numeric")
     private Double unitPrice;
 
     @Column(name = "state", nullable = false)
@@ -39,7 +39,7 @@ public class SalesItems {
     @JoinColumn(name = "campaign_id")
     private Campaign campaign;
 
-    @Column(name = "total_price", columnDefinition = "numeric")
+    @Column(name = "total_price(tl)", columnDefinition = "numeric")
     private Double totalPrice;
 
     @Enumerated(value = EnumType.STRING)

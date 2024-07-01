@@ -1,5 +1,6 @@
 package com.toyota.salesservice.dto.responses;
 
+import com.toyota.salesservice.domain.CampaignType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,9 +18,8 @@ public class GetAllCampaignsResponse {
     private Long id;
     private String campaignNumber;
     private String name;
-    private String buyPay;
-    private Integer percent;
-    private Integer moneyDiscount;
+    private CampaignType campaignTypes;
+    private String campaignKey;
     private Integer campaignType;
     private Boolean state;
     private String createdBy;

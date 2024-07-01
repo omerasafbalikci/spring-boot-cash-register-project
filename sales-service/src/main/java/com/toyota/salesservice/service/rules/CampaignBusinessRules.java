@@ -2,8 +2,7 @@ package com.toyota.salesservice.service.rules;
 
 import com.toyota.salesservice.dao.CampaignRepository;
 import com.toyota.salesservice.domain.Campaign;
-import com.toyota.salesservice.dto.requests.CreateCampaignRequest;
-import com.toyota.salesservice.dto.requests.UpdateCampaignRequest;
+import com.toyota.salesservice.domain.CampaignType;
 import com.toyota.salesservice.service.abstracts.CampaignService;
 import com.toyota.salesservice.utilities.exceptions.CampaignAlreadyExistsException;
 import com.toyota.salesservice.utilities.exceptions.CampaignDetailsAreIncorrectException;
@@ -25,72 +24,53 @@ public class CampaignBusinessRules {
     private final Logger logger = LogManager.getLogger(CampaignService.class);
 
     /**
-     * Validates the details of a campaign, ensuring that the buy-pay entry is in the correct format.
+     * Validates the details of a campaign, ensuring that the campaign key is in the correct format
+     * based on the campaign type.
      *
      * @param campaign the campaign to validate
-     * @throws CampaignDetailsAreIncorrectException if the buy-pay entry is incorrect
+     * @throws CampaignDetailsAreIncorrectException if the campaign key is incorrect based on the campaign type
      */
     public void checkCampaignDetails(Campaign campaign) {
-        if (campaign.getBuyPay() != null) {
+        if (campaign.getCampaignTypes().equals(CampaignType.BUYPAY)) {
             Pattern pattern = Pattern.compile("^\\d+,\\d+$");
-            if (!pattern.matcher(campaign.getBuyPay()).matches()) {
-                logger.error("Incorrect buy-pay entry. Campaign ID: {}. Please enter buyPay in the format 'integer,integer'. For example, '3,2'.", campaign.getId());
+            if (!pattern.matcher(campaign.getCampaignKey()).matches()) {
+                logger.warn("Incorrect buy-pay entry. Campaign ID: {}. Please enter buyPay in the format 'integer,integer'. For example, '3,2'.", campaign.getId());
                 throw new CampaignDetailsAreIncorrectException("Incorrect buy-pay entry. Please enter buyPay in the format 'integer,integer'. For example, '3,2'.");
             }
 
-            String[] parts = campaign.getBuyPay().split(",");
+            String[] parts = campaign.getCampaignKey().split(",");
             int buyPayPartOne = Integer.parseInt(parts[0]);
             int buyPayPartTwo = Integer.parseInt(parts[1]);
 
             if (buyPayPartOne <= buyPayPartTwo) {
-                logger.error("Incorrect buy-pay entry. Campaign ID: " + campaign.getId() + ". 'Buy' value must be greater than 'Pay' value.");
+                logger.warn("Incorrect buy-pay entry. Campaign ID: " + campaign.getId() + ". 'Buy' value must be greater than 'Pay' value.");
                 throw new CampaignDetailsAreIncorrectException("Incorrect buy-pay entry. 'Buy' value must be greater than 'Pay' value.");
             }
-
-            campaign.setBuyPayPartOne(buyPayPartOne);
-            campaign.setBuyPayPartTwo(buyPayPartTwo);
-        }
-    }
-
-    /**
-     * Sets the campaign type based on the details provided in the create campaign request.
-     *
-     * @param campaign the campaign to update
-     * @param createCampaignRequest the request containing the campaign details
-     * @throws CampaignDetailsAreIncorrectException if no campaign details are provided
-     */
-    public void addCampaignType(Campaign campaign, CreateCampaignRequest createCampaignRequest) {
-        if (createCampaignRequest.getBuyPay() == null && createCampaignRequest.getPercent() == null && createCampaignRequest.getMoneyDiscount() == null) {
-            logger.error("Campaign details not entered. Campaign ID: {}.", campaign.getId());
-            throw new CampaignDetailsAreIncorrectException("Campaign details not entered");
-        }
-        if (createCampaignRequest.getBuyPay() != null) {
             campaign.setCampaignType(1);
-        } else if (createCampaignRequest.getPercent() != null) {
+        } else if (campaign.getCampaignTypes().equals(CampaignType.PERCENT)) {
+            try {
+                int percentValue = Integer.parseInt(campaign.getCampaignKey());
+                if (percentValue <= 0 || percentValue > 100) {
+                    logger.warn("Incorrect percent entry. Campaign ID: " + campaign.getId() + ". Value must be between 0 and 100.");
+                    throw new CampaignDetailsAreIncorrectException("Incorrect percent entry. Value must be between 0 and 100.");
+                }
+            } catch (NumberFormatException e) {
+                logger.warn("Invalid percent entry. Campaign ID: " + campaign.getId() + ". Value must be an integer.");
+                throw new CampaignDetailsAreIncorrectException("Invalid percent entry. Value must be an integer.");
+            }
             campaign.setCampaignType(2);
-        } else {
+        } else if (campaign.getCampaignTypes().equals(CampaignType.MONEYDISCOUNT)) {
+            try {
+                int moneyDiscountValue = Integer.parseInt(campaign.getCampaignKey());
+                if (moneyDiscountValue <= 0) {
+                    logger.warn("Incorrect money discount entry. Campaign ID: {}. Value must be greater than 0.", campaign.getId());
+                    throw new CampaignDetailsAreIncorrectException("Incorrect money discount entry. Value must be greater than 0.");
+                }
+            } catch (NumberFormatException e) {
+                logger.warn("Invalid money discount entry. Campaign ID: {}. Value must be an integer.", campaign.getId());
+                throw new CampaignDetailsAreIncorrectException("Invalid money discount entry. Value must be an integer.");
+            }
             campaign.setCampaignType(3);
-        }
-    }
-
-    /**
-     * Updates the campaign type based on the details provided in the update campaign request.
-     *
-     * @param campaign the campaign to update
-     * @param updateCampaignRequest the request containing the updated campaign details
-     * @throws CampaignDetailsAreIncorrectException if no campaign details are provided
-     */
-    public void updateCampaignType(Campaign campaign, UpdateCampaignRequest updateCampaignRequest) {
-        if (updateCampaignRequest.getBuyPay() != null) {
-            campaign.setCampaignType(1);
-        } else if (updateCampaignRequest.getPercent() != null) {
-            campaign.setCampaignType(2);
-        } else if (updateCampaignRequest.getMoneyDiscount() != null) {
-            campaign.setCampaignType(3);
-        }
-        if (campaign.getBuyPay() == null && campaign.getPercent() == null && campaign.getMoneyDiscount() == null) {
-            logger.error("Campaign details not entered. Campaign ID: {}.", campaign.getId());
-            throw new CampaignDetailsAreIncorrectException("Campaign details not entered");
         }
     }
 
@@ -109,21 +89,18 @@ public class CampaignBusinessRules {
         if (campaign.getState() == null) {
             campaign.setState(existingCampaign.getState());
         }
-        if (campaign.getBuyPay() == null) {
-            campaign.setBuyPay(existingCampaign.getBuyPay());
+        if (campaign.getCampaignKey() == null) {
+            campaign.setCampaignKey(existingCampaign.getCampaignKey());
         }
-        if (campaign.getPercent() == null) {
-            campaign.setPercent(existingCampaign.getPercent());
-        }
-        if (campaign.getMoneyDiscount() == null) {
-            campaign.setMoneyDiscount(existingCampaign.getMoneyDiscount());
+        if (campaign.getCampaignTypes() == null) {
+            campaign.setCampaignTypes(existingCampaign.getCampaignTypes());
         }
         if (campaign.getCampaignType() == null) {
             campaign.setCampaignType(existingCampaign.getCampaignType());
         }
 
         if (this.campaignRepository.existsByNameIgnoreCase(campaign.getName()) && !existingCampaign.getName().equals(campaign.getName())) {
-            logger.error("Campaign with the same name already exists. Campaign Name: {}. Campaign ID: {}.", campaign.getName(), campaign.getId());
+            logger.warn("Campaign with the same name already exists. Campaign Name: {}. Campaign ID: {}.", campaign.getName(), campaign.getId());
             throw new CampaignAlreadyExistsException("Campaign already exists");
         }
     }

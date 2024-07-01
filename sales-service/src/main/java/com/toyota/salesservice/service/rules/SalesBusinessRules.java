@@ -54,7 +54,7 @@ public class SalesBusinessRules {
                 .map(request -> Optional.ofNullable(request.getPaymentType())).toList();
 
         if ((createSalesRequest.getPaymentType() == null) && (paymentTypes.stream().anyMatch(Optional::isEmpty))) {
-            logger.error("Payment type not entered.");
+            logger.warn("Payment type not entered.");
             throw new PaymentTypeNotEnteredException("Payment type not entered");
         }
         if (createSalesRequest.getPaymentType() != null) {
@@ -76,7 +76,7 @@ public class SalesBusinessRules {
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, clientResponse ->
                         clientResponse.bodyToMono(String.class).flatMap(errorBody -> {
-                            logger.error("Client error: {}.", errorBody);
+                            logger.warn("Client error: {}.", errorBody);
                             if (errorBody.contains("Product is not in stock")) {
                                 logger.warn("Product is not in stock for barcode: {}", extractProductBarcodeNumber(errorBody));
                                 return Mono.error(new ProductIsNotInStockException("Product is not in stock: " + extractProductBarcodeNumber(errorBody)));
@@ -91,7 +91,7 @@ public class SalesBusinessRules {
                 )
                 .onStatus(HttpStatusCode::is5xxServerError, clientResponse ->
                         clientResponse.bodyToMono(String.class).flatMap(errorBody -> {
-                            logger.error("Server error: {}.", errorBody);
+                            logger.warn("Server error: {}.", errorBody);
                             return Mono.error(new UnexpectedException("Server error: " + errorBody));
                         })
                 )
@@ -117,7 +117,7 @@ public class SalesBusinessRules {
                 return message.substring(message.indexOf(":") + 2).trim();
             }
         } catch (Exception e) {
-            logger.error("Error parsing error body JSON: {}", e.getMessage());
+            logger.warn("Error parsing error body JSON: {}", e.getMessage());
         }
         return "Unknown Product";
     }
@@ -182,7 +182,7 @@ public class SalesBusinessRules {
             }
             if (!salesItem.getState()) {
                 updateInventory(inventoryRequests);
-                logger.error("Product status false for item '{}'.", salesItem.getName());
+                logger.warn("Product status false for item '{}'.", salesItem.getName());
                 throw new ProductStatusFalseException(salesItem.getName() + " status is false");
             }
             Campaign campaign = salesItem.getCampaign();
@@ -191,7 +191,7 @@ public class SalesBusinessRules {
                 logger.info("Applied campaign discount for sales item with barcode '{}'.", salesItem.getBarcodeNumber());
             } else if (campaign != null) {
                 updateInventory(inventoryRequests);
-                logger.error("Campaign status false for item '{}'.", salesItem.getName());
+                logger.warn("Campaign status false for item '{}'.", salesItem.getName());
                 throw new CampaignStateFalseException("Campaign state is false: " + campaign.getName());
             }
             logger.debug("Updated sales item: {}.", salesItem.getName());
@@ -203,6 +203,7 @@ public class SalesBusinessRules {
      * Applies campaign discount to a sales item.
      *
      * @param salesItem the sales item
+     * @param inventoryRequests   the list of inventory requests
      */
     public void applyCampaignDiscount(SalesItems salesItem, List<InventoryRequest> inventoryRequests) {
         logger.info("Applying campaign discount for item '{}'.", salesItem.getName());
@@ -211,17 +212,20 @@ public class SalesBusinessRules {
         double pricePerUnit = salesItem.getUnitPrice();
         double totalPrice = pricePerUnit * quantity;
 
-        if (campaignType == 1 && quantity >= salesItem.getCampaign().getBuyPayPartOne()) {
-            int buyPart = salesItem.getCampaign().getBuyPayPartOne();
-            int payPart = salesItem.getCampaign().getBuyPayPartTwo();
-            int sets = quantity / buyPart;
-            int remainingItems = quantity % buyPart;
-            double newTotalPrice = (sets * payPart + remainingItems) * pricePerUnit;
-            salesItem.setTotalPrice(newTotalPrice);
-            logger.info("Applied 'Buy X Pay Y' discount: buy part = {}, pay part = {}, sets = {}, remaining items = {}, new total price = {}.",
-                    buyPart, payPart, sets, remainingItems, newTotalPrice);
+        if (campaignType == 1) {
+            String[] parts = salesItem.getCampaign().getCampaignKey().split(",");
+            int buyPart = Integer.parseInt(parts[0]);
+            int payPart = Integer.parseInt(parts[1]);
+            if (quantity >= buyPart) {
+                int sets = quantity / buyPart;
+                int remainingItems = quantity % buyPart;
+                double newTotalPrice = (sets * payPart + remainingItems) * pricePerUnit;
+                salesItem.setTotalPrice(newTotalPrice);
+                logger.info("Applied 'Buy X Pay Y' discount: buy part = {}, pay part = {}, sets = {}, remaining items = {}, new total price = {}.",
+                        buyPart, payPart, sets, remainingItems, newTotalPrice);
+            }
         } else if (campaignType == 2) {
-            double discountPercent = salesItem.getCampaign().getPercent();
+            double discountPercent = Integer.parseInt(salesItem.getCampaign().getCampaignKey());
             double discountAmount = totalPrice * discountPercent / 100;
             if (discountAmount <= totalPrice) {
                 double newTotalPrice = totalPrice - discountAmount;
@@ -234,7 +238,7 @@ public class SalesBusinessRules {
                 throw new CampaignDiscountException("Discount amount exceeds total price for item: " + salesItem.getName());
             }
         } else if (campaignType == 3) {
-            double discountAmount = salesItem.getCampaign().getMoneyDiscount();
+            double discountAmount = Integer.parseInt(salesItem.getCampaign().getCampaignKey());
             if (discountAmount <= totalPrice) {
                 double newTotalPrice = totalPrice - discountAmount;
                 salesItem.setTotalPrice(newTotalPrice);
@@ -278,7 +282,7 @@ public class SalesBusinessRules {
         if (isCash) {
             if (createSalesRequest.getMoney() == null) {
                 updateInventory(inventoryRequests);
-                logger.error("No money entered for cash payment.");
+                logger.warn("No money entered for cash payment.");
                 throw new NoMoneyEnteredException("No money entered");
             }
             money += createSalesRequest.getMoney();
@@ -299,7 +303,7 @@ public class SalesBusinessRules {
         logger.info("Validating return period for sales date: {} and return date: {}.", salesDate, returnDate);
         Duration duration = Duration.between(salesDate, returnDate);
         if (duration.toDays() > 15) {
-            logger.error("Return period has expired.");
+            logger.warn("Return period has expired.");
             throw new ReturnPeriodExpiredException("Return period has expired");
         }
     }
@@ -316,7 +320,7 @@ public class SalesBusinessRules {
                 .body(BodyInserters.fromValue(inventoryRequests))
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, clientResponse -> {
-                    logger.error("Error response from product service: {}", clientResponse.statusCode());
+                    logger.warn("Error response from product service: {}", clientResponse.statusCode());
                     return clientResponse.createException().flatMap(Mono::error);
                 })
                 .toBodilessEntity()
@@ -324,7 +328,7 @@ public class SalesBusinessRules {
 
         updateInventoryMono.subscribe(
                 success -> logger.info("Inventory updated successfully."),
-                error -> logger.error("Error updating inventory: ", error)
+                error -> logger.warn("Error updating inventory: ", error)
         );
     }
 }
