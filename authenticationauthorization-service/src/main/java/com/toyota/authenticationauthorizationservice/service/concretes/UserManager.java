@@ -107,7 +107,7 @@ public class UserManager implements UserService {
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
             );
         } catch (AuthenticationException e) {
-            logger.error("Authentication failed for user: {}", request.getUsername());
+            logger.warn("Authentication failed for user: {}", request.getUsername());
             throw new InvalidAuthenticationException("Authentication failed! Username or password is incorrect");
         }
         User user = this.userRepository.findByUsernameAndDeletedIsFalse(request.getUsername()).orElseThrow();
@@ -172,7 +172,7 @@ public class UserManager implements UserService {
             logger.warn("User not found in user management service with email: {}", email);
             throw new UserNotFoundException("User not found in user management service with email: " + email);
         } catch (Exception e) {
-            logger.error("Error occurred while calling user management service: {}", e.getMessage());
+            logger.warn("Error occurred while calling user management service: {}", e.getMessage());
             throw new UnexpectedException("Error occurred while calling user management service: " + e);
         }
 
