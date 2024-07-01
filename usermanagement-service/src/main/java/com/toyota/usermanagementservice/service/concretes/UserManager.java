@@ -69,20 +69,20 @@ public class UserManager implements UserService {
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, clientResponse -> {
                     if (clientResponse.statusCode() == HttpStatus.CONFLICT) {
-                        logger.error("User already exists in authentication-authorization-service.");
+                        logger.warn("User already exists in authentication-authorization-service.");
                         throw new UserAlreadyExistsException("User already exists in authentication-authorization-service");
                     } else if (clientResponse.statusCode() == HttpStatus.BAD_REQUEST) {
-                        logger.error("Problem with roles in authentication-authorization-service.");
+                        logger.warn("Problem with roles in authentication-authorization-service.");
                         throw new RoleNotFoundException("Problem with roles in authentication-authorization-service");
                     } else {
-                        logger.error("Unexpected exception in authentication-authorization-service with status code: {}.", clientResponse.statusCode());
+                        logger.warn("Unexpected exception in authentication-authorization-service with status code: {}.", clientResponse.statusCode());
                         throw new UnexpectedException("Unexpected exception in authentication-authorization-service");
                     }
                 })
                 .bodyToMono(Boolean.class)
                 .block();
         if (response == null || !response) {
-            logger.error("Failed to create user! Reason: Unexpected problem in authentication-authorization-service.");
+            logger.warn("Failed to create user! Reason: Unexpected problem in authentication-authorization-service.");
             throw new UnexpectedException("Failed to create user! Reason: Unexpected problem in authentication-authorization-service");
         }
         User saved = this.userRepository.save(user);
@@ -128,13 +128,13 @@ public class UserManager implements UserService {
                         .retrieve()
                         .onStatus(HttpStatusCode::isError, clientResponse -> {
                             if (clientResponse.statusCode() == HttpStatus.CONFLICT) {
-                                logger.error("Username already exists in authentication-authorization-service.");
+                                logger.warn("Username already exists in authentication-authorization-service.");
                                 throw new UserAlreadyExistsException("Username already exists in in authentication-authorization-service");
                             } else if (clientResponse.statusCode() == HttpStatus.NOT_FOUND) {
-                                logger.error("Username not found in authentication-authorization-service.");
+                                logger.warn("Username not found in authentication-authorization-service.");
                                 throw new UserNotFoundException("Username not found in authentication-authorization-service");
                             } else {
-                                logger.error("Unexpected exception in authentication-authorization-service with status code: {}.", clientResponse.statusCode());
+                                logger.warn("Unexpected exception in authentication-authorization-service with status code: {}.", clientResponse.statusCode());
                                 throw new UnexpectedException("Unexpected exception in authentication-authorization-service");
                             }
                         })
@@ -143,7 +143,7 @@ public class UserManager implements UserService {
                 if (updated != null && updated) {
                     user.setUsername(updateUserRequest.getUsername());
                 } else {
-                    logger.error("Failed to update username in authentication-authorization-service.");
+                    logger.warn("Failed to update username in authentication-authorization-service.");
                     throw new UnexpectedException("Unexpected exception failure to change username in authentication-authorization-service");
                 }
             }
@@ -162,7 +162,7 @@ public class UserManager implements UserService {
             User saved = this.userRepository.save(user);
             return this.modelMapperService.forResponse().map(saved, GetAllUsersResponse.class);
         } else {
-            logger.error("User not found! ID: {}.", updateUserRequest.getId());
+            logger.warn("User not found! ID: {}.", updateUserRequest.getId());
             throw new UserNotFoundException("User not found! ID: " + updateUserRequest.getId());
         }
     }
@@ -189,10 +189,10 @@ public class UserManager implements UserService {
                     .retrieve()
                     .onStatus(HttpStatusCode::isError, clientResponse -> {
                         if (clientResponse.statusCode() == HttpStatus.NOT_FOUND) {
-                            logger.error("User not found in authentication-authorization-service.");
+                            logger.warn("User not found in authentication-authorization-service.");
                             throw new UserNotFoundException("User not found in authentication-authorization-service");
                         } else {
-                            logger.error("Unexpected exception in authentication-authorization-service with status code: {}.", clientResponse.statusCode());
+                            logger.warn("Unexpected exception in authentication-authorization-service with status code: {}.", clientResponse.statusCode());
                             throw new UnexpectedException("Unexpected exception in authentication-authorization-service");
                         }
                     })
@@ -205,11 +205,11 @@ public class UserManager implements UserService {
                 logger.info("User marked as deleted in local repository: {}.", saved.getUsername());
                 return this.modelMapperService.forResponse().map(saved, GetAllUsersResponse.class);
             } else {
-                logger.error("Failed to delete user from authentication-authorization-service! ID: {}", id);
+                logger.warn("Failed to delete user from authentication-authorization-service! ID: {}", id);
                 throw new UnexpectedException("User not found in authentication-authorization-service! ID: " + id);
             }
         } else {
-            logger.error("User not found! ID: {}", id);
+            logger.warn("User not found! ID: {}", id);
             throw new UserNotFoundException("User not found! ID: " + id);
         }
     }
@@ -335,13 +335,13 @@ public class UserManager implements UserService {
                         HttpHeaders headers = clientResponse.headers().asHttpHeaders();
                         String exceptionType = headers.getFirst("exception-type");
                         if (clientResponse.statusCode() == HttpStatus.NOT_FOUND && Objects.equals(exceptionType, "RoleNotFound")) {
-                            logger.error("Role not found in authentication-authorization-service.");
+                            logger.warn("Role not found in authentication-authorization-service.");
                             throw new RoleNotFoundException("Role not found in authentication-authorization-service");
                         } else if (clientResponse.statusCode() == HttpStatus.NOT_FOUND && Objects.equals(exceptionType, "UserNotFound")) {
-                            logger.error("User not found in authentication-authorization-service.");
+                            logger.warn("User not found in authentication-authorization-service.");
                             throw new UserNotFoundException("User not found in authentication-authorization-service");
                         } else {
-                            logger.error("Unexpected exception in authentication-authorization-service with status code: {}.", clientResponse.statusCode());
+                            logger.warn("Unexpected exception in authentication-authorization-service with status code: {}.", clientResponse.statusCode());
                             throw new UnexpectedException("Unexpected exception in authentication-authorization-service");
                         }
                     })
@@ -353,11 +353,11 @@ public class UserManager implements UserService {
                 logger.info("Role: {} added to user: {}.", role, user.getUsername());
                 return this.modelMapperService.forResponse().map(user, GetAllUsersResponse.class);
             } else {
-                logger.error("Failed to add role in authentication-authorization-service.");
+                logger.warn("Failed to add role in authentication-authorization-service.");
                 throw new UnexpectedException("Failed to add role in authentication-authorization-service");
             }
         } else {
-            logger.error("User not found! ID: {}.", id);
+            logger.warn("User not found! ID: {}.", id);
             throw new UserNotFoundException("User not found! ID: " + id);
         }
     }
@@ -399,13 +399,13 @@ public class UserManager implements UserService {
                         HttpHeaders headers = clientResponse.headers().asHttpHeaders();
                         String exceptionType = headers.getFirst("exception-type");
                         if (clientResponse.statusCode() == HttpStatus.NOT_FOUND && Objects.equals(exceptionType, "RoleNotFound")) {
-                            logger.error("Role not found in authentication-authorization-service.");
+                            logger.warn("Role not found in authentication-authorization-service.");
                             throw new RoleNotFoundException("Role not found in authentication-authorization-service");
                         } else if (clientResponse.statusCode() == HttpStatus.NOT_FOUND && Objects.equals(exceptionType, "UserNotFound")) {
-                            logger.error("User not found in authentication-authorization-service.");
+                            logger.warn("User not found in authentication-authorization-service.");
                             throw new UserNotFoundException("User not found in authentication-authorization-service");
                         } else {
-                            logger.error("Unexpected exception in authentication-authorization-service with status code: {}.", clientResponse.statusCode());
+                            logger.warn("Unexpected exception in authentication-authorization-service with status code: {}.", clientResponse.statusCode());
                             throw new UnexpectedException("Unexpected exception in authentication-authorization-service");
                         }
                     })
@@ -417,11 +417,11 @@ public class UserManager implements UserService {
                 logger.info("Role: {} removed from user: {}.", role, user.getUsername());
                 return this.modelMapperService.forResponse().map(user, GetAllUsersResponse.class);
             } else {
-                logger.error("Failed to remove role in authentication-authorization-service.");
+                logger.warn("Failed to remove role in authentication-authorization-service.");
                 throw new UnexpectedException("Remove role failed in authentication-authorization-service");
             }
         } else {
-            logger.error("User not found! ID: {}.", id);
+            logger.warn("User not found! ID: {}.", id);
             throw new UserNotFoundException("User not found! ID: " + id);
         }
     }
