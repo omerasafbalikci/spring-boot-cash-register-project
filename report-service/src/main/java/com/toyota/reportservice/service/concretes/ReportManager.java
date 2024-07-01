@@ -82,7 +82,7 @@ public class ReportManager implements ReportService {
                         logger.warn("Sales report page retrieval returned null - page: {}, size: {}", page, size);
                     }
                 })
-                .doOnError(error -> logger.error("Error occurred while retrieving sales report page - page: {}, size: {}", page, size, error));
+                .doOnError(error -> logger.warn("Error occurred while retrieving sales report page - page: {}, size: {}", page, size, error));
     }
 
     /**
@@ -121,7 +121,7 @@ public class ReportManager implements ReportService {
             document.close();
             return pdfBytes;
         } else {
-            logger.error("Report not found for sales number: {}", salesNumber);
+            logger.warn("Report not found for sales number: {}", salesNumber);
             throw new ReportNotFoundException("Report not found");
         }
     }
