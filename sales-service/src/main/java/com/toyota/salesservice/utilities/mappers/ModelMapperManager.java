@@ -1,7 +1,9 @@
 package com.toyota.salesservice.utilities.mappers;
 
+import com.toyota.salesservice.domain.CampaignType;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,20 @@ import org.springframework.stereotype.Service;
 public class ModelMapperManager implements ModelMapperService {
     @Autowired
     private ModelMapper modelMapper;
+
+    /**
+     * Provides a ModelMapper instance with a converter for CampaignType enumeration.
+     *
+     * @return a ModelMapper instance with the CampaignType converter
+     */
+    public ModelMapper modelMapper() {
+
+        Converter<String, CampaignType> toEnumConverter = context -> CampaignType.valueOf(context.getSource());
+
+        this.modelMapper.addConverter(toEnumConverter);
+
+        return this.modelMapper;
+    }
 
     /**
      * Configures the ModelMapper for response mapping.

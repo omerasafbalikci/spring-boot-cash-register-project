@@ -9,6 +9,12 @@ import org.modelmapper.ModelMapper;
 
 public interface ModelMapperService {
     /**
+     * Provides a ModelMapper instance.
+     *
+     * @return a ModelMapper instance
+     */
+    ModelMapper modelMapper();
+    /**
      * Provides a ModelMapper instance configured for response mapping.
      *
      * @return a configured ModelMapper instance for response mapping

@@ -87,7 +87,7 @@ public class CampaignManager implements CampaignService {
             throw new CampaignAlreadyExistsException("Campaign already exists");
         }
         logger.debug("Mapping CreateCampaignRequest to Campaign entity.");
-        Campaign campaign = this.modelMapperService.forRequest().map(createCampaignRequest, Campaign.class);
+        Campaign campaign = this.modelMapperService.modelMapper().map(createCampaignRequest, Campaign.class);
         logger.debug("Checking campaign details.");
         this.campaignBusinessRules.checkCampaignDetails(campaign);
         campaign.setCampaignNumber(UUID.randomUUID().toString().substring(0, 8));
@@ -111,8 +111,14 @@ public class CampaignManager implements CampaignService {
             logger.warn("No campaign found with id '{}'.", updateCampaignRequest.getId());
             return new CampaignNotFoundException("Campaign not found");
         });
-        logger.debug("Mapping CreateCampaignRequest to Campaign entity.");
-        Campaign campaign = this.modelMapperService.forRequest().map(updateCampaignRequest, Campaign.class);
+        logger.debug("Mapping UpdateCampaignRequest to Campaign entity.");
+        Campaign campaign = new Campaign();
+        campaign.setId(updateCampaignRequest.getId());
+        campaign.setName(updateCampaignRequest.getName());
+        campaign.setCampaignCategory(updateCampaignRequest.getCampaignCategory());
+        campaign.setCampaignKey(updateCampaignRequest.getCampaignKey());
+        campaign.setState(updateCampaignRequest.getState());
+        campaign.setCreatedBy(updateCampaignRequest.getCreatedBy());
         logger.debug("Checking campaign details.");
         this.campaignBusinessRules.checkCampaignDetails(campaign);
         logger.debug("Checking update rules for the campaign.");

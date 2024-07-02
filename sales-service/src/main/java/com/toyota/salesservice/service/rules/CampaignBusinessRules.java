@@ -31,7 +31,15 @@ public class CampaignBusinessRules {
      * @throws CampaignDetailsAreIncorrectException if the campaign key is incorrect based on the campaign type
      */
     public void checkCampaignDetails(Campaign campaign) {
-        if (campaign.getCampaignTypes().equals(CampaignType.BUYPAY)) {
+        if ((campaign.getCampaignCategory() != null) && (campaign.getCampaignKey() == null)) {
+            logger.warn("Campaign key not entered.");
+            throw new CampaignDetailsAreIncorrectException("Campaign key not entered");
+        }
+        if ((campaign.getCampaignCategory() == null) && (campaign.getCampaignKey() != null)) {
+            logger.warn("Campaign category not entered.");
+            throw new CampaignDetailsAreIncorrectException("Campaign category not entered");
+        }
+        if (campaign.getCampaignCategory() == CampaignType.BUYPAY) {
             Pattern pattern = Pattern.compile("^\\d+,\\d+$");
             if (!pattern.matcher(campaign.getCampaignKey()).matches()) {
                 logger.warn("Incorrect buy-pay entry. Campaign ID: {}. Please enter buyPay in the format 'integer,integer'. For example, '3,2'.", campaign.getId());
@@ -47,7 +55,7 @@ public class CampaignBusinessRules {
                 throw new CampaignDetailsAreIncorrectException("Incorrect buy-pay entry. 'Buy' value must be greater than 'Pay' value.");
             }
             campaign.setCampaignType(1);
-        } else if (campaign.getCampaignTypes().equals(CampaignType.PERCENT)) {
+        } else if (campaign.getCampaignCategory() == CampaignType.PERCENT) {
             try {
                 int percentValue = Integer.parseInt(campaign.getCampaignKey());
                 if (percentValue <= 0 || percentValue > 100) {
@@ -59,7 +67,7 @@ public class CampaignBusinessRules {
                 throw new CampaignDetailsAreIncorrectException("Invalid percent entry. Value must be an integer.");
             }
             campaign.setCampaignType(2);
-        } else if (campaign.getCampaignTypes().equals(CampaignType.MONEYDISCOUNT)) {
+        } else if (campaign.getCampaignCategory() == CampaignType.MONEYDISCOUNT) {
             try {
                 int moneyDiscountValue = Integer.parseInt(campaign.getCampaignKey());
                 if (moneyDiscountValue <= 0) {
@@ -92,8 +100,8 @@ public class CampaignBusinessRules {
         if (campaign.getCampaignKey() == null) {
             campaign.setCampaignKey(existingCampaign.getCampaignKey());
         }
-        if (campaign.getCampaignTypes() == null) {
-            campaign.setCampaignTypes(existingCampaign.getCampaignTypes());
+        if (campaign.getCampaignCategory() == null) {
+            campaign.setCampaignCategory(existingCampaign.getCampaignCategory());
         }
         if (campaign.getCampaignType() == null) {
             campaign.setCampaignType(existingCampaign.getCampaignType());

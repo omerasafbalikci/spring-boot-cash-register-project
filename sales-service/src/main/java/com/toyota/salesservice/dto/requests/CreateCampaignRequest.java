@@ -18,8 +18,8 @@ public class CreateCampaignRequest {
     @NotNull(message = "Name must not be null")
     @NotBlank(message = "Name must not be blank")
     private String name;
-    @NotNull(message = "Campaign types must not be null")
-    private CampaignType campaignTypes;
+    @NotNull(message = "Campaign category must not be null")
+    private CampaignType campaignCategory;
     @NotNull(message = "Campaign key must not be null")
     @NotBlank(message = "Campaign key must not be blank")
     private String campaignKey;

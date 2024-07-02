@@ -18,7 +18,7 @@ public class GetAllCampaignsResponse {
     private Long id;
     private String campaignNumber;
     private String name;
-    private CampaignType campaignTypes;
+    private CampaignType campaignCategory;
     private String campaignKey;
     private Integer campaignType;
     private Boolean state;

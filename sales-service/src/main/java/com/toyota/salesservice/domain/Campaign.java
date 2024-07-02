@@ -31,8 +31,9 @@ public class Campaign {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "campaign_types")
-    private CampaignType campaignTypes;
+    @Enumerated(value = EnumType.STRING)
+    @Column(name = "campaign_category")
+    private CampaignType campaignCategory;
 
     @Column(name = "campaign_key((b,p), %, tl)")
     private String campaignKey;

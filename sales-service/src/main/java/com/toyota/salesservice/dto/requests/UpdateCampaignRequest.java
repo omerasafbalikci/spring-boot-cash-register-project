@@ -18,7 +18,7 @@ public class UpdateCampaignRequest {
     @NotNull(message = "Id must not be null")
     private Long id;
     private String name;
-    private CampaignType campaignTypes;
+    private CampaignType campaignCategory;
     private String campaignKey;
     private Boolean state;
     @NotNull(message = "Created by must not be null")
