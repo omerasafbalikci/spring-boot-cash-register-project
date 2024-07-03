@@ -22,20 +22,6 @@ public class ModelMapperManager implements ModelMapperService {
     private ModelMapper modelMapper;
 
     /**
-     * Provides a ModelMapper instance with a converter for CampaignType enumeration.
-     *
-     * @return a ModelMapper instance with the CampaignType converter
-     */
-    public ModelMapper modelMapper() {
-
-        Converter<String, CampaignType> toEnumConverter = context -> CampaignType.valueOf(context.getSource());
-
-        this.modelMapper.addConverter(toEnumConverter);
-
-        return this.modelMapper;
-    }
-
-    /**
      * Configures the ModelMapper for response mapping.
      * Sets the matching strategy to "LOOSE" and ignores ambiguities.
      *

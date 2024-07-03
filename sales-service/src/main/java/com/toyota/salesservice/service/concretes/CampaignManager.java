@@ -87,7 +87,12 @@ public class CampaignManager implements CampaignService {
             throw new CampaignAlreadyExistsException("Campaign already exists");
         }
         logger.debug("Mapping CreateCampaignRequest to Campaign entity.");
-        Campaign campaign = this.modelMapperService.modelMapper().map(createCampaignRequest, Campaign.class);
+        Campaign campaign = new Campaign();
+        campaign.setName(createCampaignRequest.getName());
+        campaign.setCampaignCategory(createCampaignRequest.getCampaignCategory());
+        campaign.setCampaignKey(createCampaignRequest.getCampaignKey());
+        campaign.setState(createCampaignRequest.getState());
+        campaign.setCreatedBy(createCampaignRequest.getCreatedBy());
         logger.debug("Checking campaign details.");
         this.campaignBusinessRules.checkCampaignDetails(campaign);
         campaign.setCampaignNumber(UUID.randomUUID().toString().substring(0, 8));

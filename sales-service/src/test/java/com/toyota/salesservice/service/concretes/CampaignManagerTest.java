@@ -83,7 +83,7 @@ public class CampaignManagerTest {
     void addCampaign_shouldAddNewCampaign() {
         CreateCampaignRequest createCampaignRequest = new CreateCampaignRequest();
         createCampaignRequest.setName("New Campaign");
-        createCampaignRequest.setBuyPay("1,2");
+        createCampaignRequest.setCampaignKey("1,2");
 
         Campaign campaign = new Campaign();
         campaign.setName("New Campaign");
