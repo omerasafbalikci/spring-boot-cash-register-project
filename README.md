@@ -586,14 +586,15 @@ Response:
 #### Add campaign
 
 Endpoint: `POST /api/campaigns/add`  
-Description: Adds new campaign to the database. 'name', (one of 'buyPay', 'percent', 'moneyDiscount'), 'state', 'createdBy' must not be null or blank.
+Description: Adds new campaign to the database. 'name', 'campaignCategory', 'campaignKey', 'state', 'createdBy' must not be null or blank.
 
 Request Body:
 
 ```json
 {
     "name": "3 AL 2 ÖDE!",
-    "buyPay": "3,2",
+    "campaignCategory": "BUYPAY",
+    "campaignKey": "3,2",
     "state": true,
     "createdBy": "Ömer Asaf Balıkçı"
 }
@@ -606,9 +607,8 @@ Response:
     "id": 1,
     "campaignNumber": "998af4f5",
     "name": "3 AL 2 ÖDE!",
-    "buyPay": "3,2",
-    "percent": null,
-    "moneyDiscount": null,
+    "campaignCategory": "BUYPAY",
+    "campaignKey": "3,2",
     "campaignType": 1,
     "state": true,
     "createdBy": "Ömer Asaf Balıkçı",
@@ -627,7 +627,8 @@ Request Body:
 {
     "id": 3,
     "name": "%50 İNDİRİM!",
-    "percent": "50",
+    "campaignCategory": "PERCENT",
+    "campaignKey": "50",
     "state": true,
     "createdBy": "Ömer Asaf Balıkçı"
 }
@@ -640,9 +641,8 @@ Response:
     "id": 3,
     "campaignNumber": "0a56d5a2",
     "name": "%50 İNDİRİM!",
-    "buyPay": null,
-    "percent": 50,
-    "moneyDiscount": null,
+    "campaignCategory": "PERCENT",
+    "campaignKey": "50",
     "campaignType": 2,
     "state": true,
     "createdBy": "Ömer Asaf Balıkçı",
@@ -668,9 +668,8 @@ Response:
     "id": 5,
     "campaignNumber": "511d6299",
     "name": "50 TL İNDİRİM!",
-    "buyPay": null,
-    "percent": null,
-    "moneyDiscount": 50,
+    "campaignCategory": "MONEYDISCOUNT",
+    "campaignKey": "50",
     "campaignType": 3,
     "state": true,
     "createdBy": "Ömer Asaf Balıkçı",
@@ -702,9 +701,8 @@ Response:
       "id": 1,
       "campaignNumber": "998af4f5",
       "name": "3 AL 2 ÖDE!",
-      "buyPay": "3,2",
-      "percent": null,
-      "moneyDiscount": null,
+      "campaignCategory": "BUYPAY",
+      "campaignKey": "3,2",
       "campaignType": 1,
       "state": true,
       "createdBy": "Ömer Asaf Balıkçı",
@@ -714,9 +712,8 @@ Response:
       "id": 2,
       "campaignNumber": "d3167c9b",
       "name": "5 AL 4 ÖDE!",
-      "buyPay": "5,4",
-      "percent": null,
-      "moneyDiscount": null,
+      "campaignCategory": "BUYPAY",
+      "campaignKey": "5,4",
       "campaignType": 1,
       "state": false,
       "createdBy": "Ömer Asaf Balıkçı",
@@ -726,9 +723,8 @@ Response:
       "id": 4,
       "campaignNumber": "209af7c6",
       "name": "30 TL İNDİRİM!",
-      "buyPay": null,
-      "percent": null,
-      "moneyDiscount": 30,
+      "campaignCategory": "MONEYDISCOUNT",
+      "campaignKey": "30",
       "campaignType": 3,
       "state": true,
       "createdBy": "Ömer Asaf Balıkçı",
@@ -738,9 +734,8 @@ Response:
       "id": 3,
       "campaignNumber": "0a56d5a2",
       "name": "%50 İNDİRİM!",
-      "buyPay": null,
-      "percent": 50,
-      "moneyDiscount": null,
+      "campaignCategory": "PERCENT",
+      "campaignKey": "50",
       "campaignType": 2,
       "state": true,
       "createdBy": "Ömer Asaf Balıkçı",
@@ -767,9 +762,8 @@ Response:
     "id": 1,
     "campaignNumber": "998af4f5",
     "name": "3 AL 2 ÖDE!",
-    "buyPay": "3,2",
-    "percent": null,
-    "moneyDiscount": null,
+    "campaignCategory": "BUYPAY",
+    "campaignKey": "3,2",
     "campaignType": 1,
     "state": true,
     "createdBy": "Ömer Asaf Balıkçı",
