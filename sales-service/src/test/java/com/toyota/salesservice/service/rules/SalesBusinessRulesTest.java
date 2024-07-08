@@ -157,8 +157,7 @@ public class SalesBusinessRulesTest {
 
         Campaign campaign = new Campaign();
         campaign.setCampaignType(1);
-        campaign.setBuyPayPartOne(3);
-        campaign.setBuyPayPartTwo(2);
+        campaign.setCampaignKey("3,2");
 
         salesItem.setCampaign(campaign);
 
@@ -178,7 +177,7 @@ public class SalesBusinessRulesTest {
 
         Campaign campaign = new Campaign();
         campaign.setCampaignType(2);
-        campaign.setPercent(20);
+        campaign.setCampaignKey("20");
 
         salesItem.setCampaign(campaign);
 
@@ -198,7 +197,7 @@ public class SalesBusinessRulesTest {
 
         Campaign campaign = new Campaign();
         campaign.setCampaignType(3);
-        campaign.setMoneyDiscount(30);
+        campaign.setCampaignKey("30");
 
         salesItem.setCampaign(campaign);
 

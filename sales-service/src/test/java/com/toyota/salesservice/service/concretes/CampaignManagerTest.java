@@ -2,6 +2,7 @@ package com.toyota.salesservice.service.concretes;
 
 import com.toyota.salesservice.dao.CampaignRepository;
 import com.toyota.salesservice.domain.Campaign;
+import com.toyota.salesservice.domain.CampaignType;
 import com.toyota.salesservice.dto.requests.CreateCampaignRequest;
 import com.toyota.salesservice.dto.requests.UpdateCampaignRequest;
 import com.toyota.salesservice.dto.responses.GetAllCampaignsResponse;
@@ -80,74 +81,123 @@ public class CampaignManagerTest {
     }
 
     @Test
-    void addCampaign_shouldAddNewCampaign() {
-        CreateCampaignRequest createCampaignRequest = new CreateCampaignRequest();
-        createCampaignRequest.setName("New Campaign");
-        createCampaignRequest.setCampaignKey("1,2");
+    void addCampaign_whenCampaignDoesNotExist_shouldAddCampaign() {
+        CreateCampaignRequest request = new CreateCampaignRequest();
+        request.setName("New Campaign");
+        request.setCampaignCategory(CampaignType.PERCENT);
+        request.setCampaignKey("50");
+        request.setState(true);
+        request.setCreatedBy("Ömer Asaf Balıkçı");
 
         Campaign campaign = new Campaign();
-        campaign.setName("New Campaign");
+        campaign.setName(request.getName());
+        campaign.setCampaignCategory(request.getCampaignCategory());
+        campaign.setCampaignKey(request.getCampaignKey());
+        campaign.setState(request.getState());
+        campaign.setCreatedBy(request.getCreatedBy());
         campaign.setCampaignNumber(UUID.randomUUID().toString().substring(0, 8));
         campaign.setUpdatedAt(LocalDateTime.now());
 
-        when(modelMapperService.forResponse()).thenReturn(modelMapper);
-        when(modelMapperService.forRequest()).thenReturn(modelMapper);
-        when(campaignRepository.existsByNameIgnoreCase(createCampaignRequest.getName())).thenReturn(false);
-        when(modelMapper.map(any(CreateCampaignRequest.class), eq(Campaign.class))).thenReturn(campaign);
+        GetAllCampaignsResponse response = new GetAllCampaignsResponse();
+        response.setName(campaign.getName());
+        response.setCampaignCategory(campaign.getCampaignCategory());
+
+        when(campaignRepository.existsByNameIgnoreCase(request.getName())).thenReturn(false);
         when(campaignRepository.save(any(Campaign.class))).thenReturn(campaign);
-        when(modelMapper.map(any(Campaign.class), eq(GetAllCampaignsResponse.class))).thenReturn(new GetAllCampaignsResponse());
+        when(modelMapperService.forResponse()).thenReturn(modelMapper);
+        when(modelMapper.map(any(Campaign.class), eq(GetAllCampaignsResponse.class))).thenReturn(response);
 
-        GetAllCampaignsResponse response = campaignManager.addCampaign(createCampaignRequest);
+        GetAllCampaignsResponse actualResponse = campaignManager.addCampaign(request);
 
-        assertNotNull(response);
-        verify(campaignRepository, times(1)).save(campaign);
+        assertNotNull(actualResponse);
+        assertEquals(request.getName(), actualResponse.getName());
+        assertEquals(request.getCampaignCategory(), actualResponse.getCampaignCategory());
+
+        verify(campaignRepository, times(1)).existsByNameIgnoreCase(request.getName());
+        verify(campaignRepository, times(1)).save(any(Campaign.class));
+        verify(modelMapperService, times(1)).forResponse();
+        verify(modelMapper, times(1)).map(any(Campaign.class), eq(GetAllCampaignsResponse.class));
     }
 
     @Test
-    void addCampaign_shouldThrowCampaignAlreadyExistsException() {
-        CreateCampaignRequest createCampaignRequest = new CreateCampaignRequest();
-        createCampaignRequest.setName("Existing Campaign");
+    void addCampaign_whenCampaignExists_shouldThrowException() {
+        CreateCampaignRequest request = new CreateCampaignRequest();
+        request.setName("Existing Campaign");
 
-        when(campaignRepository.existsByNameIgnoreCase(createCampaignRequest.getName())).thenReturn(true);
+        when(campaignRepository.existsByNameIgnoreCase(request.getName())).thenReturn(true);
 
-        assertThrows(CampaignAlreadyExistsException.class, () -> campaignManager.addCampaign(createCampaignRequest));
+        CampaignAlreadyExistsException exception = assertThrows(CampaignAlreadyExistsException.class, () -> campaignManager.addCampaign(request));
+
+        assertEquals("Campaign already exists", exception.getMessage());
+
+        verify(campaignRepository, times(1)).existsByNameIgnoreCase(request.getName());
+        verify(campaignRepository, never()).save(any(Campaign.class));
     }
 
     @Test
-    void updateCampaign_shouldUpdateExistingCampaign() {
-        UpdateCampaignRequest updateCampaignRequest = new UpdateCampaignRequest();
-        updateCampaignRequest.setId(1L);
-        updateCampaignRequest.setName("Updated Campaign");
+    void updateCampaign_whenCampaignExists_shouldUpdateCampaign() {
+        UpdateCampaignRequest request = new UpdateCampaignRequest();
+        request.setId(1L);
+        request.setName("Updated Campaign");
+        request.setCampaignCategory(CampaignType.PERCENT);
+        request.setCampaignKey("50");
+        request.setState(true);
+        request.setCreatedBy("Ömer Asaf Balıkçı");
 
         Campaign existingCampaign = new Campaign();
         existingCampaign.setId(1L);
         existingCampaign.setName("Existing Campaign");
+        existingCampaign.setCampaignCategory(CampaignType.PERCENT);
+        existingCampaign.setCampaignKey("70");
+        existingCampaign.setState(true);
+        existingCampaign.setCreatedBy("Ömer Asaf Balıkçı");
+        existingCampaign.setCampaignNumber("12345678");
+        existingCampaign.setUpdatedAt(LocalDateTime.now());
 
         Campaign updatedCampaign = new Campaign();
-        updatedCampaign.setId(1L);
-        updatedCampaign.setName("Updated Campaign");
+        updatedCampaign.setId(request.getId());
+        updatedCampaign.setName(request.getName());
+        updatedCampaign.setCampaignCategory(request.getCampaignCategory());
+        updatedCampaign.setCampaignKey(request.getCampaignKey());
+        updatedCampaign.setState(request.getState());
+        updatedCampaign.setCreatedBy(request.getCreatedBy());
+        updatedCampaign.setCampaignNumber(existingCampaign.getCampaignNumber());
+        updatedCampaign.setUpdatedAt(LocalDateTime.now());
 
-        when(modelMapperService.forResponse()).thenReturn(modelMapper);
-        when(modelMapperService.forRequest()).thenReturn(modelMapper);
-        when(campaignRepository.findById(1L)).thenReturn(Optional.of(existingCampaign));
-        when(modelMapper.map(any(UpdateCampaignRequest.class), eq(Campaign.class))).thenReturn(updatedCampaign);
+        GetAllCampaignsResponse response = new GetAllCampaignsResponse();
+        response.setName(updatedCampaign.getName());
+        response.setCampaignCategory(updatedCampaign.getCampaignCategory());
+
+        when(campaignRepository.findById(request.getId())).thenReturn(Optional.of(existingCampaign));
         when(campaignRepository.save(any(Campaign.class))).thenReturn(updatedCampaign);
-        when(modelMapper.map(any(Campaign.class), eq(GetAllCampaignsResponse.class))).thenReturn(new GetAllCampaignsResponse());
+        when(modelMapperService.forResponse()).thenReturn(modelMapper);
+        when(modelMapper.map(any(Campaign.class), eq(GetAllCampaignsResponse.class))).thenReturn(response);
 
-        GetAllCampaignsResponse response = campaignManager.updateCampaign(updateCampaignRequest);
+        GetAllCampaignsResponse actualResponse = campaignManager.updateCampaign(request);
 
-        assertNotNull(response);
-        verify(campaignRepository, times(1)).save(updatedCampaign);
+        assertNotNull(actualResponse);
+        assertEquals(request.getName(), actualResponse.getName());
+        assertEquals(request.getCampaignCategory(), actualResponse.getCampaignCategory());
+
+        verify(campaignRepository, times(1)).findById(request.getId());
+        verify(campaignRepository, times(1)).save(any(Campaign.class));
+        verify(modelMapperService, times(1)).forResponse();
+        verify(modelMapper, times(1)).map(any(Campaign.class), eq(GetAllCampaignsResponse.class));
     }
 
     @Test
-    void updateCampaign_shouldThrowCampaignNotFoundException() {
-        UpdateCampaignRequest updateCampaignRequest = new UpdateCampaignRequest();
-        updateCampaignRequest.setId(1L);
+    void updateCampaign_whenCampaignDoesNotExist_shouldThrowException() {
+        UpdateCampaignRequest request = new UpdateCampaignRequest();
+        request.setId(1L);
 
-        when(campaignRepository.findById(1L)).thenReturn(Optional.empty());
+        when(campaignRepository.findById(request.getId())).thenReturn(Optional.empty());
 
-        assertThrows(CampaignNotFoundException.class, () -> campaignManager.updateCampaign(updateCampaignRequest));
+        CampaignNotFoundException exception = assertThrows(CampaignNotFoundException.class, () -> campaignManager.updateCampaign(request));
+
+        assertEquals("Campaign not found", exception.getMessage());
+
+        verify(campaignRepository, times(1)).findById(request.getId());
+        verify(campaignRepository, never()).save(any(Campaign.class));
     }
 
     @Test
