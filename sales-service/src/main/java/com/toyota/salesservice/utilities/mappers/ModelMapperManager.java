@@ -1,9 +1,7 @@
 package com.toyota.salesservice.utilities.mappers;
 
-import com.toyota.salesservice.domain.CampaignType;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
