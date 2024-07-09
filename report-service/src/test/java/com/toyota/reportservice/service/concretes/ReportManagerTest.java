@@ -35,6 +35,7 @@ public class ReportManagerTest {
     void setUp() {
         reportManager = new ReportManager(webClientBuilder, reportBusinessRules);
     }
+
     @Test
     void generatePdfReport_success() throws IOException {
         String salesNumber = "12345";
