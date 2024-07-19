@@ -1102,22 +1102,7 @@ Request Parameters:
 Response:
 
 ```json
-%PDF-1.6
-%����
-1 0 obj
-<<
-/Type /Catalog
-/Version /1.6
-/Pages 2 0 R
->>
-endobj
-10 0 obj
-<<
-/Length 9176
-/Filter /FlateDecode
-/Length1 13672
->>
-stream
+"%PDF-1.6 %���� 1 0 obj << /Type /Catalog /Version /1.6 /Pages 2 0 R >> endobj 10 0 obj << /Length 9176 /Filter /FlateDecode /Length1 13672 >> stream"
 ```
 
 ### User Management Service
@@ -1417,7 +1402,7 @@ Request Parameters:
 
 Response:
 ```json
-  Password reset initiated successfully. Check your email.
+  "Password reset initiated successfully. Check your email."
 ```
 
 #### Change Password
