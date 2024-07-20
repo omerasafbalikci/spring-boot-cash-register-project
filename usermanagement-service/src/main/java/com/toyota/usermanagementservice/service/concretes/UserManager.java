@@ -52,11 +52,11 @@ public class UserManager implements UserService {
     public GetAllUsersResponse createUser(CreateUserRequest createUserRequest) {
         logger.info("Creating user with username: {} and email: {}.", createUserRequest.getUsername(), createUserRequest.getEmail());
         if (this.userRepository.existsByUsernameAndDeletedIsFalse(createUserRequest.getUsername())) {
-            logger.warn("Username '{}' is already taken.", createUserRequest.getUsername());
+            logger.warn("Create user: Username '{}' is already taken.", createUserRequest.getUsername());
             throw new UserAlreadyExistsException("Username '" + createUserRequest.getUsername() + "' is already taken");
         }
         if (this.userRepository.existsByEmailAndDeletedIsFalse(createUserRequest.getEmail())) {
-            logger.warn("Email '{}' is already taken.", createUserRequest.getEmail());
+            logger.warn("Create user: Email '{}' is already taken.", createUserRequest.getEmail());
             throw new UserAlreadyExistsException("Email '" + createUserRequest.getEmail() + "' is already taken");
         }
         User user = this.modelMapperService.forRequest().map(createUserRequest, User.class);
@@ -75,7 +75,7 @@ public class UserManager implements UserService {
                         logger.warn("Problem with roles in authentication-authorization-service.");
                         throw new RoleNotFoundException("Problem with roles in authentication-authorization-service");
                     } else {
-                        logger.warn("Unexpected exception in authentication-authorization-service with status code: {}.", clientResponse.statusCode());
+                        logger.warn("Create user: Unexpected exception in authentication-authorization-service with status code: {}.", clientResponse.statusCode());
                         throw new UnexpectedException("Unexpected exception in authentication-authorization-service");
                     }
                 })
@@ -110,7 +110,7 @@ public class UserManager implements UserService {
             if (updateUserRequest.getEmail() != null && !user.getEmail().equals(updateUserRequest.getEmail())) {
                 logger.info("Updating email to: {}.", updateUserRequest.getEmail());
                 if (this.userRepository.existsByEmailAndDeletedIsFalse(updateUserRequest.getEmail())) {
-                    logger.warn("Email '{}' is already taken.", updateUserRequest.getEmail());
+                    logger.warn("Update user: Email '{}' is already taken.", updateUserRequest.getEmail());
                     throw new UserAlreadyExistsException("Email is already taken");
                 }
                 user.setEmail(updateUserRequest.getEmail());
@@ -118,7 +118,7 @@ public class UserManager implements UserService {
             if (updateUserRequest.getUsername() != null && !user.getUsername().equals(updateUserRequest.getUsername())) {
                 logger.info("Updating username to: {}.", updateUserRequest.getUsername());
                 if (this.userRepository.existsByUsernameAndDeletedIsFalse(updateUserRequest.getUsername())) {
-                    logger.warn("Username '{}' is already taken.", updateUserRequest.getUsername());
+                    logger.warn("Update user: Username '{}' is already taken.", updateUserRequest.getUsername());
                     throw new UserAlreadyExistsException("Username is taken");
                 }
                 Boolean updated = webClientBuilder.build().put()
@@ -134,7 +134,7 @@ public class UserManager implements UserService {
                                 logger.warn("Username not found in authentication-authorization-service.");
                                 throw new UserNotFoundException("Username not found in authentication-authorization-service");
                             } else {
-                                logger.warn("Unexpected exception in authentication-authorization-service with status code: {}.", clientResponse.statusCode());
+                                logger.warn("Update user: Unexpected exception in authentication-authorization-service with status code: {}.", clientResponse.statusCode());
                                 throw new UnexpectedException("Unexpected exception in authentication-authorization-service");
                             }
                         })
@@ -162,7 +162,7 @@ public class UserManager implements UserService {
             User saved = this.userRepository.save(user);
             return this.modelMapperService.forResponse().map(saved, GetAllUsersResponse.class);
         } else {
-            logger.warn("User not found! ID: {}.", updateUserRequest.getId());
+            logger.warn("Update user: User not found! ID: {}.", updateUserRequest.getId());
             throw new UserNotFoundException("User not found! ID: " + updateUserRequest.getId());
         }
     }
@@ -182,17 +182,17 @@ public class UserManager implements UserService {
 
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            logger.info("User found: {}.", user.getUsername());
+            logger.info("Delete user: User found: {}.", user.getUsername());
             Boolean deleteFromAuth = this.webClientBuilder.build().put()
                     .uri("http://authentication-authorization-service/auth/delete")
                     .bodyValue(user.getUsername())
                     .retrieve()
                     .onStatus(HttpStatusCode::isError, clientResponse -> {
                         if (clientResponse.statusCode() == HttpStatus.NOT_FOUND) {
-                            logger.warn("User not found in authentication-authorization-service.");
+                            logger.warn("Delete user: User not found in authentication-authorization-service.");
                             throw new UserNotFoundException("User not found in authentication-authorization-service");
                         } else {
-                            logger.warn("Unexpected exception in authentication-authorization-service with status code: {}.", clientResponse.statusCode());
+                            logger.warn("Delete user: Unexpected exception in authentication-authorization-service with status code: {}.", clientResponse.statusCode());
                             throw new UnexpectedException("Unexpected exception in authentication-authorization-service");
                         }
                     })
@@ -209,7 +209,7 @@ public class UserManager implements UserService {
                 throw new UnexpectedException("User not found in authentication-authorization-service! ID: " + id);
             }
         } else {
-            logger.warn("User not found! ID: {}", id);
+            logger.warn("Delete user: User not found! ID: {}", id);
             throw new UserNotFoundException("User not found! ID: " + id);
         }
     }
@@ -320,7 +320,7 @@ public class UserManager implements UserService {
 
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            logger.info("User found: {}.", user);
+            logger.info("Add role: User found: {}.", user);
             if (user.getRoles().contains(role)) {
                 logger.warn("User already has this role: {}.", role);
                 throw new RoleAlreadyExistsException("User already has this Role. Role: " + role.toString());
@@ -335,13 +335,13 @@ public class UserManager implements UserService {
                         HttpHeaders headers = clientResponse.headers().asHttpHeaders();
                         String exceptionType = headers.getFirst("exception-type");
                         if (clientResponse.statusCode() == HttpStatus.NOT_FOUND && Objects.equals(exceptionType, "RoleNotFound")) {
-                            logger.warn("Role not found in authentication-authorization-service.");
+                            logger.warn("Add role: Role not found in authentication-authorization-service.");
                             throw new RoleNotFoundException("Role not found in authentication-authorization-service");
                         } else if (clientResponse.statusCode() == HttpStatus.NOT_FOUND && Objects.equals(exceptionType, "UserNotFound")) {
-                            logger.warn("User not found in authentication-authorization-service.");
+                            logger.warn("Add role: User not found in authentication-authorization-service.");
                             throw new UserNotFoundException("User not found in authentication-authorization-service");
                         } else {
-                            logger.warn("Unexpected exception in authentication-authorization-service with status code: {}.", clientResponse.statusCode());
+                            logger.warn("Add role: Unexpected exception in authentication-authorization-service with status code: {}.", clientResponse.statusCode());
                             throw new UnexpectedException("Unexpected exception in authentication-authorization-service");
                         }
                     })
@@ -357,7 +357,7 @@ public class UserManager implements UserService {
                 throw new UnexpectedException("Failed to add role in authentication-authorization-service");
             }
         } else {
-            logger.warn("User not found! ID: {}.", id);
+            logger.warn("Add role: User not found! ID: {}.", id);
             throw new UserNotFoundException("User not found! ID: " + id);
         }
     }
@@ -380,7 +380,7 @@ public class UserManager implements UserService {
 
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            logger.info("User found: {}.", user);
+            logger.info("Remove role: User found: {}.", user);
             if (user.getRoles().size() <= 1) {
                 logger.warn("Cannot remove role: {}. User must have at least one role.", role);
                 throw new SingleRoleRemovalException("Cannot remove role. User must have at least one role");
@@ -399,13 +399,13 @@ public class UserManager implements UserService {
                         HttpHeaders headers = clientResponse.headers().asHttpHeaders();
                         String exceptionType = headers.getFirst("exception-type");
                         if (clientResponse.statusCode() == HttpStatus.NOT_FOUND && Objects.equals(exceptionType, "RoleNotFound")) {
-                            logger.warn("Role not found in authentication-authorization-service.");
+                            logger.warn("Remove role: Role not found in authentication-authorization-service.");
                             throw new RoleNotFoundException("Role not found in authentication-authorization-service");
                         } else if (clientResponse.statusCode() == HttpStatus.NOT_FOUND && Objects.equals(exceptionType, "UserNotFound")) {
-                            logger.warn("User not found in authentication-authorization-service.");
+                            logger.warn("Remove role: User not found in authentication-authorization-service.");
                             throw new UserNotFoundException("User not found in authentication-authorization-service");
                         } else {
-                            logger.warn("Unexpected exception in authentication-authorization-service with status code: {}.", clientResponse.statusCode());
+                            logger.warn("Remove role: Unexpected exception in authentication-authorization-service with status code: {}.", clientResponse.statusCode());
                             throw new UnexpectedException("Unexpected exception in authentication-authorization-service");
                         }
                     })
@@ -421,7 +421,7 @@ public class UserManager implements UserService {
                 throw new UnexpectedException("Remove role failed in authentication-authorization-service");
             }
         } else {
-            logger.warn("User not found! ID: {}.", id);
+            logger.warn("Remove role: User not found! ID: {}.", id);
             throw new UserNotFoundException("User not found! ID: " + id);
         }
     }

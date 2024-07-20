@@ -315,7 +315,7 @@ public class UserManager implements UserService {
             logger.info("User deleted successfully: {}", username);
             return true;
         } else {
-            logger.warn("User not found: {}", username);
+            logger.warn("Delete username: User not found: {}", username);
             throw new UserNotFoundException("User not found");
         }
      }
@@ -428,11 +428,11 @@ public class UserManager implements UserService {
                 logger.info("Role {} added successfully to user {}", role, username);
                 return true;
             } else {
-                logger.warn("Role not found: {}", role);
+                logger.warn("Add role: Role not found: {}", role);
                 throw new RoleNotFoundException("Role not found");
             }
         }
-        logger.warn("User not found: {}", username);
+        logger.warn("Add role: User not found: {}", username);
         throw new UserNotFoundException("User not found");
     }
 
@@ -458,11 +458,11 @@ public class UserManager implements UserService {
                 logger.info("Role {} removed successfully from user {}", role, username);
                 return true;
             } else {
-                logger.warn("Role not found: {}", role);
+                logger.warn("Remove role: Role not found: {}", role);
                 throw new RoleNotFoundException("Role not found");
             }
         }
-        logger.warn("User not found: {}", username);
+        logger.warn("Remove role: User not found: {}", username);
         throw new UserNotFoundException("User not found");
     }
 

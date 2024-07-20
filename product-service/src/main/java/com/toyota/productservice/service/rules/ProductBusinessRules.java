@@ -51,7 +51,7 @@ public class ProductBusinessRules {
         }
 
         if (this.productRepository.existsByNameIgnoreCase(product.getName()) && !existingProduct.getName().equals(product.getName())) {
-            logger.warn("Product name already exists: " + product.getName());
+            logger.warn("Product name already exists: {}", product.getName());
             throw new EntityAlreadyExistsException("Product name already exists");
         }
     }

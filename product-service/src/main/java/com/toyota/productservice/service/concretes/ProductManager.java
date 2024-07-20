@@ -100,14 +100,14 @@ public class ProductManager implements ProductService {
         List<GetAllProductsResponse> responses = pagePro.getContent().stream()
                 .map(product -> this.modelMapperService.forResponse()
                         .map(product, GetAllProductsResponse.class)).collect(Collectors.toList());
-        logger.debug("Mapped products to response DTOs. Number of products: {}", responses.size());
+        logger.debug("Get products: Mapped products to response DTOs. Number of products: {}", responses.size());
 
         TreeMap<String, Object> response = new TreeMap<>();
         response.put("products", responses);
         response.put("currentPage", pagePro.getNumber());
         response.put("totalItems", pagePro.getTotalElements());
         response.put("totalPages", pagePro.getTotalPages());
-        logger.debug("Retrieved {} products for page {}. Total items: {}. Total pages: {}.", responses.size(), pagePro.getNumber(), pagePro.getTotalElements(), pagePro.getTotalPages());
+        logger.debug("Get products: Retrieved {} products for page {}. Total items: {}. Total pages: {}.", responses.size(), pagePro.getNumber(), pagePro.getTotalElements(), pagePro.getTotalPages());
         return response;
     }
 
@@ -129,14 +129,14 @@ public class ProductManager implements ProductService {
         List<GetAllProductsResponse> responses = pagePro.getContent().stream()
                 .map(product -> this.modelMapperService.forResponse()
                         .map(product, GetAllProductsResponse.class)).collect(Collectors.toList());
-        logger.debug("Mapped products to response DTOs. Number of products: {}", responses.size());
+        logger.debug("Search: Mapped products to response DTOs. Number of products: {}", responses.size());
 
         TreeMap<String, Object> response = new TreeMap<>();
         response.put("products", responses);
         response.put("currentPage", pagePro.getNumber());
         response.put("totalItems", pagePro.getTotalElements());
         response.put("totalPages", pagePro.getTotalPages());
-        logger.debug("Retrieved {} products for page {}. Total items: {}. Total pages: {}.", responses.size(), pagePro.getNumber(), pagePro.getTotalElements(), pagePro.getTotalPages());
+        logger.debug("Search: Retrieved {} products for page {}. Total items: {}. Total pages: {}.", responses.size(), pagePro.getNumber(), pagePro.getTotalElements(), pagePro.getTotalPages());
         return response;
     }
 
@@ -158,7 +158,7 @@ public class ProductManager implements ProductService {
             Product product;
             if (optionalProduct.isPresent()) {
                 product = optionalProduct.get();
-                logger.debug("Product found in inventory for barcodeNumber '{}'", barcodeNumber);
+                logger.debug("Check product: Product found in inventory for barcode number '{}'", barcodeNumber);
                 if (product.getQuantity() >= quantity) {
                     logger.debug("Sufficient quantity available for product '{}'", barcodeNumber);
                     product.setQuantity(product.getQuantity() - quantity);
@@ -168,7 +168,7 @@ public class ProductManager implements ProductService {
                     throw new ProductIsNotInStockException("Product is not in stock: " + barcodeNumber);
                 }
             } else {
-                logger.warn("Product not found in inventory for barcodeNumber '{}'", barcodeNumber);
+                logger.warn("Check product: Product not found in inventory for barcode number '{}'", barcodeNumber);
                 throw new EntityNotFoundException("Product not found: " + barcodeNumber);
             }
             InventoryResponse inventoryResponse = getInventoryResponse(product, quantity);
@@ -211,11 +211,11 @@ public class ProductManager implements ProductService {
             Product product;
             if (optionalProduct.isPresent()) {
                 product = optionalProduct.get();
-                logger.debug("Product found in inventory for barcodeNumber '{}'", barcodeNumber);
+                logger.debug("Update product: Product found in inventory for barcode number '{}'", barcodeNumber);
                 product.setQuantity(product.getQuantity() + quantity);
                 this.productRepository.save(product);
             } else {
-                logger.warn("Product not found in inventory for barcodeNumber '{}'", barcodeNumber);
+                logger.warn("Update product: Product not found in inventory for barcode number '{}'", barcodeNumber);
                 throw new EntityNotFoundException("Product not found: " + barcodeNumber);
             }
         }
@@ -278,7 +278,7 @@ public class ProductManager implements ProductService {
     public GetAllProductsResponse updateProduct(UpdateProductRequest updateProductRequest) {
         logger.info("Updating product with id '{}'.", updateProductRequest.getId());
         Product existingProduct = this.productRepository.findById(updateProductRequest.getId()).orElseThrow(() -> {
-            logger.warn("No product found with id '{}'.", updateProductRequest.getId());
+            logger.warn("No product found with id '{}' to update.", updateProductRequest.getId());
             return new EntityNotFoundException("Product not found");
         });
         Product product = this.modelMapperService.forRequest().map(updateProductRequest, Product.class);
@@ -309,7 +309,7 @@ public class ProductManager implements ProductService {
             logger.debug("Product with id '{}' deleted successfully.", id);
             return this.modelMapperService.forResponse().map(product, GetAllProductsResponse.class);
         } else {
-            logger.warn("No product found with id '{}'.", id);
+            logger.warn("No product found with id '{}' to delete.", id);
             throw new EntityNotFoundException("Product not found");
         }
     }

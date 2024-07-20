@@ -49,7 +49,7 @@ public class ProductCategoryManager implements ProductCategoryService {
         List<GetAllProductCategoriesResponse> responses = productCategories.stream()
                 .map(productCategory -> this.modelMapperService.forResponse()
                         .map(productCategory, GetAllProductCategoriesResponse.class)).toList();
-        logger.info("Retrieved and converted {} product categories to GetAllProductCategoriesResponse.", responses.size());
+        logger.info("Get all: Retrieved and converted {} product categories to GetAllProductCategoriesResponse.", responses.size());
         return responses;
     }
 
@@ -67,7 +67,7 @@ public class ProductCategoryManager implements ProductCategoryService {
             logger.debug("Retrieved {} product categories by name containing '{}'.", productCategories.size(), name);
             List<GetAllProductCategoriesResponse> responses = productCategories.stream()
                     .map(productCategory -> modelMapperService.forResponse().map(productCategory, GetAllProductCategoriesResponse.class)).toList();
-            logger.info("Retrieved and converted {} product categories to GetAllProductCategoriesResponse.", responses.size());
+            logger.info("Search: Retrieved and converted {} product categories to GetAllProductCategoriesResponse.", responses.size());
             return responses;
         } else {
             logger.warn("No product categories found by name containing '{}'.", name);
@@ -85,7 +85,7 @@ public class ProductCategoryManager implements ProductCategoryService {
     public GetAllProductCategoriesResponse getCategoryById(Long id) {
         logger.info("Fetching product category by id '{}'.", id);
         ProductCategory productCategory = this.productCategoryRepository.findById(id).orElseThrow(() -> {
-            logger.warn("No product category found with id '{}'.", id);
+            logger.warn("Get category by id: No product category found with id '{}'.", id);
             return new EntityNotFoundException("Product category not found for id: " + id);
         });
         logger.debug("Retrieved product category with id '{}'.", id);
@@ -102,7 +102,7 @@ public class ProductCategoryManager implements ProductCategoryService {
     public List<GetAllProductsResponse> getProductsByCategoryId(Long categoryId) {
         logger.info("Fetching products by category id '{}'.", categoryId);
         ProductCategory productCategory = this.productCategoryRepository.findById(categoryId).orElseThrow(() -> {
-            logger.warn("No product category found with id '{}'.", categoryId);
+            logger.warn("Get products by category id: No product category found with id '{}'.", categoryId);
             return new EntityNotFoundException("Product category not found");
         });
         logger.debug("Retrieved products for category id '{}'.", categoryId);
@@ -158,7 +158,7 @@ public class ProductCategoryManager implements ProductCategoryService {
             logger.debug("Product category updated with id '{}'.", updateProductCategoryRequest.getId());
             return this.modelMapperService.forResponse().map(productCategory, GetAllProductCategoriesResponse.class);
         } else {
-            logger.warn("No product category found with id '{}'.", updateProductCategoryRequest.getId());
+            logger.warn("No product category found with id '{}' to update.", updateProductCategoryRequest.getId());
             throw new EntityNotFoundException("Product category not found");
         }
     }
@@ -180,7 +180,7 @@ public class ProductCategoryManager implements ProductCategoryService {
             logger.debug("Product category deleted with id '{}'.", id);
             return this.modelMapperService.forResponse().map(productCategory, GetAllProductCategoriesResponse.class);
         } else {
-            logger.warn("No product category found with id '{}'.", id);
+            logger.warn("No product category found with id '{}' to delete.", id);
             throw new EntityNotFoundException("Product category not found");
         }
     }
