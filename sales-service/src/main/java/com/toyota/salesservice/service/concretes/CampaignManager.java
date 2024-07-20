@@ -93,7 +93,7 @@ public class CampaignManager implements CampaignService {
         campaign.setCampaignKey(createCampaignRequest.getCampaignKey());
         campaign.setState(createCampaignRequest.getState());
         campaign.setCreatedBy(createCampaignRequest.getCreatedBy());
-        logger.debug("Checking campaign details.");
+        logger.debug("Add campaign: Checking campaign details.");
         this.campaignBusinessRules.checkCampaignDetails(campaign);
         campaign.setCampaignNumber(UUID.randomUUID().toString().substring(0, 8));
         campaign.setUpdatedAt(LocalDateTime.now());
@@ -113,7 +113,7 @@ public class CampaignManager implements CampaignService {
     public GetAllCampaignsResponse updateCampaign(UpdateCampaignRequest updateCampaignRequest) {
         logger.info("Updating campaign with id '{}'.", updateCampaignRequest.getId());
         Campaign existingCampaign = this.campaignRepository.findById(updateCampaignRequest.getId()).orElseThrow(() -> {
-            logger.warn("No campaign found with id '{}'.", updateCampaignRequest.getId());
+            logger.warn("No campaign found with id '{}' to update.", updateCampaignRequest.getId());
             return new CampaignNotFoundException("Campaign not found");
         });
         logger.debug("Mapping UpdateCampaignRequest to Campaign entity.");
@@ -124,7 +124,7 @@ public class CampaignManager implements CampaignService {
         campaign.setCampaignKey(updateCampaignRequest.getCampaignKey());
         campaign.setState(updateCampaignRequest.getState());
         campaign.setCreatedBy(updateCampaignRequest.getCreatedBy());
-        logger.debug("Checking campaign details.");
+        logger.debug("Update campaign: Checking campaign details.");
         this.campaignBusinessRules.checkCampaignDetails(campaign);
         logger.debug("Checking update rules for the campaign.");
         this.campaignBusinessRules.checkUpdate(campaign, existingCampaign);
@@ -153,7 +153,7 @@ public class CampaignManager implements CampaignService {
             logger.debug("Campaign with id '{}' deleted successfully.", id);
             return this.modelMapperService.forResponse().map(campaign, GetAllCampaignsResponse.class);
         } else {
-            logger.warn("No campaign found with id '{}'.", id);
+            logger.warn("No campaign found with id '{}' to delete.", id);
             throw new CampaignNotFoundException("Campaign not found");
         }
     }

@@ -156,7 +156,7 @@ public class SalesBusinessRules {
                     });
                     paymentTypes.get(i).ifPresent(paymentType -> {
                         salesItem.setPaymentType(paymentType);
-                        logger.info("Set payment type '{}' for sales item with barcode '{}'.", paymentType, barcodeNumbers.get(i));
+                        logger.info("Set payment type '{}' for sales item with barcode number '{}'.", paymentType, barcodeNumbers.get(i));
                     });
                     logger.debug("Created sales item: {}.", salesItem);
                     return salesItem;
@@ -234,7 +234,7 @@ public class SalesBusinessRules {
                         discountPercent, discountAmount, newTotalPrice);
             } else {
                 updateInventory(inventoryRequests);
-                logger.warn("Discount amount exceeds total price for item '{}'.", salesItem.getName());
+                logger.warn("Discount (percent) amount exceeds total price for item '{}'.", salesItem.getName());
                 throw new CampaignDiscountException("Discount amount exceeds total price for item: " + salesItem.getName());
             }
         } else if (campaignType == 3) {
@@ -246,7 +246,7 @@ public class SalesBusinessRules {
                         discountAmount, newTotalPrice);
             } else {
                 updateInventory(inventoryRequests);
-                logger.warn("Discount amount exceeds total price for item '{}'.", salesItem.getName());
+                logger.warn("Discount (money discount) amount exceeds total price for item '{}'.", salesItem.getName());
                 throw new CampaignDiscountException("Discount amount exceeds total price for item: " + salesItem.getName());
             }
         } else {

@@ -51,7 +51,7 @@ public class CampaignBusinessRules {
             int buyPayPartTwo = Integer.parseInt(parts[1]);
 
             if (buyPayPartOne <= buyPayPartTwo) {
-                logger.warn("Incorrect buy-pay entry. Campaign ID: " + campaign.getId() + ". 'Buy' value must be greater than 'Pay' value.");
+                logger.warn("Incorrect buy-pay entry. Campaign ID: {}. 'Buy' value must be greater than 'Pay' value.", campaign.getId());
                 throw new CampaignDetailsAreIncorrectException("Incorrect buy-pay entry. 'Buy' value must be greater than 'Pay' value.");
             }
             campaign.setCampaignType(1);
@@ -59,11 +59,11 @@ public class CampaignBusinessRules {
             try {
                 int percentValue = Integer.parseInt(campaign.getCampaignKey());
                 if (percentValue <= 0 || percentValue > 100) {
-                    logger.warn("Incorrect percent entry. Campaign ID: " + campaign.getId() + ". Value must be between 0 and 100.");
+                    logger.warn("Incorrect percent entry. Campaign ID: {}. Value must be between 0 and 100.", campaign.getId());
                     throw new CampaignDetailsAreIncorrectException("Incorrect percent entry. Value must be between 0 and 100.");
                 }
             } catch (NumberFormatException e) {
-                logger.warn("Invalid percent entry. Campaign ID: " + campaign.getId() + ". Value must be an integer.");
+                logger.warn("Invalid percent entry. Campaign ID: {}. Value must be an integer.", campaign.getId());
                 throw new CampaignDetailsAreIncorrectException("Invalid percent entry. Value must be an integer.");
             }
             campaign.setCampaignType(2);
