@@ -102,7 +102,7 @@ public class UserManager implements UserService {
     @Override
     public GetAllUsersResponse updateUser(UpdateUserRequest updateUserRequest) {
         logger.info("Updating user with ID: {}.", updateUserRequest.getId());
-        Optional<User> optionalUser = this.userRepository.findById(updateUserRequest.getId());
+        Optional<User> optionalUser = this.userRepository.findByIdAndDeletedFalse(updateUserRequest.getId());
 
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
@@ -178,7 +178,7 @@ public class UserManager implements UserService {
     @Override
     public GetAllUsersResponse deleteUser(Long id) {
         logger.info("Attempting to delete user with ID: {}.", id);
-        Optional<User> optionalUser = this.userRepository.findById(id);
+        Optional<User> optionalUser = this.userRepository.findByIdAndDeletedFalse(id);
 
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
@@ -288,7 +288,7 @@ public class UserManager implements UserService {
     @Override
     public UserManagementResponse getUserByEmail(String email) {
         logger.info("Attempting to retrieve user by email: {}", email);
-        Optional<User> optionalUser = this.userRepository.findByEmail(email);
+        Optional<User> optionalUser = this.userRepository.findByEmailAndDeletedFalse(email);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             UserManagementResponse userManagementResponse = new UserManagementResponse();
@@ -316,7 +316,7 @@ public class UserManager implements UserService {
     @Override
     public GetAllUsersResponse addRole(Long id, Role role) {
         logger.info("Attempting to add role: {} to user with ID: {}.", role, id);
-        Optional<User> optionalUser = this.userRepository.findById(id);
+        Optional<User> optionalUser = this.userRepository.findByIdAndDeletedFalse(id);
 
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
@@ -376,7 +376,7 @@ public class UserManager implements UserService {
     @Override
     public GetAllUsersResponse removeRole(Long id, Role role) {
         logger.info("Attempting to remove role: {} from user with ID: {}.", role, id);
-        Optional<User> optionalUser = this.userRepository.findById(id);
+        Optional<User> optionalUser = this.userRepository.findByIdAndDeletedFalse(id);
 
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();

@@ -7,6 +7,7 @@ import com.toyota.authenticationauthorizationservice.dto.responses.Authenticatio
 import com.toyota.authenticationauthorizationservice.service.abstracts.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,7 +56,7 @@ public class UserController {
      * @return a response entity with a message indicating the result of the password reset initiation
      */
     @PostMapping("/forgot-password")
-    public ResponseEntity<String> forgotPassword(@RequestParam("email") String email) {
+    public ResponseEntity<String> forgotPassword(@RequestParam("email") @Email(message = "It must be a valid email") String email) {
         boolean result = this.userService.initiatePasswordReset(email);
         if (result) {
             return ResponseEntity.ok("Password reset initiated successfully. Check your email.");

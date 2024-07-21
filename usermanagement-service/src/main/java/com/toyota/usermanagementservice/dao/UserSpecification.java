@@ -43,6 +43,9 @@ public class UserSpecification {
             if (gender != null && !gender.isEmpty()) {
                 predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("gender"), gender));
             }
+
+            predicate = criteriaBuilder.and(predicate, criteriaBuilder.isFalse(root.get("deleted")));
+
             return predicate;
         };
     }

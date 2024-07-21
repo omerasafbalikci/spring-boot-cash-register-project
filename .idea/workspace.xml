@@ -6,16 +6,31 @@
   <component name="ChangeListManager">
     <list default="true" id="4d6e52b4-0d65-4c7c-b617-aca701f9252f" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/authenticationauthorization-service/src/main/java/com/toyota/authenticationauthorizationservice/service/concretes/UserManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/authenticationauthorization-service/src/main/java/com/toyota/authenticationauthorizationservice/service/concretes/UserManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product-service/src/main/java/com/toyota/productservice/service/concretes/ProductCategoryManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/product-service/src/main/java/com/toyota/productservice/service/concretes/ProductCategoryManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product-service/src/main/java/com/toyota/productservice/service/concretes/ProductManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/product-service/src/main/java/com/toyota/productservice/service/concretes/ProductManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product-service/src/main/java/com/toyota/productservice/service/rules/ProductBusinessRules.java" beforeDir="false" afterPath="$PROJECT_DIR$/product-service/src/main/java/com/toyota/productservice/service/rules/ProductBusinessRules.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api-gateway/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/api-gateway/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/authenticationauthorization-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/authenticationauthorization-service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/authenticationauthorization-service/src/main/java/com/toyota/authenticationauthorizationservice/domain/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/authenticationauthorization-service/src/main/java/com/toyota/authenticationauthorizationservice/domain/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/authenticationauthorization-service/src/main/java/com/toyota/authenticationauthorizationservice/resource/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/authenticationauthorization-service/src/main/java/com/toyota/authenticationauthorizationservice/resource/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/discovery-server/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/discovery-server/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/usermanagement-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/usermanagement-service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/usermanagement-service/src/main/java/com/toyota/usermanagementservice/dao/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/usermanagement-service/src/main/java/com/toyota/usermanagementservice/dao/UserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/usermanagement-service/src/main/java/com/toyota/usermanagementservice/dao/UserSpecification.java" beforeDir="false" afterPath="$PROJECT_DIR$/usermanagement-service/src/main/java/com/toyota/usermanagementservice/dao/UserSpecification.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/usermanagement-service/src/main/java/com/toyota/usermanagementservice/dto/responses/GetAllUsersResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/usermanagement-service/src/main/java/com/toyota/usermanagementservice/dto/responses/GetAllUsersResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/usermanagement-service/src/main/java/com/toyota/usermanagementservice/resource/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/usermanagement-service/src/main/java/com/toyota/usermanagementservice/resource/UserController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/usermanagement-service/src/main/java/com/toyota/usermanagementservice/service/concretes/UserManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/usermanagement-service/src/main/java/com/toyota/usermanagementservice/service/concretes/UserManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/usermanagement-service/src/test/java/com/toyota/usermanagementservice/resource/UserControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/usermanagement-service/src/test/java/com/toyota/usermanagementservice/resource/UserControllerTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/usermanagement-service/src/test/java/com/toyota/usermanagementservice/service/concretes/UserManagerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/usermanagement-service/src/test/java/com/toyota/usermanagementservice/service/concretes/UserManagerTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -28,101 +43,111 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.ApigatewayApplication.executor": "Run",
-    "Application.AuthenticationauthorizationserviceApplication.executor": "Run",
-    "Application.DiscoveryserverApplication.executor": "Run",
-    "Application.ProductserviceApplication.executor": "Run",
-    "Application.ReportserviceApplication.executor": "Run",
-    "Application.SalesserviceApplication.executor": "Run",
-    "Application.UsermanagementserviceApplication.executor": "Run",
-    "JUnit.CampaignBusinessRulesTest.checkCampaignDetails_whenBuyPayEntryIsIncorrect_shouldThrowException.executor": "Run",
-    "JUnit.CampaignBusinessRulesTest.executor": "Run",
-    "JUnit.CampaignManagerTest.executor": "Run",
-    "JUnit.SalesBusinessRulesTest.executor": "Run",
-    "JUnit.SalesManagerTest.executor": "Run",
-    "Maven.toyota-project [clean].executor": "Run",
-    "Maven.toyota-project [install].executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
-    "ignore.virus.scanning.warn.message": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/omera/Desktop/springboot-microservices-market-checkout"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.ApigatewayApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Application.AuthenticationauthorizationserviceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Application.DiscoveryserverApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Application.ProductserviceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Application.ReportserviceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Application.SalesserviceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Application.UsermanagementserviceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.CampaignBusinessRulesTest.checkCampaignDetails_whenBuyPayEntryIsIncorrect_shouldThrowException.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.CampaignBusinessRulesTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.CampaignManagerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.GlobalExceptionHandlerTest (1).executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.GlobalExceptionHandlerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.JwtAuthenticationFilterTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.JwtManagerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.MailManagerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.RoleTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.SalesBusinessRulesTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.SalesManagerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.TokenRepositoryTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserControllerTest (1).executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserControllerTest.deleteUsername.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserControllerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserControllerTest.restoreUser.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserManagerTest (1).executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserManagerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserManagerTest.restoreUser_success.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserManagerTest.restoreUser_unexpectedFail.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserManagerTest.restoreUser_userNotFound.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserManagerTest.restoreUsername_success.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserManagerTest.restoreUsername_userNotFound.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UsermanagementserviceApplicationTests.executor&quot;: &quot;Run&quot;,
+    &quot;Maven.toyota-project [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.toyota-project [install].executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/omera/Desktop/springboot-microservices-market-checkout&quot;
   }
-}]]></component>
-  <component name="RunManager" selected="JUnit.CampaignBusinessRulesTest.checkCampaignDetails_whenBuyPayEntryIsIncorrect_shouldThrowException">
-    <configuration name="CampaignBusinessRulesTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="salesservice" />
+}</component>
+  <component name="RunManager" selected="Application.UsermanagementserviceApplication">
+    <configuration name="ApigatewayApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.toyota.apigateway.ApigatewayApplication" />
+      <module name="apigateway" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.toyota.salesservice.service.rules.*" />
+          <option name="PATTERN" value="com.toyota.apigateway.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.toyota.salesservice.service.rules" />
-      <option name="MAIN_CLASS_NAME" value="com.toyota.salesservice.service.rules.CampaignBusinessRulesTest" />
-      <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="CampaignBusinessRulesTest.checkCampaignDetails_whenBuyPayEntryIsIncorrect_shouldThrowException" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="salesservice" />
+    <configuration name="AuthenticationauthorizationserviceApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.toyota.authenticationauthorizationservice.AuthenticationauthorizationserviceApplication" />
+      <module name="authenticationauthorizationservice" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.toyota.salesservice.service.rules.*" />
+          <option name="PATTERN" value="com.toyota.authenticationauthorizationservice.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.toyota.salesservice.service.rules" />
-      <option name="MAIN_CLASS_NAME" value="com.toyota.salesservice.service.rules.CampaignBusinessRulesTest" />
-      <option name="METHOD_NAME" value="checkCampaignDetails_whenBuyPayEntryIsIncorrect_shouldThrowException" />
-      <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="CampaignManagerTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="salesservice" />
+    <configuration name="DiscoveryserverApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.toyota.discoveryserver.DiscoveryserverApplication" />
+      <module name="discoveryserver" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.toyota.salesservice.service.concretes.*" />
+          <option name="PATTERN" value="com.toyota.discoveryserver.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.toyota.salesservice.service.concretes" />
-      <option name="MAIN_CLASS_NAME" value="com.toyota.salesservice.service.concretes.CampaignManagerTest" />
-      <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="SalesBusinessRulesTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="salesservice" />
+    <configuration name="UsermanagementserviceApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.toyota.usermanagementservice.UsermanagementserviceApplication" />
+      <module name="usermanagementservice" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.toyota.salesservice.service.rules.*" />
+          <option name="PATTERN" value="com.toyota.usermanagementservice.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.toyota.salesservice.service.rules" />
-      <option name="MAIN_CLASS_NAME" value="com.toyota.salesservice.service.rules.SalesBusinessRulesTest" />
-      <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="SalesManagerTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="salesservice" />
+    <configuration name="UserManagerTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="authenticationauthorizationservice" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.toyota.salesservice.service.concretes.*" />
+          <option name="PATTERN" value="com.toyota.authenticationauthorizationservice.service.concretes.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.toyota.salesservice.service.concretes" />
-      <option name="MAIN_CLASS_NAME" value="com.toyota.salesservice.service.concretes.SalesManagerTest" />
+      <option name="PACKAGE_NAME" value="com.toyota.authenticationauthorizationservice.service.concretes" />
+      <option name="MAIN_CLASS_NAME" value="com.toyota.authenticationauthorizationservice.service.concretes.UserManagerTest" />
       <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -143,11 +168,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.CampaignBusinessRulesTest.checkCampaignDetails_whenBuyPayEntryIsIncorrect_shouldThrowException" />
-        <item itemvalue="JUnit.SalesBusinessRulesTest" />
-        <item itemvalue="JUnit.CampaignBusinessRulesTest" />
-        <item itemvalue="JUnit.CampaignManagerTest" />
-        <item itemvalue="JUnit.SalesManagerTest" />
+        <item itemvalue="Application.UsermanagementserviceApplication" />
+        <item itemvalue="Application.AuthenticationauthorizationserviceApplication" />
+        <item itemvalue="Application.ApigatewayApplication" />
+        <item itemvalue="Application.DiscoveryserverApplication" />
+        <item itemvalue="JUnit.UserManagerTest" />
       </list>
     </recent_temporary>
   </component>

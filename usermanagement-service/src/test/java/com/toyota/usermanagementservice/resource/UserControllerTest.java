@@ -95,7 +95,7 @@ public class UserControllerTest {
         CreateUserRequest createUserRequest = new CreateUserRequest("firstname", "lastname", "username",
                 "email@gmail.com", "abcdef1", Set.of(Role.CASHIER), Gender.FEMALE);
         GetAllUsersResponse response = new GetAllUsersResponse(1L, "firstname", "lastname", "username",
-                "email@gmail.com", false, Set.of(Role.CASHIER), Gender.FEMALE);
+                "email@gmail.com", Set.of(Role.CASHIER), Gender.FEMALE);
 
         // When
         when(userService.createUser(any(CreateUserRequest.class))).thenReturn(response);
@@ -113,7 +113,7 @@ public class UserControllerTest {
         // Given
         UpdateUserRequest updateUserRequest = new UpdateUserRequest();
         GetAllUsersResponse response = new GetAllUsersResponse(1L, "updated", "updated", "updated",
-                "updated@gmail.com", false, Set.of(Role.CASHIER), Gender.FEMALE);
+                "updated@gmail.com", Set.of(Role.CASHIER), Gender.FEMALE);
 
         // When
         when(userService.updateUser(any(UpdateUserRequest.class))).thenReturn(response);

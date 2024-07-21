@@ -77,7 +77,7 @@ public class UserManagerTest {
         user.setGender(Gender.FEMALE);
 
         GetAllUsersResponse getAllUsersResponse = new GetAllUsersResponse(1L, "firstname", "lastname", "username",
-                "email@gmail.com", false, Set.of(Role.CASHIER), Gender.FEMALE);
+                "email@gmail.com", Set.of(Role.CASHIER), Gender.FEMALE);
 
         // When
         when(webClientBuilder.build()).thenReturn(webClient);
@@ -189,13 +189,13 @@ public class UserManagerTest {
         when(responseSpec.bodyToMono(Boolean.class)).thenReturn(monoSpy);
         // Repository mock
         when(userRepository.save(any(User.class))).thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(existingUser));
+        when(userRepository.findByIdAndDeletedFalse(any(Long.class))).thenReturn(Optional.of(existingUser));
 
         when(modelMapperService.forResponse()).thenReturn(modelMapper);
 
         // ModelMapper mock
         GetAllUsersResponse getAllUsersResponse = new GetAllUsersResponse(1L, "firstname", "lastname", "username",
-                "email@gmail.com", false, Set.of(Role.CASHIER), Gender.FEMALE);
+                "email@gmail.com", Set.of(Role.CASHIER), Gender.FEMALE);
         when(modelMapper.map(any(User.class), eq(GetAllUsersResponse.class))).thenReturn(getAllUsersResponse);
 
         GetAllUsersResponse response = userManager.updateUser(updateUserRequest);
@@ -230,7 +230,7 @@ public class UserManagerTest {
         Mono<Boolean> monoSpy = Mockito.spy(mono);
         when(responseSpec.bodyToMono(Boolean.class)).thenReturn(monoSpy);
         // Repository mock
-        when(userRepository.findById(any())).thenReturn(Optional.of(existingUser));
+        when(userRepository.findByIdAndDeletedFalse(any())).thenReturn(Optional.of(existingUser));
 
         // Then
         assertThrows(UnexpectedException.class, () -> userManager.updateUser(updateUserRequest));
@@ -242,7 +242,7 @@ public class UserManagerTest {
         UpdateUserRequest updateUserRequest = new UpdateUserRequest();
 
         // When
-        when(userRepository.findById(any())).thenReturn(Optional.empty());
+        when(userRepository.findByIdAndDeletedFalse(any())).thenReturn(Optional.empty());
 
         // Then
         assertThrows(UserNotFoundException.class, () -> userManager.updateUser(updateUserRequest));
@@ -257,7 +257,7 @@ public class UserManagerTest {
         user.setUsername("oldUsername");
 
         // When
-        when(userRepository.findById(any())).thenReturn(Optional.of(user));
+        when(userRepository.findByIdAndDeletedFalse(any())).thenReturn(Optional.of(user));
         when(userRepository.existsByUsernameAndDeletedIsFalse(anyString())).thenReturn(true);
 
         // Then
@@ -273,7 +273,7 @@ public class UserManagerTest {
         user.setEmail("oldEmail");
 
         // When
-        when(userRepository.findById(any())).thenReturn(Optional.of(user));
+        when(userRepository.findByIdAndDeletedFalse(any())).thenReturn(Optional.of(user));
         when(userRepository.existsByEmailAndDeletedIsFalse(anyString())).thenReturn(true);
 
         // Then
@@ -287,7 +287,7 @@ public class UserManagerTest {
                 "test@gmail.com", Set.of(Role.CASHIER), Gender.MALE, false);
 
         GetAllUsersResponse getAllUsersResponse = new GetAllUsersResponse(1L, "test", "test", "test",
-                "test@gmail.com", true, Set.of(Role.CASHIER), Gender.MALE);
+                "test@gmail.com", Set.of(Role.CASHIER), Gender.MALE);
 
         // When
         when(webClientBuilder.build()).thenReturn(webClient);
@@ -299,7 +299,7 @@ public class UserManagerTest {
         Mono<Boolean> mono = Mono.just(true);
         Mono<Boolean> monoSpy = Mockito.spy(mono);
         when(responseSpec.bodyToMono(Boolean.class)).thenReturn(monoSpy);
-        when(userRepository.findById(any())).thenReturn(Optional.of(existingUser));
+        when(userRepository.findByIdAndDeletedFalse(any())).thenReturn(Optional.of(existingUser));
         when(userRepository.save(any(User.class))).thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
         when(modelMapper.map(any(User.class), eq(GetAllUsersResponse.class))).thenReturn(getAllUsersResponse);
 
@@ -321,7 +321,7 @@ public class UserManagerTest {
 
         // When
         // Repository mock
-        when(userRepository.findById(any())).thenReturn(Optional.empty());
+        when(userRepository.findByIdAndDeletedFalse(any())).thenReturn(Optional.empty());
 
         // Then
         assertThrows(UserNotFoundException.class,
@@ -347,7 +347,7 @@ public class UserManagerTest {
         Mono<Boolean> monoSpy = Mockito.spy(mono);
         when(responseSpec.bodyToMono(Boolean.class)).thenReturn(monoSpy);
         // Repository mock
-        when(userRepository.findById(any())).thenReturn(Optional.of(existingUser));
+        when(userRepository.findByIdAndDeletedFalse(any())).thenReturn(Optional.of(existingUser));
 
         // Then
         assertThrows(UnexpectedException.class, () -> userManager.deleteUser(userId));
@@ -375,7 +375,7 @@ public class UserManagerTest {
         Page<User> pageMock = new PageImpl<>(content, pageable, 1);
         doReturn(pageMock).when(userRepository).findAll(ArgumentMatchers.<Specification<User>>any(), any(Pageable.class));
         when(modelMapper.map(any(User.class), eq(GetAllUsersResponse.class)))
-                .thenReturn(new GetAllUsersResponse(id, firstname, lastname, username, email, deleted, roles, Gender.valueOf(gender.toUpperCase())));
+                .thenReturn(new GetAllUsersResponse(id, firstname, lastname, username, email, roles, Gender.valueOf(gender.toUpperCase())));
 
         when(modelMapperService.forResponse()).thenReturn(modelMapper);
 
@@ -390,7 +390,6 @@ public class UserManagerTest {
         assertEquals(lastname, response.getContent().get(0).getLastName());
         assertEquals(username, response.getContent().get(0).getUsername());
         assertEquals(email, response.getContent().get(0).getEmail());
-        assertEquals(deleted, response.getContent().get(0).isDeleted());
         assertEquals(roles, response.getContent().get(0).getRoles());
         assertEquals(Gender.valueOf(gender.toUpperCase()), response.getContent().get(0).getGender());
     }
@@ -417,7 +416,7 @@ public class UserManagerTest {
         Page<User> pageMock = new PageImpl<>(content, pageable, 1);
         doReturn(pageMock).when(userRepository).findAll(ArgumentMatchers.<Specification<User>>any(), any(Pageable.class));
         when(modelMapper.map(any(User.class), eq(GetAllUsersResponse.class)))
-                .thenReturn(new GetAllUsersResponse(id, firstname, lastname, username, email, deleted, roles, Gender.valueOf(gender.toUpperCase())));
+                .thenReturn(new GetAllUsersResponse(id, firstname, lastname, username, email, roles, Gender.valueOf(gender.toUpperCase())));
 
         when(modelMapperService.forResponse()).thenReturn(modelMapper);
 
@@ -432,7 +431,6 @@ public class UserManagerTest {
         assertEquals(lastname, response.getContent().get(0).getLastName());
         assertEquals(username, response.getContent().get(0).getUsername());
         assertEquals(email, response.getContent().get(0).getEmail());
-        assertEquals(deleted, response.getContent().get(0).isDeleted());
         assertEquals(roles, response.getContent().get(0).getRoles());
         assertEquals(Gender.valueOf(gender.toUpperCase()), response.getContent().get(0).getGender());
     }
@@ -449,7 +447,7 @@ public class UserManagerTest {
         expectedResponse.setEmail(user.getEmail());
         expectedResponse.setUsername(user.getUsername());
 
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(userRepository.findByEmailAndDeletedFalse(email)).thenReturn(Optional.of(user));
 
         // When
         UserManagementResponse actualResponse = userManager.getUserByEmail(email);
@@ -464,7 +462,7 @@ public class UserManagerTest {
         // Given
         String email = "nonexistent@example.com";
 
-        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+        when(userRepository.findByEmailAndDeletedFalse(email)).thenReturn(Optional.empty());
 
         // When / Then
         try {
@@ -490,7 +488,6 @@ public class UserManagerTest {
                 existingUser.getLastName(),
                 existingUser.getUsername(),
                 existingUser.getEmail(),
-                existingUser.isDeleted(),
                 new HashSet<>(existingUser.getRoles()),
                 existingUser.getGender()
         );
@@ -512,7 +509,7 @@ public class UserManagerTest {
 
         // Repository mock
         when(userRepository.save(any(User.class))).thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
-        when(userRepository.findById(any())).thenReturn(Optional.of(existingUser));
+        when(userRepository.findByIdAndDeletedFalse(any())).thenReturn(Optional.of(existingUser));
         when(modelMapperService.forResponse().map(any(User.class), eq(GetAllUsersResponse.class))).thenReturn(mappedResponse);
         GetAllUsersResponse response = userManager.addRole(userId, Role.ADMIN);
 
@@ -543,7 +540,7 @@ public class UserManagerTest {
         Mono<Boolean> monoSpy = Mockito.spy(mono);
         when(responseSpec.bodyToMono(Boolean.class)).thenReturn(monoSpy);
         // Repository mock
-        when(userRepository.findById(any())).thenReturn(Optional.of(existingUser));
+        when(userRepository.findByIdAndDeletedFalse(any())).thenReturn(Optional.of(existingUser));
 
         // Then
         assertThrows(UnexpectedException.class,
@@ -561,7 +558,7 @@ public class UserManagerTest {
 
         // When
         // Repository mock
-        when(userRepository.findById(any())).thenReturn(Optional.of(existingUser));
+        when(userRepository.findByIdAndDeletedFalse(any())).thenReturn(Optional.of(existingUser));
 
         // Then
         assertThrows(RoleAlreadyExistsException.class,
@@ -575,7 +572,7 @@ public class UserManagerTest {
 
         // When
         // Repository mock
-        when(userRepository.findById(any())).thenReturn(Optional.empty());
+        when(userRepository.findByIdAndDeletedFalse(any())).thenReturn(Optional.empty());
 
         // Then
         assertThrows(UserNotFoundException.class,
@@ -604,7 +601,7 @@ public class UserManagerTest {
 
         // Repository mock
         when(userRepository.save(any(User.class))).thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
-        when(userRepository.findById(any())).thenReturn(Optional.of(existingUser));
+        when(userRepository.findByIdAndDeletedFalse(any())).thenReturn(Optional.of(existingUser));
 
         when(modelMapperService.forResponse()).thenReturn(modelMapper);
         // ModelMapper mock
@@ -614,7 +611,6 @@ public class UserManagerTest {
         mockResponse.setLastName(existingUser.getLastName());
         mockResponse.setUsername(existingUser.getUsername());
         mockResponse.setEmail(existingUser.getEmail());
-        mockResponse.setDeleted(existingUser.isDeleted());
         mockResponse.setGender(existingUser.getGender());
         Set<Role> responseRoles = new HashSet<>(existingUser.getRoles());
         responseRoles.remove(Role.CASHIER);
@@ -653,7 +649,7 @@ public class UserManagerTest {
         Mono<Boolean> monoSpy = Mockito.spy(mono);
         when(responseSpec.bodyToMono(Boolean.class)).thenReturn(monoSpy);
         // Repository mock
-        when(userRepository.findById(any())).thenReturn(Optional.of(existingUser));
+        when(userRepository.findByIdAndDeletedFalse(any())).thenReturn(Optional.of(existingUser));
 
         // Then
         assertThrows(UnexpectedException.class,
@@ -670,7 +666,7 @@ public class UserManagerTest {
         Long userId = 1L;
 
         // When
-        when(userRepository.findById(any())).thenReturn(Optional.of(existingUser));
+        when(userRepository.findByIdAndDeletedFalse(any())).thenReturn(Optional.of(existingUser));
 
         // Then
         assertThrows(SingleRoleRemovalException.class,
@@ -688,7 +684,7 @@ public class UserManagerTest {
         Long userId = 1L;
 
         // When
-        when(userRepository.findById(any())).thenReturn(Optional.of(existingUser));
+        when(userRepository.findByIdAndDeletedFalse(any())).thenReturn(Optional.of(existingUser));
 
         // Then
         assertThrows(RoleNotFoundException.class,
@@ -701,7 +697,7 @@ public class UserManagerTest {
         Long userId = 1L;
 
         // When
-        when(userRepository.findById(any())).thenReturn(Optional.empty());
+        when(userRepository.findByIdAndDeletedFalse(any())).thenReturn(Optional.empty());
 
         // Then
         assertThrows(UserNotFoundException.class,

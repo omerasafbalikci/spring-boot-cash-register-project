@@ -82,7 +82,7 @@ public class UserController {
      * @return the updated user
      */
     @PutMapping("/update")
-    public ResponseEntity<GetAllUsersResponse> updateUser(@RequestBody UpdateUserRequest updateUserRequest) {
+    public ResponseEntity<GetAllUsersResponse> updateUser(@RequestBody @Valid UpdateUserRequest updateUserRequest) {
         return ResponseEntity.status(HttpStatus.OK).body(this.userService.updateUser(updateUserRequest));
     }
 

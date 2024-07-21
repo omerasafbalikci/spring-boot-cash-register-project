@@ -21,7 +21,6 @@ public class GetAllUsersResponse {
     private String lastName;
     private String username;
     private String email;
-    private boolean deleted;
     private Set<Role> roles;
     private Gender gender;
 }
