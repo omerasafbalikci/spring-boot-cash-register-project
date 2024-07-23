@@ -57,14 +57,15 @@ public class ProductManager implements ProductService {
      * @param unitPrice     the unit price to filter by
      * @param state         the state to filter by
      * @param createdBy     the creator to filter by
+     * @param categoryId    the category ID to filter by
      * @return a Map containing the filtered products and pagination details
      */
     @Override
     public Map<String, Object> getProductsFiltered(int page, int size, String[] sort, Long id, String barcodeNumber, String name,
-                                                   Integer quantity, Double unitPrice, Boolean state, String createdBy) {
-        logger.info("Fetching all products with pagination. Page: {}, Size: {}, Sort: {}. Filter: id={}, barcodeNumber={}, name={}, quantity={}, unitPrice={}, state={}, createdBy={}.", page, size, Arrays.toString(sort), id, barcodeNumber, name, quantity, unitPrice, state, createdBy);
+                                                   Integer quantity, Double unitPrice, Boolean state, String createdBy, Long categoryId) {
+        logger.info("Fetching all products with pagination. Page: {}, Size: {}, Sort: {}. Filter: id={}, barcodeNumber={}, name={}, quantity={}, unitPrice={}, state={}, createdBy={}, categoryId={}.", page, size, Arrays.toString(sort), id, barcodeNumber, name, quantity, unitPrice, state, createdBy, categoryId);
         Pageable pagingSort = PageRequest.of(page, size, Sort.by(getOrder(sort)));
-        ProductSpecification specification = new ProductSpecification(id, barcodeNumber, name, quantity, unitPrice, state, createdBy);
+        ProductSpecification specification = new ProductSpecification(id, barcodeNumber, name, quantity, unitPrice, state, createdBy, categoryId);
         Page<Product> pagePro = this.productRepository.findAll(specification, pagingSort);
 
         List<GetAllProductsResponse> responses = pagePro.getContent().stream()

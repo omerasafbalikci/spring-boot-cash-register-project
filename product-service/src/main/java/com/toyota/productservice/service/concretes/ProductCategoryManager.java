@@ -2,12 +2,10 @@ package com.toyota.productservice.service.concretes;
 
 import com.toyota.productservice.dao.ProductCategoryRepository;
 import com.toyota.productservice.dao.ProductCategorySpecification;
-import com.toyota.productservice.domain.Product;
 import com.toyota.productservice.domain.ProductCategory;
 import com.toyota.productservice.dto.requests.CreateProductCategoryRequest;
 import com.toyota.productservice.dto.requests.UpdateProductCategoryRequest;
 import com.toyota.productservice.dto.responses.GetAllProductCategoriesResponse;
-import com.toyota.productservice.dto.responses.GetAllProductsResponse;
 import com.toyota.productservice.service.abstracts.ProductCategoryService;
 import com.toyota.productservice.service.rules.ProductCategoryBusinessRules;
 import com.toyota.productservice.utilities.exceptions.EntityAlreadyExistsException;
@@ -103,55 +101,6 @@ public class ProductCategoryManager implements ProductCategoryService {
             orders.add(new Sort.Order(getSortDirection(sort[1]), sort[0]));
         }
         return orders;
-    }
-
-    /**
-     * Retrieves products by category ID with pagination and sorting.
-     *
-     * @param page       the page number to retrieve
-     * @param size       the number of items per page
-     * @param sort       the sorting criteria
-     * @param categoryId the ID of the product category
-     * @return a Map containing the products and pagination details
-     * @throws EntityNotFoundException if no product category with the given ID is found
-     */
-    @Override
-    public Map<String, Object> getProductsByCategoryId(int page, int size, String[] sort, Long categoryId) {
-        logger.info("Fetching products by category id '{}' with pagination. Page: {}, Size: {}, Sort: {}.", categoryId, page, size, Arrays.toString(sort));
-        Optional<ProductCategory> optionalProductCategory = this.productCategoryRepository.findByIdAndDeletedFalse(categoryId);
-        if (optionalProductCategory.isPresent()) {
-            ProductCategory productCategory = optionalProductCategory.get();
-            List<Product> products = productCategory.getProducts();
-
-            Pageable pageable = PageRequest.of(page, size, Sort.by(getOrder(sort)));
-
-            int start = (int) pageable.getOffset();
-            int end = Math.min((start + pageable.getPageSize()), products.size());
-
-            if (start > products.size()) {
-                start = products.size();
-                end = products.size();
-            }
-
-            Page<Product> pagePro = new PageImpl<>(products.subList(start, end), pageable, products.size());
-
-            List<GetAllProductsResponse> responses = pagePro.getContent().stream()
-                    .filter(product -> !product.isDeleted())
-                    .map(product -> modelMapperService.forResponse().map(product, GetAllProductsResponse.class))
-                    .collect(Collectors.toList());
-            logger.debug("Mapped products to response DTOs. Number of products: {}", responses.size());
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("products", responses);
-            response.put("currentPage", pagePro.getNumber());
-            response.put("totalItems", pagePro.getTotalElements());
-            response.put("totalPages", pagePro.getTotalPages());
-            logger.debug("Retrieved {} products for category id '{}'. Total items: {}. Total pages: {}.", responses.size(), categoryId, pagePro.getTotalElements(), pagePro.getTotalPages());
-            return response;
-        } else {
-            logger.warn("No product category found with id '{}'.", categoryId);
-            throw new EntityNotFoundException("Product category not found");
-        }
     }
 
     /**

@@ -30,10 +30,10 @@ public class ProductControllerTest {
     void getProductsFiltered() {
         // Given
         Map<String, Object> response = new HashMap<>();
-        when(productService.getProductsFiltered(0, 3, new String[]{"id", "asc"}, null, "", null, null, null, null, null)).thenReturn(response);
+        when(productService.getProductsFiltered(0, 3, new String[]{"id", "asc"}, null, "", null, null, null, null, null, null)).thenReturn(response);
 
         // When
-        ResponseEntity<Map<String, Object>> result = productController.getProductsFiltered(0, 3, new String[]{"id", "asc"}, null, "", null, null , null, null, null);
+        ResponseEntity<Map<String, Object>> result = productController.getProductsFiltered(0, 3, new String[]{"id", "asc"}, null, "", null, null , null, null, null, null);
 
         // Then
         assertEquals(HttpStatus.OK, result.getStatusCode());

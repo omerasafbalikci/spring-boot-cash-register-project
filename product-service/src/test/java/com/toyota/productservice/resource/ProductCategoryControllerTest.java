@@ -44,20 +44,6 @@ public class ProductCategoryControllerTest {
     }
 
     @Test
-    void getProductsByCategoryId() {
-        // Given
-        Map<String, Object> response = new HashMap<>();
-        when(productCategoryService.getProductsByCategoryId(0, 3, new String[]{"id", "asc"}, 1L)).thenReturn(response);
-
-        // When
-        ResponseEntity<Map<String, Object>> result = productCategoryController.getProductsByCategoryId(0, 3, new String[]{"id", "asc"}, 1L);
-
-        // Then
-        assertEquals(HttpStatus.OK, result.getStatusCode());
-        assertEquals(response, result.getBody());
-    }
-
-    @Test
     void addCategory() {
         // Given
         CreateProductCategoryRequest request = new CreateProductCategoryRequest("New Category", "New Description", "New ImageURL", "Admin");

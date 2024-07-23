@@ -27,10 +27,11 @@ public interface ProductService {
      * @param unitPrice     the unit price to filter by
      * @param state         the state to filter by
      * @param createdBy     the creator to filter by
-     * @return a TreeMap containing the filtered products and pagination details
+     * @param categoryId    the category ID to filter by
+     * @return a Map containing the filtered products and pagination details
      */
     Map<String, Object> getProductsFiltered(int page, int size, String[] sort, Long id, String barcodeNumber, String name,
-                                            Integer quantity, Double unitPrice, Boolean state, String createdBy);
+                                            Integer quantity, Double unitPrice, Boolean state, String createdBy, Long categoryId);
 
     /**
      * Checks the availability of products in the inventory.

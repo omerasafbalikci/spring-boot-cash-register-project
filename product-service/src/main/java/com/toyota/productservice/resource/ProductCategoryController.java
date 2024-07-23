@@ -48,25 +48,6 @@ public class ProductCategoryController {
     }
 
     /**
-     * Retrieves paginated and sorted products for a given category ID.
-     *
-     * @param page       the page number to retrieve, default is 0
-     * @param size       the number of items per page, default is 3
-     * @param sort       the sorting criteria in the format "property,direction", default is "id,asc"
-     * @param categoryId the ID of the product category
-     * @return a ResponseEntity containing a Map with the products and pagination details
-     */
-    @GetMapping("/products")
-    public ResponseEntity<Map<String, Object>> getProductsByCategoryId(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "3") int size,
-            @RequestParam(defaultValue = "id,asc") String[] sort,
-            @RequestParam() Long categoryId) {
-        Map<String, Object> response = this.productCategoryService.getProductsByCategoryId(page, size, sort, categoryId);
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-    /**
      * Adds a new product category.
      *
      * @param createProductCategoryRequest the request object containing the details of the category to add

@@ -73,7 +73,7 @@ public class ProductManagerTest {
                 });
         when(modelMapperService.forResponse()).thenReturn(modelMapper);
 
-        Map<String, Object> response = productManager.getProductsFiltered(page, size, sort, null, null, null, null, null, null, null);
+        Map<String, Object> response = productManager.getProductsFiltered(page, size, sort, null, null, null, null, null, null, null, null);
 
         // Then
         @SuppressWarnings("unchecked")
@@ -107,7 +107,7 @@ public class ProductManagerTest {
                 });
         when(modelMapperService.forResponse()).thenReturn(modelMapper);
 
-        Map<String, Object> response = productManager.getProductsFiltered(page, size, sort, null, null, null, null, null, null, null);
+        Map<String, Object> response = productManager.getProductsFiltered(page, size, sort, null, null, null, null, null, null, null, null);
 
         // Then
         @SuppressWarnings("unchecked")

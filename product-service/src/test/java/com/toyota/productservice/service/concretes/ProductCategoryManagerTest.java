@@ -2,12 +2,10 @@ package com.toyota.productservice.service.concretes;
 
 import com.toyota.productservice.dao.ProductCategoryRepository;
 import com.toyota.productservice.dao.ProductCategorySpecification;
-import com.toyota.productservice.domain.Product;
 import com.toyota.productservice.domain.ProductCategory;
 import com.toyota.productservice.dto.requests.CreateProductCategoryRequest;
 import com.toyota.productservice.dto.requests.UpdateProductCategoryRequest;
 import com.toyota.productservice.dto.responses.GetAllProductCategoriesResponse;
-import com.toyota.productservice.dto.responses.GetAllProductsResponse;
 import com.toyota.productservice.service.rules.ProductCategoryBusinessRules;
 import com.toyota.productservice.utilities.exceptions.EntityAlreadyExistsException;
 import com.toyota.productservice.utilities.exceptions.EntityNotFoundException;
@@ -77,82 +75,6 @@ public class ProductCategoryManagerTest {
         assertEquals(0, response.get("currentPage"));
         assertEquals(2L, response.get("totalItems"));
         assertEquals(1, response.get("totalPages"));
-    }
-
-    @Test
-    void getProductsByCategoryId_returnsProducts() {
-        // Given
-        int page = 0;
-        int size = 2;
-        String[] sort = {"name,asc"};
-        Long categoryId = 1L;
-
-        ProductCategory productCategory = getProductCategory(categoryId);
-
-        when(productCategoryRepository.findByIdAndDeletedFalse(categoryId)).thenReturn(Optional.of(productCategory));
-        when(modelMapperService.forResponse()).thenReturn(modelMapper);
-        when(modelMapper.map(any(Product.class), eq(GetAllProductsResponse.class)))
-                .thenAnswer(invocation -> {
-                    Product product = invocation.getArgument(0);
-                    GetAllProductsResponse response = new GetAllProductsResponse();
-                    response.setId(product.getId());
-                    response.setName(product.getName());
-                    return response;
-                });
-
-        // When
-        Map<String, Object> response = productCategoryManager.getProductsByCategoryId(page, size, sort, categoryId);
-
-        // Then
-        @SuppressWarnings("unchecked")
-        List<GetAllProductsResponse> productsResponse = (List<GetAllProductsResponse>) response.get("products");
-
-        assertEquals(2, productsResponse.size());
-        assertEquals(0, response.get("currentPage"));
-        assertEquals(2L, response.get("totalItems"));
-        assertEquals(1, response.get("totalPages"));
-
-        verify(productCategoryRepository).findByIdAndDeletedFalse(categoryId);
-        verify(modelMapper, times(2)).map(any(Product.class), eq(GetAllProductsResponse.class));
-    }
-
-    private static ProductCategory getProductCategory(Long categoryId) {
-        ProductCategory productCategory = new ProductCategory();
-        productCategory.setId(categoryId);
-
-        Product product1 = new Product();
-        product1.setId(1L);
-        product1.setName("Product1");
-        product1.setDeleted(false);
-
-        Product product2 = new Product();
-        product2.setId(2L);
-        product2.setName("Product2");
-        product2.setDeleted(false);
-
-        List<Product> products = Arrays.asList(product1, product2);
-        productCategory.setProducts(products);
-        return productCategory;
-    }
-
-    @Test
-    void getProductsByCategoryId_noProductCategoryFound() {
-        // Given
-        int page = 0;
-        int size = 2;
-        String[] sort = {"name,asc"};
-        Long categoryId = 1L;
-
-        when(productCategoryRepository.findByIdAndDeletedFalse(categoryId)).thenReturn(Optional.empty());
-
-        // When / Then
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> productCategoryManager.getProductsByCategoryId(page, size, sort, categoryId));
-
-        assertEquals("Product category not found", exception.getMessage());
-
-        verify(productCategoryRepository).findByIdAndDeletedFalse(categoryId);
-        verifyNoMoreInteractions(modelMapperService);
-        verifyNoMoreInteractions(modelMapper);
     }
 
     @Test

@@ -26,15 +26,20 @@ public class ProductController {
     private final ProductService productService;
 
     /**
-     * Retrieves a filtered list of products.
+     * Retrieves filtered products with pagination and sorting.
      *
-     * @param page          the page number to retrieve (default is 0)
-     * @param size          the size of the page (default is 3)
-     * @param sort          the sort criteria (default is "id,asc")
-     * @param id            optional filter by product ID
-     * @param barcodeNumber optional filter by barcode number
-     * @param state         optional filter by state
-     * @return a TreeMap containing the filtered products
+     * @param page          the page number to retrieve
+     * @param size          the number of items per page
+     * @param sort          the sorting criteria
+     * @param id            the product ID to filter by
+     * @param barcodeNumber the barcode number to filter by
+     * @param name          the name to filter by
+     * @param quantity      the quantity to filter by
+     * @param unitPrice     the unit price to filter by
+     * @param state         the state to filter by
+     * @param createdBy     the creator to filter by
+     * @param categoryId    the category ID to filter by
+     * @return a ResponseEntity containing a map of the filtered products and pagination details
      */
     @GetMapping("/get-all")
     public ResponseEntity<Map<String, Object>> getProductsFiltered(
@@ -47,8 +52,9 @@ public class ProductController {
             @RequestParam(defaultValue = "") Integer quantity,
             @RequestParam(defaultValue = "") Double unitPrice,
             @RequestParam(defaultValue = "") Boolean state,
-            @RequestParam(defaultValue = "") String createdBy) {
-        Map<String, Object> response = this.productService.getProductsFiltered(page, size, sort, id, barcodeNumber, name, quantity, unitPrice, state, createdBy);
+            @RequestParam(defaultValue = "") String createdBy,
+            @RequestParam(defaultValue = "") Long categoryId) {
+        Map<String, Object> response = this.productService.getProductsFiltered(page, size, sort, id, barcodeNumber, name, quantity, unitPrice, state, createdBy, categoryId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

@@ -27,17 +27,6 @@ public interface ProductCategoryService {
                                               String name, String createdBy);
 
     /**
-     * Retrieves products by category ID with pagination and sorting.
-     *
-     * @param page       the page number to retrieve
-     * @param size       the number of items per page
-     * @param sort       the sorting criteria
-     * @param categoryId the ID of the product category
-     * @return a Map containing the products and pagination details
-     */
-    Map<String, Object> getProductsByCategoryId(int page, int size, String[] sort, Long categoryId);
-
-    /**
      * Adds a new product category.
      *
      * @param createProductCategoryRequest the details of the category to be created.

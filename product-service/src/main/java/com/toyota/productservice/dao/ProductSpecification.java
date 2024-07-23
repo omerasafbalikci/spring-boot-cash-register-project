@@ -25,6 +25,7 @@ public class ProductSpecification implements Specification<Product> {
     private final Double unitPrice;
     private final Boolean state;
     private final String createdBy;
+    private final Long categoryId;
 
     /**
      * Constructs a {@link Predicate} based on the filtering criteria provided.
@@ -58,6 +59,9 @@ public class ProductSpecification implements Specification<Product> {
         }
         if (createdBy != null && !createdBy.isEmpty()) {
             predicates.add(criteriaBuilder.like(root.get("createdBy"), "%" + createdBy + "%"));
+        }
+        if (categoryId != null) {
+            predicates.add(criteriaBuilder.equal(root.get("productCategory").get("id"), categoryId));
         }
 
         predicates.add(criteriaBuilder.isFalse(root.get("deleted")));
