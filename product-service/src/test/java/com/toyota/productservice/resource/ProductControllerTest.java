@@ -14,9 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -29,28 +27,13 @@ public class ProductControllerTest {
     private ProductController productController;
 
     @Test
-    void getProductFiltered() {
+    void getProductsFiltered() {
         // Given
-        TreeMap<String, Object> response = new TreeMap<>();
-        when(productService.getProductFiltered(0, 3, new String[]{"id", "asc"}, null, "", null)).thenReturn(response);
+        Map<String, Object> response = new HashMap<>();
+        when(productService.getProductsFiltered(0, 3, new String[]{"id", "asc"}, null, "", null, null, null, null, null)).thenReturn(response);
 
         // When
-        ResponseEntity<TreeMap<String, Object>> result = productController.getProductFiltered(0, 3, new String[]{"id", "asc"}, null, "", null);
-
-        // Then
-        assertEquals(HttpStatus.OK, result.getStatusCode());
-        assertEquals(response, result.getBody());
-    }
-
-    @Test
-    void getProductsByNameContaining() {
-        // Given
-        String name = "Product";
-        TreeMap<String, Object> response = new TreeMap<>();
-        when(productService.getProductsByNameContaining(name, 0, 3, new String[]{"id", "asc"})).thenReturn(response);
-
-        // When
-        ResponseEntity<TreeMap<String, Object>> result = productController.getProductsByNameContaining(name, 0, 3, new String[]{"id", "asc"});
+        ResponseEntity<Map<String, Object>> result = productController.getProductsFiltered(0, 3, new String[]{"id", "asc"}, null, "", null, null , null, null, null);
 
         // Then
         assertEquals(HttpStatus.OK, result.getStatusCode());

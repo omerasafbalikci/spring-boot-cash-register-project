@@ -7,7 +7,7 @@ import com.toyota.productservice.dto.responses.GetAllProductsResponse;
 import com.toyota.productservice.dto.responses.InventoryResponse;
 
 import java.util.List;
-import java.util.TreeMap;
+import java.util.Map;
 
 /**
  * Interface for product's service class.
@@ -15,28 +15,22 @@ import java.util.TreeMap;
 
 public interface ProductService {
     /**
-     * Retrieves a filtered list of products based on the given parameters.
+     * Retrieves filtered and paginated products.
      *
-     * @param page          the page number for pagination.
-     * @param size          the number of items per page.
-     * @param sort          the sorting criteria.
-     * @param id            the ID of the product to filter by.
-     * @param barcodeNumber the barcode number of the product to filter by.
-     * @param state         the state of the product to filter by.
-     * @return a {@link TreeMap} containing the filtered products and additional pagination information.
+     * @param page          the page number to retrieve
+     * @param size          the number of items per page
+     * @param sort          the sorting criteria
+     * @param id            the ID to filter by
+     * @param barcodeNumber the barcode number to filter by
+     * @param name          the name to filter by
+     * @param quantity      the quantity to filter by
+     * @param unitPrice     the unit price to filter by
+     * @param state         the state to filter by
+     * @param createdBy     the creator to filter by
+     * @return a TreeMap containing the filtered products and pagination details
      */
-    TreeMap<String, Object> getProductFiltered(int page, int size, String[] sort, Long id, String barcodeNumber, Boolean state);
-
-    /**
-     * Retrieves products whose names contain the specified string.
-     *
-     * @param name the string to search for in product names.
-     * @param page the page number for pagination.
-     * @param size the number of items per page.
-     * @param sort the sorting criteria.
-     * @return a {@link TreeMap} containing the products matching the search criteria and additional pagination information.
-     */
-    TreeMap<String, Object> getProductsByNameContaining(String name, int page, int size, String[] sort);
+    Map<String, Object> getProductsFiltered(int page, int size, String[] sort, Long id, String barcodeNumber, String name,
+                                            Integer quantity, Double unitPrice, Boolean state, String createdBy);
 
     /**
      * Checks the availability of products in the inventory.
@@ -70,10 +64,10 @@ public interface ProductService {
     GetAllProductsResponse updateProduct(UpdateProductRequest updateProductRequest);
 
     /**
-     * Deletes a product by its ID.
+     * Soft deletes a product by its ID (marks it as deleted without removing it from the database).
      *
-     * @param id the ID of the product to be deleted.
-     * @return a {@link GetAllProductsResponse} representing the deleted product.
+     * @param id the ID of the product to be soft deleted
+     * @return the details of the soft-deleted product
      */
     GetAllProductsResponse deleteProduct(Long id);
 }

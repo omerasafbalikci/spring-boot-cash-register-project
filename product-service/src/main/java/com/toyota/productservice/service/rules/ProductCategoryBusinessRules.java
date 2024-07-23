@@ -25,7 +25,7 @@ public class ProductCategoryBusinessRules {
      * @throws EntityAlreadyExistsException if a product category with the given name already exists
      */
     public void checkIfProductCategoryNameExists(String name) {
-        if (this.productCategoryRepository.existsByNameIgnoreCase(name)) {
+        if (this.productCategoryRepository.existsByNameIgnoreCaseAndDeletedIsFalse(name)) {
             throw new EntityAlreadyExistsException("Product category already exists");
         }
     }
@@ -36,7 +36,7 @@ public class ProductCategoryBusinessRules {
      * value from the existing product category will be retained.
      *
      * @param updateProductCategoryRequest the request containing new attribute values for the product category
-     * @param productCategory the product category to be updated
+     * @param productCategory              the product category to be updated
      */
     public void checkUpdate(UpdateProductCategoryRequest updateProductCategoryRequest, ProductCategory productCategory) {
         if (updateProductCategoryRequest.getName() != null) {

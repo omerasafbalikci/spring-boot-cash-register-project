@@ -3,7 +3,6 @@ package com.toyota.productservice.resource;
 import com.toyota.productservice.dto.requests.CreateProductCategoryRequest;
 import com.toyota.productservice.dto.requests.UpdateProductCategoryRequest;
 import com.toyota.productservice.dto.responses.GetAllProductCategoriesResponse;
-import com.toyota.productservice.dto.responses.GetAllProductsResponse;
 import com.toyota.productservice.service.abstracts.ProductCategoryService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -11,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * REST controller for managing product categories.
@@ -24,50 +23,47 @@ public class ProductCategoryController {
     private final ProductCategoryService productCategoryService;
 
     /**
-     * Retrieves all product categories.
+     * Retrieves paginated and sorted product categories based on various filter criteria.
      *
-     * @return a ResponseEntity containing the list of all product categories
+     * @param page           the page number to retrieve, default is 0
+     * @param size           the number of items per page, default is 3
+     * @param sort           the sorting criteria in the format "property,direction", default is "id,asc"
+     * @param id             the ID of the category to filter by, default is empty
+     * @param categoryNumber the category number to filter by, default is empty
+     * @param name           the name to filter by, default is empty
+     * @param createdBy      the creator to filter by, default is empty
+     * @return a ResponseEntity containing a Map with the filtered categories and pagination details
      */
     @GetMapping("/get-all")
-    public ResponseEntity<List<GetAllProductCategoriesResponse>> getAllCategories() {
-        List<GetAllProductCategoriesResponse> responses = this.productCategoryService.getAllCategories();
-        return new ResponseEntity<>(responses, HttpStatus.OK);
+    public ResponseEntity<Map<String, Object>> getCategoriesFiltered(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "3") int size,
+            @RequestParam(defaultValue = "id,asc") String[] sort,
+            @RequestParam(defaultValue = "") Long id,
+            @RequestParam(defaultValue = "") String categoryNumber,
+            @RequestParam(defaultValue = "") String name,
+            @RequestParam(defaultValue = "") String createdBy) {
+        Map<String, Object> response = this.productCategoryService.getCategoriesFiltered(page, size, sort, id, categoryNumber, name, createdBy);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     /**
-     * Retrieves product categories by name containing a specified string.
+     * Retrieves paginated and sorted products for a given category ID.
      *
-     * @param name the string to search for in category names
-     * @return a ResponseEntity containing the list of matching product categories
-     */
-    @GetMapping("/search")
-    public ResponseEntity<List<GetAllProductCategoriesResponse>> getCategoriesByNameContaining(@RequestParam() String name) {
-        List<GetAllProductCategoriesResponse> responses = this.productCategoryService.getCategoriesByNameContaining(name);
-        return new ResponseEntity<>(responses, HttpStatus.OK);
-    }
-
-    /**
-     * Retrieves a product category by its ID.
-     *
-     * @param id the ID of the product category to retrieve
-     * @return a ResponseEntity containing the matching product category
-     */
-    @GetMapping("/id")
-    public ResponseEntity<GetAllProductCategoriesResponse> getCategoryById(@RequestParam() Long id) {
-        GetAllProductCategoriesResponse response = this.productCategoryService.getCategoryById(id);
-        return ResponseEntity.ok(response);
-    }
-
-    /**
-     * Retrieves all products in a specified category.
-     *
-     * @param categoryId the ID of the category whose products to retrieve
-     * @return a ResponseEntity containing the list of products in the specified category
+     * @param page       the page number to retrieve, default is 0
+     * @param size       the number of items per page, default is 3
+     * @param sort       the sorting criteria in the format "property,direction", default is "id,asc"
+     * @param categoryId the ID of the product category
+     * @return a ResponseEntity containing a Map with the products and pagination details
      */
     @GetMapping("/products")
-    public ResponseEntity<List<GetAllProductsResponse>> getProductsByCategoryId(@RequestParam() Long categoryId) {
-        List<GetAllProductsResponse> responses = this.productCategoryService.getProductsByCategoryId(categoryId);
-        return new ResponseEntity<>(responses, HttpStatus.OK);
+    public ResponseEntity<Map<String, Object>> getProductsByCategoryId(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "3") int size,
+            @RequestParam(defaultValue = "id,asc") String[] sort,
+            @RequestParam() Long categoryId) {
+        Map<String, Object> response = this.productCategoryService.getProductsByCategoryId(page, size, sort, categoryId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     /**
@@ -95,7 +91,7 @@ public class ProductCategoryController {
     }
 
     /**
-     * Deletes a product category.
+     * Marks the product category with the given ID as deleted.
      *
      * @param id the ID of the category to delete
      * @return a ResponseEntity containing the details of the deleted product category

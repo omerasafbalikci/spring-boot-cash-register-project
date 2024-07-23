@@ -1,6 +1,7 @@
 package com.toyota.productservice.service.concretes;
 
 import com.toyota.productservice.dao.ProductCategoryRepository;
+import com.toyota.productservice.dao.ProductCategorySpecification;
 import com.toyota.productservice.domain.Product;
 import com.toyota.productservice.domain.ProductCategory;
 import com.toyota.productservice.dto.requests.CreateProductCategoryRequest;
@@ -15,13 +16,13 @@ import com.toyota.productservice.utilities.mappers.ModelMapperService;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Service implementation for managing product categories.
@@ -37,80 +38,120 @@ public class ProductCategoryManager implements ProductCategoryService {
     private final ProductCategoryBusinessRules productCategoryBusinessRules;
 
     /**
-     * Fetches all product categories.
+     * Retrieves filtered and paginated product categories.
      *
-     * @return a list of GetAllProductCategoriesResponse objects
+     * @param page           the page number to retrieve
+     * @param size           the number of items per page
+     * @param sort           the sorting criteria
+     * @param id             the ID to filter by
+     * @param categoryNumber the category number to filter by
+     * @param name           the name to filter by
+     * @param createdBy      the creator to filter by
+     * @return a Map containing the filtered product categories and pagination details
      */
     @Override
-    public List<GetAllProductCategoriesResponse> getAllCategories() {
-        logger.info("Fetching all product categories.");
-        List<ProductCategory> productCategories = this.productCategoryRepository.findAll();
-        logger.debug("Retrieved {} product categories.", productCategories.size());
-        List<GetAllProductCategoriesResponse> responses = productCategories.stream()
+    public Map<String, Object> getCategoriesFiltered(int page, int size, String[] sort, Long id, String categoryNumber,
+                                                     String name, String createdBy) {
+        logger.info("Fetching all product categories with pagination. Page: {}, Size: {}, Sort: {}. Filter: id={}, categoryNumber={}, name={}, createdBy={}.", page, size, Arrays.toString(sort), id, categoryNumber, name, createdBy);
+        Pageable pagingSort = PageRequest.of(page, size, Sort.by(getOrder(sort)));
+        ProductCategorySpecification specification = new ProductCategorySpecification(id, categoryNumber, name, createdBy);
+        Page<ProductCategory> categoryPage = this.productCategoryRepository.findAll(specification, pagingSort);
+
+        List<GetAllProductCategoriesResponse> responses = categoryPage.getContent().stream()
                 .map(productCategory -> this.modelMapperService.forResponse()
-                        .map(productCategory, GetAllProductCategoriesResponse.class)).toList();
-        logger.info("Get all: Retrieved and converted {} product categories to GetAllProductCategoriesResponse.", responses.size());
-        return responses;
+                        .map(productCategory, GetAllProductCategoriesResponse.class)).collect(Collectors.toList());
+        logger.debug("Get product categories: Mapped product categories to response DTOs. Number of product categories: {}", responses.size());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("productCategories", responses);
+        response.put("currentPage", categoryPage.getNumber());
+        response.put("totalItems", categoryPage.getTotalElements());
+        response.put("totalPages", categoryPage.getTotalPages());
+        logger.debug("Get product categories: Retrieved {} products for page {}. Total items: {}. Total pages: {}.", responses.size(), categoryPage.getNumber(), categoryPage.getTotalElements(), categoryPage.getTotalPages());
+        return response;
     }
 
     /**
-     * Fetches product categories by name containing the specified string.
+     * Determines the sorting direction.
      *
-     * @param name the name string to search for
-     * @return a list of GetAllProductCategoriesResponse objects
+     * @param direction the direction to sort (asc or desc)
+     * @return the Sort.Direction enum value
      */
-    @Override
-    public List<GetAllProductCategoriesResponse> getCategoriesByNameContaining(String name) {
-        logger.info("Fetching product categories by name containing '{}'.", name);
-        List<ProductCategory> productCategories = this.productCategoryRepository.findByNameContainingIgnoreCase(name);
-        if (!productCategories.isEmpty()) {
-            logger.debug("Retrieved {} product categories by name containing '{}'.", productCategories.size(), name);
-            List<GetAllProductCategoriesResponse> responses = productCategories.stream()
-                    .map(productCategory -> modelMapperService.forResponse().map(productCategory, GetAllProductCategoriesResponse.class)).toList();
-            logger.info("Search: Retrieved and converted {} product categories to GetAllProductCategoriesResponse.", responses.size());
-            return responses;
-        } else {
-            logger.warn("No product categories found by name containing '{}'.", name);
-            throw new EntityNotFoundException("Product category not found for name: " + name);
+    private Sort.Direction getSortDirection(String direction) {
+        if (direction.equals("asc")) {
+            return Sort.Direction.ASC;
+        } else if (direction.equals("desc")) {
+            return Sort.Direction.DESC;
         }
+        return Sort.Direction.ASC;
     }
 
     /**
-     * Fetches a product category by its ID.
+     * Creates a list of Sort.Order objects based on the provided sort parameters.
      *
-     * @param id the ID of the product category
-     * @return a GetAllProductCategoriesResponse object
+     * @param sort the sort parameters
+     * @return a list of Sort.Order objects
      */
-    @Override
-    public GetAllProductCategoriesResponse getCategoryById(Long id) {
-        logger.info("Fetching product category by id '{}'.", id);
-        ProductCategory productCategory = this.productCategoryRepository.findById(id).orElseThrow(() -> {
-            logger.warn("Get category by id: No product category found with id '{}'.", id);
-            return new EntityNotFoundException("Product category not found for id: " + id);
-        });
-        logger.debug("Retrieved product category with id '{}'.", id);
-        return this.modelMapperService.forResponse().map(productCategory, GetAllProductCategoriesResponse.class);
+    private List<Sort.Order> getOrder(String[] sort) {
+        List<Sort.Order> orders = new ArrayList<>();
+        if (sort[0].contains(",")) {
+            for (String sortOrder : sort) {
+                String[] _sort = sortOrder.split(",");
+                orders.add(new Sort.Order(getSortDirection(_sort[1]), _sort[0]));
+            }
+        } else {
+            orders.add(new Sort.Order(getSortDirection(sort[1]), sort[0]));
+        }
+        return orders;
     }
 
     /**
-     * Fetches products by their category ID.
+     * Retrieves products by category ID with pagination and sorting.
      *
-     * @param categoryId the ID of the category
-     * @return a list of GetAllProductsResponse objects
+     * @param page       the page number to retrieve
+     * @param size       the number of items per page
+     * @param sort       the sorting criteria
+     * @param categoryId the ID of the product category
+     * @return a Map containing the products and pagination details
+     * @throws EntityNotFoundException if no product category with the given ID is found
      */
     @Override
-    public List<GetAllProductsResponse> getProductsByCategoryId(Long categoryId) {
-        logger.info("Fetching products by category id '{}'.", categoryId);
-        ProductCategory productCategory = this.productCategoryRepository.findById(categoryId).orElseThrow(() -> {
-            logger.warn("Get products by category id: No product category found with id '{}'.", categoryId);
-            return new EntityNotFoundException("Product category not found");
-        });
-        logger.debug("Retrieved products for category id '{}'.", categoryId);
-        List<Product> products = productCategory.getProducts();
-        List<GetAllProductsResponse> responses = products.stream()
-                .map(product -> modelMapperService.forResponse().map(product, GetAllProductsResponse.class)).toList();
-        logger.info("Retrieved and converted {} product to GetAllProductsResponse.", responses.size());
-        return responses;
+    public Map<String, Object> getProductsByCategoryId(int page, int size, String[] sort, Long categoryId) {
+        logger.info("Fetching products by category id '{}' with pagination. Page: {}, Size: {}, Sort: {}.", categoryId, page, size, Arrays.toString(sort));
+        Optional<ProductCategory> optionalProductCategory = this.productCategoryRepository.findByIdAndDeletedFalse(categoryId);
+        if (optionalProductCategory.isPresent()) {
+            ProductCategory productCategory = optionalProductCategory.get();
+            List<Product> products = productCategory.getProducts();
+
+            Pageable pageable = PageRequest.of(page, size, Sort.by(getOrder(sort)));
+
+            int start = (int) pageable.getOffset();
+            int end = Math.min((start + pageable.getPageSize()), products.size());
+
+            if (start > products.size()) {
+                start = products.size();
+                end = products.size();
+            }
+
+            Page<Product> pagePro = new PageImpl<>(products.subList(start, end), pageable, products.size());
+
+            List<GetAllProductsResponse> responses = pagePro.getContent().stream()
+                    .filter(product -> !product.isDeleted())
+                    .map(product -> modelMapperService.forResponse().map(product, GetAllProductsResponse.class))
+                    .collect(Collectors.toList());
+            logger.debug("Mapped products to response DTOs. Number of products: {}", responses.size());
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("products", responses);
+            response.put("currentPage", pagePro.getNumber());
+            response.put("totalItems", pagePro.getTotalElements());
+            response.put("totalPages", pagePro.getTotalPages());
+            logger.debug("Retrieved {} products for category id '{}'. Total items: {}. Total pages: {}.", responses.size(), categoryId, pagePro.getTotalElements(), pagePro.getTotalPages());
+            return response;
+        } else {
+            logger.warn("No product category found with id '{}'.", categoryId);
+            throw new EntityNotFoundException("Product category not found");
+        }
     }
 
     /**
@@ -145,10 +186,10 @@ public class ProductCategoryManager implements ProductCategoryService {
     @Override
     public GetAllProductCategoriesResponse updateCategory(UpdateProductCategoryRequest updateProductCategoryRequest) {
         logger.info("Updating product category with id '{}'.", updateProductCategoryRequest.getId());
-        Optional<ProductCategory> optionalProductCategory = this.productCategoryRepository.findById(updateProductCategoryRequest.getId());
+        Optional<ProductCategory> optionalProductCategory = this.productCategoryRepository.findByIdAndDeletedFalse(updateProductCategoryRequest.getId());
         if (optionalProductCategory.isPresent()) {
             ProductCategory productCategory = optionalProductCategory.get();
-            if (this.productCategoryRepository.existsByNameIgnoreCase(updateProductCategoryRequest.getName()) && !productCategory.getName().equals(updateProductCategoryRequest.getName())) {
+            if (this.productCategoryRepository.existsByNameIgnoreCaseAndDeletedIsFalse(updateProductCategoryRequest.getName()) && !productCategory.getName().equals(updateProductCategoryRequest.getName())) {
                 logger.warn("Product category name '{}' already exists.", productCategory.getName());
                 throw new EntityAlreadyExistsException("Product category name already exists");
             }
@@ -164,19 +205,21 @@ public class ProductCategoryManager implements ProductCategoryService {
     }
 
     /**
-     * Deletes a product category by its ID.
+     * Marks the product category with the given ID as deleted.
      *
      * @param id the ID of the product category to delete
-     * @return a GetAllProductCategoriesResponse object containing the deleted product category details
+     * @return the response object containing the details of the deleted product category
+     * @throws EntityNotFoundException if no product category with the given ID is found
      */
     @Override
     public GetAllProductCategoriesResponse deleteCategory(Long id) {
         logger.info("Deleting product category with id '{}'.", id);
-        Optional<ProductCategory> optionalProductCategory = this.productCategoryRepository.findById(id);
-
+        Optional<ProductCategory> optionalProductCategory = this.productCategoryRepository.findByIdAndDeletedFalse(id);
         if (optionalProductCategory.isPresent()) {
             ProductCategory productCategory = optionalProductCategory.get();
-            this.productCategoryRepository.deleteById(id);
+            productCategory.setUpdatedAt(LocalDateTime.now());
+            productCategory.setDeleted(true);
+            this.productCategoryRepository.save(productCategory);
             logger.debug("Product category deleted with id '{}'.", id);
             return this.modelMapperService.forResponse().map(productCategory, GetAllProductCategoriesResponse.class);
         } else {

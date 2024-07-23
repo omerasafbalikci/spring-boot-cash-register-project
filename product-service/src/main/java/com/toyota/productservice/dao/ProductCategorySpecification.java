@@ -1,6 +1,6 @@
 package com.toyota.productservice.dao;
 
-import com.toyota.productservice.domain.Product;
+import com.toyota.productservice.domain.ProductCategory;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
@@ -13,21 +13,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Specification class for filtering products based on various criteria.
+ * Specification class for filtering product categories based on various criteria.
  */
 
 @RequiredArgsConstructor
-public class ProductSpecification implements Specification<Product> {
+public class ProductCategorySpecification implements Specification<ProductCategory> {
     private final Long id;
-    private final String barcodeNumber;
+    private final String categoryNumber;
     private final String name;
-    private final Integer quantity;
-    private final Double unitPrice;
-    private final Boolean state;
     private final String createdBy;
 
     /**
-     * Constructs a {@link Predicate} based on the filtering criteria provided.
+     * Converts the filter criteria into a {@link Predicate} that can be used in a query.
      *
      * @param root the root
      * @param query the criteria query
@@ -35,29 +32,20 @@ public class ProductSpecification implements Specification<Product> {
      * @return a {@link Predicate} representing the filtering conditions
      */
     @Override
-    public Predicate toPredicate(@NonNull Root<Product> root, @NonNull CriteriaQuery<?> query, @NonNull CriteriaBuilder criteriaBuilder) {
+    public Predicate toPredicate(@NonNull Root<ProductCategory> root, @NonNull CriteriaQuery<?> query, @NonNull CriteriaBuilder criteriaBuilder) {
         List<Predicate> predicates = new ArrayList<>();
 
         if (id != null) {
             predicates.add(criteriaBuilder.equal(root.get("id"), id));
         }
-        if (barcodeNumber != null && !barcodeNumber.isEmpty()) {
-            predicates.add(criteriaBuilder.like(root.get("barcodeNumber"), "%" + barcodeNumber + "%"));
+        if (categoryNumber != null && !categoryNumber.isEmpty()) {
+            predicates.add(criteriaBuilder.like(root.get("categoryNumber"), "%" + categoryNumber + "%"));
         }
         if (name != null && !name.isEmpty()) {
             predicates.add(criteriaBuilder.like(root.get("name"), "%" + name + "%"));
         }
-        if (quantity != null) {
-            predicates.add(criteriaBuilder.equal(root.get("quantity"), quantity));
-        }
-        if (unitPrice != null) {
-            predicates.add(criteriaBuilder.equal(root.get("unitPrice"), unitPrice));
-        }
-        if (state != null) {
-            predicates.add(criteriaBuilder.equal(root.get("state"), state));
-        }
         if (createdBy != null && !createdBy.isEmpty()) {
-            predicates.add(criteriaBuilder.like(root.get("createdBy"), "%" + createdBy + "%"));
+            predicates.add(criteriaBuilder.like(root.get("createdBy"), "%" + categoryNumber + "%"));
         }
 
         predicates.add(criteriaBuilder.isFalse(root.get("deleted")));

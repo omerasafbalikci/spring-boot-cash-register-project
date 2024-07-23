@@ -45,6 +45,43 @@ public class ProductManager implements ProductService {
     private final ProductBusinessRules productBusinessRules;
 
     /**
+     * Retrieves filtered and paginated products.
+     *
+     * @param page          the page number to retrieve
+     * @param size          the number of items per page
+     * @param sort          the sorting criteria
+     * @param id            the ID to filter by
+     * @param barcodeNumber the barcode number to filter by
+     * @param name          the name to filter by
+     * @param quantity      the quantity to filter by
+     * @param unitPrice     the unit price to filter by
+     * @param state         the state to filter by
+     * @param createdBy     the creator to filter by
+     * @return a Map containing the filtered products and pagination details
+     */
+    @Override
+    public Map<String, Object> getProductsFiltered(int page, int size, String[] sort, Long id, String barcodeNumber, String name,
+                                                   Integer quantity, Double unitPrice, Boolean state, String createdBy) {
+        logger.info("Fetching all products with pagination. Page: {}, Size: {}, Sort: {}. Filter: id={}, barcodeNumber={}, name={}, quantity={}, unitPrice={}, state={}, createdBy={}.", page, size, Arrays.toString(sort), id, barcodeNumber, name, quantity, unitPrice, state, createdBy);
+        Pageable pagingSort = PageRequest.of(page, size, Sort.by(getOrder(sort)));
+        ProductSpecification specification = new ProductSpecification(id, barcodeNumber, name, quantity, unitPrice, state, createdBy);
+        Page<Product> pagePro = this.productRepository.findAll(specification, pagingSort);
+
+        List<GetAllProductsResponse> responses = pagePro.getContent().stream()
+                .map(product -> this.modelMapperService.forResponse()
+                        .map(product, GetAllProductsResponse.class)).collect(Collectors.toList());
+        logger.debug("Get products: Mapped products to response DTOs. Number of products: {}", responses.size());
+
+        Map<String, Object> response = new TreeMap<>();
+        response.put("products", responses);
+        response.put("currentPage", pagePro.getNumber());
+        response.put("totalItems", pagePro.getTotalElements());
+        response.put("totalPages", pagePro.getTotalPages());
+        logger.debug("Get products: Retrieved {} products for page {}. Total items: {}. Total pages: {}.", responses.size(), pagePro.getNumber(), pagePro.getTotalElements(), pagePro.getTotalPages());
+        return response;
+    }
+
+    /**
      * Determines the sorting direction.
      *
      * @param direction the direction to sort (asc or desc)
@@ -79,68 +116,6 @@ public class ProductManager implements ProductService {
     }
 
     /**
-     * Fetches filtered products with pagination and sorting.
-     *
-     * @param page          the page number to fetch
-     * @param size          the number of products per page
-     * @param sort          the sort parameters
-     * @param id            the ID filter
-     * @param barcodeNumber the barcode number filter
-     * @param state         the state filter
-     * @return a TreeMap containing the filtered products and pagination information
-     */
-    @Override
-    public TreeMap<String, Object> getProductFiltered(int page, int size, String[] sort, Long id, String barcodeNumber,
-                                                      Boolean state) {
-        logger.info("Fetching all products with pagination. Page: {}, Size: {}, Sort: {}. Filter: id={}, barcodeNumber={}, state={}.", page, size, Arrays.toString(sort), id, barcodeNumber, state);
-        Pageable pagingSort = PageRequest.of(page, size, Sort.by(getOrder(sort)));
-        ProductSpecification specification = new ProductSpecification(id, barcodeNumber, state);
-        Page<Product> pagePro = this.productRepository.findAll(specification, pagingSort);
-
-        List<GetAllProductsResponse> responses = pagePro.getContent().stream()
-                .map(product -> this.modelMapperService.forResponse()
-                        .map(product, GetAllProductsResponse.class)).collect(Collectors.toList());
-        logger.debug("Get products: Mapped products to response DTOs. Number of products: {}", responses.size());
-
-        TreeMap<String, Object> response = new TreeMap<>();
-        response.put("products", responses);
-        response.put("currentPage", pagePro.getNumber());
-        response.put("totalItems", pagePro.getTotalElements());
-        response.put("totalPages", pagePro.getTotalPages());
-        logger.debug("Get products: Retrieved {} products for page {}. Total items: {}. Total pages: {}.", responses.size(), pagePro.getNumber(), pagePro.getTotalElements(), pagePro.getTotalPages());
-        return response;
-    }
-
-    /**
-     * Fetches products by name containing the specified string with pagination and sorting.
-     *
-     * @param name  the name to search for
-     * @param page  the page number to fetch
-     * @param size  the number of products per page
-     * @param sort  the sort parameters
-     * @return a TreeMap containing the products and pagination information
-     */
-    @Override
-    public TreeMap<String, Object> getProductsByNameContaining(String name, int page, int size, String[] sort) {
-        logger.info("Fetching products by name containing '{}', with pagination. Page: {}, Size: {}, Sort: {}.", name, page, size, Arrays.toString(sort));
-        Pageable pagingSort = PageRequest.of(page, size, Sort.by(getOrder(sort)));
-        Page<Product> pagePro = this.productRepository.findByNameContainingIgnoreCase(name, pagingSort);
-
-        List<GetAllProductsResponse> responses = pagePro.getContent().stream()
-                .map(product -> this.modelMapperService.forResponse()
-                        .map(product, GetAllProductsResponse.class)).collect(Collectors.toList());
-        logger.debug("Search: Mapped products to response DTOs. Number of products: {}", responses.size());
-
-        TreeMap<String, Object> response = new TreeMap<>();
-        response.put("products", responses);
-        response.put("currentPage", pagePro.getNumber());
-        response.put("totalItems", pagePro.getTotalElements());
-        response.put("totalPages", pagePro.getTotalPages());
-        logger.debug("Search: Retrieved {} products for page {}. Total items: {}. Total pages: {}.", responses.size(), pagePro.getNumber(), pagePro.getTotalElements(), pagePro.getTotalPages());
-        return response;
-    }
-
-    /**
      * Checks the availability of products in the inventory.
      *
      * @param inventoryRequests a list of inventory requests
@@ -154,7 +129,7 @@ public class ProductManager implements ProductService {
             Integer quantity = request.getQuantity();
 
             logger.info("Checking product in inventory for barcodeNumber '{}'", barcodeNumber);
-            Optional<Product> optionalProduct = this.productRepository.findByBarcodeNumber(barcodeNumber);
+            Optional<Product> optionalProduct = this.productRepository.findByBarcodeNumberAndDeletedFalse(barcodeNumber);
             Product product;
             if (optionalProduct.isPresent()) {
                 product = optionalProduct.get();
@@ -162,6 +137,7 @@ public class ProductManager implements ProductService {
                 if (product.getQuantity() >= quantity) {
                     logger.debug("Sufficient quantity available for product '{}'", barcodeNumber);
                     product.setQuantity(product.getQuantity() - quantity);
+                    logger.debug("Check product in inventory: Updated quantity for product '{}'. New quantity: {}", barcodeNumber, product.getQuantity());
                     this.productRepository.save(product);
                 } else {
                     logger.warn("Insufficient quantity available for product '{}'", barcodeNumber);
@@ -173,6 +149,7 @@ public class ProductManager implements ProductService {
             }
             InventoryResponse inventoryResponse = getInventoryResponse(product, quantity);
             inventoryResponses.add(inventoryResponse);
+            logger.info("Added inventory response for product '{}'", barcodeNumber);
         }
         return inventoryResponses;
     }
@@ -192,6 +169,7 @@ public class ProductManager implements ProductService {
         inventoryResponse.setIsInStock(quantity <= product.getQuantity());
         inventoryResponse.setUnitPrice(product.getUnitPrice());
         inventoryResponse.setState(product.getState());
+        logger.debug("Created inventory response: {}", inventoryResponse);
         return inventoryResponse;
     }
 
@@ -207,15 +185,16 @@ public class ProductManager implements ProductService {
             Integer quantity = request.getQuantity();
 
             logger.info("Updating product in inventory for barcodeNumber '{}'", barcodeNumber);
-            Optional<Product> optionalProduct = this.productRepository.findByBarcodeNumber(barcodeNumber);
-            Product product;
+            Optional<Product> optionalProduct = this.productRepository.findByBarcodeNumberAndDeletedFalse(barcodeNumber);
             if (optionalProduct.isPresent()) {
-                product = optionalProduct.get();
-                logger.debug("Update product: Product found in inventory for barcode number '{}'", barcodeNumber);
+                Product product = optionalProduct.get();
+                logger.debug("Update product in inventory: Product found in inventory for barcode number '{}'", barcodeNumber);
                 product.setQuantity(product.getQuantity() + quantity);
+                logger.debug("Update product in inventory: Updated quantity for product '{}'. New quantity: {}", barcodeNumber, product.getQuantity());
                 this.productRepository.save(product);
+                logger.info("Saved updated product '{}' to repository", barcodeNumber);
             } else {
-                logger.warn("Update product: Product not found in inventory for barcode number '{}'", barcodeNumber);
+                logger.warn("Update product in inventory: Product not found in inventory for barcode number '{}'", barcodeNumber);
                 throw new EntityNotFoundException("Product not found: " + barcodeNumber);
             }
         }
@@ -230,7 +209,7 @@ public class ProductManager implements ProductService {
     @Override
     public GetAllProductsResponse addProduct(CreateProductRequest createProductRequest) {
         logger.info("Adding new product: '{}'.", createProductRequest.getName());
-        Optional<Product> optionalProduct = this.productRepository.findByNameIgnoreCase(createProductRequest.getName());
+        Optional<Product> optionalProduct = this.productRepository.findByNameIgnoreCaseAndDeletedFalse(createProductRequest.getName());
         Product product = new Product();
         if (optionalProduct.isPresent()) {
             Product existingProduct = optionalProduct.get();
@@ -256,7 +235,7 @@ public class ProductManager implements ProductService {
         product.setState(createProductRequest.getState());
         product.setImageUrl(createProductRequest.getImageUrl());
         product.setCreatedBy(createProductRequest.getCreatedBy());
-        Optional<ProductCategory> optionalProductCategory = this.productCategoryRepository.findById(createProductRequest.getProductCategoryId());
+        Optional<ProductCategory> optionalProductCategory = this.productCategoryRepository.findByIdAndDeletedFalse(createProductRequest.getProductCategoryId());
         optionalProductCategory.orElseThrow(() -> {
             logger.warn("No product category found with id '{}'.", createProductRequest.getProductCategoryId());
             return new EntityNotFoundException("Product category not found with id: " + createProductRequest.getProductCategoryId());
@@ -277,35 +256,36 @@ public class ProductManager implements ProductService {
     @Override
     public GetAllProductsResponse updateProduct(UpdateProductRequest updateProductRequest) {
         logger.info("Updating product with id '{}'.", updateProductRequest.getId());
-        Product existingProduct = this.productRepository.findById(updateProductRequest.getId()).orElseThrow(() -> {
+        Optional<Product> optionalProduct = this.productRepository.findByIdAndDeletedFalse(updateProductRequest.getId());
+        if (optionalProduct.isPresent()) {
+            Product product = optionalProduct.get();
+            this.productBusinessRules.checkUpdate(updateProductRequest, product);
+            logger.debug("Business rules applied for product id '{}'.", updateProductRequest.getId());
+            this.productRepository.save(product);
+            logger.debug("Product with id '{}' updated successfully.", updateProductRequest.getId());
+            return this.modelMapperService.forResponse().map(product, GetAllProductsResponse.class);
+        } else {
             logger.warn("No product found with id '{}' to update.", updateProductRequest.getId());
-            return new EntityNotFoundException("Product not found");
-        });
-        Product product = this.modelMapperService.forRequest().map(updateProductRequest, Product.class);
-        logger.info("Check if the product name is available?");
-        this.productBusinessRules.checkUpdate(product, existingProduct);
-        logger.info("Product name does not exist. Proceeding with creating the product.");
-        product.setBarcodeNumber(existingProduct.getBarcodeNumber());
-        product.setUpdatedAt(LocalDateTime.now());
-        this.productRepository.save(product);
-        logger.debug("Product with id '{}' updated successfully.", updateProductRequest.getId());
-        return this.modelMapperService.forResponse().map(product, GetAllProductsResponse.class);
+            throw new EntityNotFoundException("Product not found");
+        }
     }
 
     /**
-     * Deletes a product by its ID.
+     * Soft deletes a product by setting its "deleted" flag to true.
      *
-     * @param id the ID of the product to delete
-     * @return a GetAllProductsResponse object containing the deleted product details
+     * @param id the ID of the product to be soft deleted
+     * @return the details of the soft-deleted product
+     * @throws EntityNotFoundException if no product with the specified ID is found
      */
     @Override
     public GetAllProductsResponse deleteProduct(Long id) {
         logger.info("Deleting product with id '{}'.", id);
-        Optional<Product> optionalProduct = this.productRepository.findById(id);
-
+        Optional<Product> optionalProduct = this.productRepository.findByIdAndDeletedFalse(id);
         if (optionalProduct.isPresent()) {
             Product product = optionalProduct.get();
-            this.productRepository.deleteById(id);
+            product.setUpdatedAt(LocalDateTime.now());
+            product.setDeleted(true);
+            this.productRepository.save(product);
             logger.debug("Product with id '{}' deleted successfully.", id);
             return this.modelMapperService.forResponse().map(product, GetAllProductsResponse.class);
         } else {

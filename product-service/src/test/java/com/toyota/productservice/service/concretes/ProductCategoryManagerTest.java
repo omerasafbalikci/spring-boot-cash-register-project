@@ -1,6 +1,7 @@
 package com.toyota.productservice.service.concretes;
 
 import com.toyota.productservice.dao.ProductCategoryRepository;
+import com.toyota.productservice.dao.ProductCategorySpecification;
 import com.toyota.productservice.domain.Product;
 import com.toyota.productservice.domain.ProductCategory;
 import com.toyota.productservice.dto.requests.CreateProductCategoryRequest;
@@ -18,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -44,155 +46,120 @@ public class ProductCategoryManagerTest {
     }
 
     @Test
-    void getAllCategories_shouldReturnAllCategories() {
+    void getCategoriesFiltered_asc() {
         // Given
-        List<ProductCategory> productCategories = new ArrayList<>();
-        productCategories.add(new ProductCategory(1L, "CategoryNumber1", "Category 1", "Description 1", "ImageURL1", "Admin", LocalDateTime.now(), null));
-        productCategories.add(new ProductCategory(2L, "CategoryNumber2", "Category 2", "Description 2", "ImageURL2", "Admin", LocalDateTime.now(), null));
+        int page = 0;
+        int size = 3;
+        String[] sort = {"id,asc"};
 
-        when(productCategoryRepository.findAll()).thenReturn(productCategories);
+        ProductCategory productCategory1 = new ProductCategory(1L, "1234567890123", "ProductCategory1", "Description1", "imageUrl1", "Asaf", LocalDateTime.now(), null, false);
+        ProductCategory productCategory2 = new ProductCategory(2L, "1234567890124", "ProductCategory2", "Description2", "imageUrl2", "Can", LocalDateTime.now(), null, false);
+        List<ProductCategory> productCategoryList = Arrays.asList(productCategory1, productCategory2);
 
-        GetAllProductCategoriesResponse response1 = new GetAllProductCategoriesResponse(1L, "CategoryNumber1", "Category 1", "Description 1", "ImageURL1", "Admin", LocalDateTime.now());
-        GetAllProductCategoriesResponse response2 = new GetAllProductCategoriesResponse(2L, "CategoryNumber2", "Category 2", "Description 2", "ImageURL2", "Admin", LocalDateTime.now());
-
-        when(modelMapperService.forResponse()).thenReturn(modelMapper);
-        when(modelMapper.map(any(ProductCategory.class), eq(GetAllProductCategoriesResponse.class))).thenReturn(response1, response2);
+        Page<ProductCategory> productCategoryPage = new PageImpl<>(productCategoryList, PageRequest.of(page, size, Sort.by(Sort.Order.asc("id"))), productCategoryList.size());
 
         // When
-        List<GetAllProductCategoriesResponse> result = productCategoryManager.getAllCategories();
-
-        // Then
-        assertNotNull(result);
-        assertEquals(2, result.size());
-        assertEquals(1L, result.get(0).getId());
-        assertEquals("CategoryNumber1", result.get(0).getCategoryNumber());
-        assertEquals("Category 1", result.get(0).getName());
-        assertEquals("Description 1", result.get(0).getDescription());
-        assertEquals("ImageURL1", result.get(0).getImageUrl());
-        assertEquals("Admin", result.get(0).getCreatedBy());
-        assertNotNull(result.get(0).getUpdatedAt());
-
-        assertEquals(2L, result.get(1).getId());
-        assertEquals("CategoryNumber2", result.get(1).getCategoryNumber());
-        assertEquals("Category 2", result.get(1).getName());
-        assertEquals("Description 2", result.get(1).getDescription());
-        assertEquals("ImageURL2", result.get(1).getImageUrl());
-        assertEquals("Admin", result.get(1).getCreatedBy());
-        assertNotNull(result.get(1).getUpdatedAt());
-    }
-
-    @Test
-    void getCategoriesByNameContaining_shouldReturnMatchingCategories_whenCategoriesExist() {
-        // Given
-        String name = "test";
-        List<ProductCategory> productCategories = new ArrayList<>();
-        productCategories.add(new ProductCategory(1L, "CategoryNumber1", "Test Category 1", "Description 1", "ImageURL1", "Admin", null, null));
-        productCategories.add(new ProductCategory(2L, "CategoryNumber2", "Test Category 2", "Description 2", "ImageURL2", "Admin", null, null));
-
-        when(productCategoryRepository.findByNameContainingIgnoreCase(name)).thenReturn(productCategories);
-
-        GetAllProductCategoriesResponse response1 = new GetAllProductCategoriesResponse(1L, "CategoryNumber1", "Test Category 1", "Description 1", "ImageURL1", "Admin", null);
-        GetAllProductCategoriesResponse response2 = new GetAllProductCategoriesResponse(2L, "CategoryNumber2", "Test Category 2", "Description 2", "ImageURL2", "Admin", null);
-
+        when(productCategoryRepository.findAll(any(ProductCategorySpecification.class), any(Pageable.class))).thenReturn(productCategoryPage);
+        when(modelMapper.map(any(ProductCategory.class), eq(GetAllProductCategoriesResponse.class)))
+                .thenAnswer(invocation -> {
+                    ProductCategory productCategory = invocation.getArgument(0);
+                    return new GetAllProductCategoriesResponse(productCategory.getId(), productCategory.getCategoryNumber(), productCategory.getName(), productCategory.getDescription(), productCategory.getImageUrl(), productCategory.getCreatedBy(), null);
+                });
         when(modelMapperService.forResponse()).thenReturn(modelMapper);
-        when(modelMapper.map(any(ProductCategory.class), eq(GetAllProductCategoriesResponse.class))).thenReturn(response1, response2);
 
-        // When
-        List<GetAllProductCategoriesResponse> result = productCategoryManager.getCategoriesByNameContaining(name);
+        Map<String, Object> response = productCategoryManager.getCategoriesFiltered(page, size, sort, null, null, null, null);
 
         // Then
-        assertNotNull(result);
-        assertEquals(2, result.size());
-        assertEquals("Test Category 1", result.get(0).getName());
-        assertEquals("Test Category 2", result.get(1).getName());
+        @SuppressWarnings("unchecked")
+        List<GetAllProductCategoriesResponse> productCategories = (List<GetAllProductCategoriesResponse>) response.get("productCategories");
+
+        assertEquals(2, productCategories.size());
+        assertEquals(0, response.get("currentPage"));
+        assertEquals(2L, response.get("totalItems"));
+        assertEquals(1, response.get("totalPages"));
     }
 
     @Test
-    void getCategoriesByNameContaining_shouldThrowException_whenNoCategoriesFound() {
+    void getProductsByCategoryId_returnsProducts() {
         // Given
-        String name = "nonexistent";
-        when(productCategoryRepository.findByNameContainingIgnoreCase(name)).thenReturn(new ArrayList<>());
-
-        // When / Then
-        assertThrows(EntityNotFoundException.class, () -> productCategoryManager.getCategoriesByNameContaining(name));
-    }
-
-    @Test
-    void getCategoryById_shouldReturnCategory_whenCategoryExists() {
-        // Given
-        Long id = 1L;
-        ProductCategory productCategory = new ProductCategory(id, "CategoryNumber1", "Test Category 1", "Description 1", "ImageURL1", "Admin", null, null);
-
-        when(productCategoryRepository.findById(id)).thenReturn(java.util.Optional.of(productCategory));
-
-        GetAllProductCategoriesResponse response = new GetAllProductCategoriesResponse(id, "CategoryNumber1", "Test Category 1", "Description 1", "ImageURL1", "Admin", null);
-
-        when(modelMapperService.forResponse()).thenReturn(modelMapper);
-        when(modelMapper.map(productCategory, GetAllProductCategoriesResponse.class)).thenReturn(response);
-
-        // When
-        GetAllProductCategoriesResponse result = productCategoryManager.getCategoryById(id);
-
-        // Then
-        assertNotNull(result);
-        assertEquals("Test Category 1", result.getName());
-    }
-
-    @Test
-    void getCategoryById_shouldThrowException_whenCategoryDoesNotExist() {
-        // Given
-        Long id = 1L;
-        when(productCategoryRepository.findById(id)).thenReturn(java.util.Optional.empty());
-
-        // When / Then
-        assertThrows(EntityNotFoundException.class, () -> productCategoryManager.getCategoryById(id));
-    }
-
-    @Test
-    void getProductsByCategoryId_shouldReturnProducts_whenCategoryExists() {
-        // Given
+        int page = 0;
+        int size = 2;
+        String[] sort = {"name,asc"};
         Long categoryId = 1L;
-        ProductCategory productCategory = new ProductCategory(categoryId, "CategoryNumber1", "Test Category 1", "Description 1", "ImageURL1", "Admin", null, null);
-        Product product1 = new Product(1L, "BarcodeNumber1", "Test Product 1", "Description 1", 10, 100.0, true, "ImageURL1", "Admin", null, productCategory);
-        Product product2 = new Product(2L, "BarcodeNumber2", "Test Product 2", "Description 2", 20, 200.0, true, "ImageURL2", "Admin", null, productCategory);
-        productCategory.setProducts(Arrays.asList(product1, product2));
 
-        when(productCategoryRepository.findById(categoryId)).thenReturn(java.util.Optional.of(productCategory));
+        ProductCategory productCategory = getProductCategory(categoryId);
 
-        GetAllProductsResponse response1 = new GetAllProductsResponse(1L, "BarcodeNumber1", "Test Product 1", "Description 1", 10, 100.0, true, "ImageURL1", "Admin", null, "Test Category 1");
-        GetAllProductsResponse response2 = new GetAllProductsResponse(2L, "BarcodeNumber2", "Test Product 2", "Description 2", 20, 200.0, true, "ImageURL2", "Admin", null, "Test Category 1");
-
-        when(modelMapper.map(product1, GetAllProductsResponse.class)).thenReturn(response1);
-        when(modelMapper.map(product2, GetAllProductsResponse.class)).thenReturn(response2);
+        when(productCategoryRepository.findByIdAndDeletedFalse(categoryId)).thenReturn(Optional.of(productCategory));
         when(modelMapperService.forResponse()).thenReturn(modelMapper);
+        when(modelMapper.map(any(Product.class), eq(GetAllProductsResponse.class)))
+                .thenAnswer(invocation -> {
+                    Product product = invocation.getArgument(0);
+                    GetAllProductsResponse response = new GetAllProductsResponse();
+                    response.setId(product.getId());
+                    response.setName(product.getName());
+                    return response;
+                });
 
         // When
-        List<GetAllProductsResponse> result = productCategoryManager.getProductsByCategoryId(categoryId);
+        Map<String, Object> response = productCategoryManager.getProductsByCategoryId(page, size, sort, categoryId);
 
         // Then
-        assertNotNull(result);
-        assertEquals(2, result.size());
-        assertEquals("Test Product 1", result.get(0).getName());
-        assertEquals("Test Product 2", result.get(1).getName());
-        assertEquals("Test Category 1", result.get(0).getProductCategoryName());
-        assertEquals("Test Category 1", result.get(1).getProductCategoryName());
+        @SuppressWarnings("unchecked")
+        List<GetAllProductsResponse> productsResponse = (List<GetAllProductsResponse>) response.get("products");
+
+        assertEquals(2, productsResponse.size());
+        assertEquals(0, response.get("currentPage"));
+        assertEquals(2L, response.get("totalItems"));
+        assertEquals(1, response.get("totalPages"));
+
+        verify(productCategoryRepository).findByIdAndDeletedFalse(categoryId);
+        verify(modelMapper, times(2)).map(any(Product.class), eq(GetAllProductsResponse.class));
+    }
+
+    private static ProductCategory getProductCategory(Long categoryId) {
+        ProductCategory productCategory = new ProductCategory();
+        productCategory.setId(categoryId);
+
+        Product product1 = new Product();
+        product1.setId(1L);
+        product1.setName("Product1");
+        product1.setDeleted(false);
+
+        Product product2 = new Product();
+        product2.setId(2L);
+        product2.setName("Product2");
+        product2.setDeleted(false);
+
+        List<Product> products = Arrays.asList(product1, product2);
+        productCategory.setProducts(products);
+        return productCategory;
     }
 
     @Test
-    void getProductsByCategoryId_shouldThrowException_whenCategoryDoesNotExist() {
+    void getProductsByCategoryId_noProductCategoryFound() {
         // Given
+        int page = 0;
+        int size = 2;
+        String[] sort = {"name,asc"};
         Long categoryId = 1L;
-        when(productCategoryRepository.findById(categoryId)).thenReturn(java.util.Optional.empty());
+
+        when(productCategoryRepository.findByIdAndDeletedFalse(categoryId)).thenReturn(Optional.empty());
 
         // When / Then
-        assertThrows(EntityNotFoundException.class, () -> productCategoryManager.getProductsByCategoryId(categoryId));
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> productCategoryManager.getProductsByCategoryId(page, size, sort, categoryId));
+
+        assertEquals("Product category not found", exception.getMessage());
+
+        verify(productCategoryRepository).findByIdAndDeletedFalse(categoryId);
+        verifyNoMoreInteractions(modelMapperService);
+        verifyNoMoreInteractions(modelMapper);
     }
 
     @Test
     void addCategory_shouldAddNewCategory_whenCategoryDoesNotExist() {
         // Given
         CreateProductCategoryRequest request = new CreateProductCategoryRequest("TestCategory", "Description", "ImageURL", "Admin");
-        ProductCategory productCategory = new ProductCategory(null, null, "TestCategory", "Description", "ImageURL", "Admin", null, null);
+        ProductCategory productCategory = new ProductCategory(null, null, "TestCategory", "Description", "ImageURL", "Admin", null, null, false);
         GetAllProductCategoriesResponse response = new GetAllProductCategoriesResponse(1L, "CategoryNumber", "TestCategory", "Description", "ImageURL", "Admin", LocalDateTime.now());
 
         when(modelMapperService.forResponse()).thenReturn(modelMapper);
@@ -231,21 +198,24 @@ public class ProductCategoryManagerTest {
         Long categoryId = 1L;
         String categoryName = "Updated Category";
         UpdateProductCategoryRequest request = new UpdateProductCategoryRequest(categoryId, categoryName, "Updated Description", "Updated ImageURL", "Admin");
-        ProductCategory existingProductCategory = new ProductCategory(categoryId, "Category Number", "Existing Category", "Existing Description", "Existing ImageURL", "Admin", LocalDateTime.now(), null);
+        ProductCategory existingProductCategory = new ProductCategory(categoryId, "Category Number", "Existing Category", "Existing Description", "Existing ImageURL", "Admin", LocalDateTime.now(), null, false);
 
         // Repository mock
         when(modelMapperService.forResponse()).thenReturn(modelMapper);
         when(productCategoryRepository.save(any(ProductCategory.class))).thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
-        when(productCategoryRepository.findById(any())).thenReturn(Optional.of(existingProductCategory));
+        when(productCategoryRepository.findByIdAndDeletedFalse(categoryId)).thenReturn(Optional.of(existingProductCategory));
+        when(productCategoryRepository.existsByNameIgnoreCaseAndDeletedIsFalse(categoryName)).thenReturn(false);
 
         // ModelMapper mock
         GetAllProductCategoriesResponse getAllProductCategoriesResponse = new GetAllProductCategoriesResponse(1L, "Category Number", categoryName, "Updated Description", "Updated ImageURL", "Admin", null);
         when(modelMapper.map(any(ProductCategory.class), eq(GetAllProductCategoriesResponse.class))).thenReturn(getAllProductCategoriesResponse);
 
+        // When
         GetAllProductCategoriesResponse response = productCategoryManager.updateCategory(request);
 
         // Then
         Mockito.verify(productCategoryRepository).save(any(ProductCategory.class));
+        Mockito.verify(productCategoryBusinessRules).checkUpdate(request, existingProductCategory);
         assertNotNull(response);
         assertEquals(request.getId(), response.getId());
         assertEquals(request.getName(), response.getName());
@@ -260,10 +230,12 @@ public class ProductCategoryManagerTest {
         Long categoryId = 1L;
         UpdateProductCategoryRequest request = new UpdateProductCategoryRequest(categoryId, "Updated Category", "Updated Description", "Updated ImageURL", "Admin");
 
-        when(productCategoryRepository.findById(categoryId)).thenReturn(Optional.empty());
+        when(productCategoryRepository.findByIdAndDeletedFalse(categoryId)).thenReturn(Optional.empty());
 
         // When / Then
-        assertThrows(EntityNotFoundException.class, () -> productCategoryManager.updateCategory(request));
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> productCategoryManager.updateCategory(request));
+
+        assertEquals("Product category not found", exception.getMessage());
     }
 
     @Test
@@ -277,45 +249,47 @@ public class ProductCategoryManagerTest {
         existingProductCategory.setId(categoryId);
         existingProductCategory.setName("Existing Category");
 
-        when(productCategoryRepository.findById(categoryId)).thenReturn(Optional.of(existingProductCategory));
-        when(productCategoryRepository.existsByNameIgnoreCase(categoryName)).thenReturn(true);
+        when(productCategoryRepository.findByIdAndDeletedFalse(categoryId)).thenReturn(Optional.of(existingProductCategory));
+        when(productCategoryRepository.existsByNameIgnoreCaseAndDeletedIsFalse(categoryName)).thenReturn(true);
 
         // When / Then
-        assertThrows(EntityAlreadyExistsException.class, () -> productCategoryManager.updateCategory(request));
+        EntityAlreadyExistsException exception = assertThrows(EntityAlreadyExistsException.class, () -> productCategoryManager.updateCategory(request));
+
+        assertEquals("Product category name already exists", exception.getMessage());
     }
 
     @Test
     void deleteCategory_success() {
         // Given
         Long categoryId = 1L;
-        ProductCategory existingProductCategory = new ProductCategory(categoryId, "Category Number", "Existing Category", "Existing Description", "Existing ImageURL", "Admin", LocalDateTime.now(), null);
+        ProductCategory existingProductCategory = new ProductCategory(categoryId, "Category Number", "Existing Category", "Existing Description", "Existing ImageURL", "Admin", LocalDateTime.now(), null, false);
 
         GetAllProductCategoriesResponse productCategoriesResponse = new GetAllProductCategoriesResponse(categoryId, "Category Number", "Existing Category", "Existing Description", "Existing ImageURL", "Admin", LocalDateTime.now());
 
         when(modelMapperService.forResponse()).thenReturn(modelMapper);
-        when(productCategoryRepository.findById(categoryId)).thenReturn(Optional.of(existingProductCategory));
+        when(productCategoryRepository.findByIdAndDeletedFalse(categoryId)).thenReturn(Optional.of(existingProductCategory));
         when(modelMapper.map(existingProductCategory, GetAllProductCategoriesResponse.class)).thenReturn(productCategoriesResponse);
 
         // When
         GetAllProductCategoriesResponse response = productCategoryManager.deleteCategory(categoryId);
 
         // Then
-        verify(productCategoryRepository).findById(categoryId);
-        verify(productCategoryRepository).deleteById(categoryId);
+        verify(productCategoryRepository).findByIdAndDeletedFalse(categoryId);
+        verify(productCategoryRepository).save(existingProductCategory);
         assertNotNull(response);
         assertEquals(existingProductCategory.getName(), response.getName());
     }
 
     @Test
-    void deleteUser_userNotFound() {
+    void deleteCategory_categoryNotFound() {
         // Given
-        Long userId = 1L;
+        Long categoryId = 1L;
 
         // When
-        // Repository mock
-        when(productCategoryRepository.findById(any())).thenReturn(Optional.empty());
+        when(productCategoryRepository.findByIdAndDeletedFalse(categoryId)).thenReturn(Optional.empty());
 
         // Then
-        assertThrows(EntityNotFoundException.class, () -> productCategoryManager.deleteCategory(userId));
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> productCategoryManager.deleteCategory(categoryId));
+        assertEquals("Product category not found", exception.getMessage());
     }
 }

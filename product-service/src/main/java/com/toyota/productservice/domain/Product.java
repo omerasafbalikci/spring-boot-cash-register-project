@@ -52,4 +52,7 @@ public class Product {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_category_id", nullable = false)
     private ProductCategory productCategory;
+
+    @Column(name = "deleted")
+    private boolean deleted;
 }

@@ -45,4 +45,7 @@ public class ProductCategory {
     @OneToMany(mappedBy = "productCategory", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Product> products;
+
+    @Column(name = "deleted")
+    private boolean deleted;
 }

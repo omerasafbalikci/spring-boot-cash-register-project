@@ -3,9 +3,8 @@ package com.toyota.productservice.service.abstracts;
 import com.toyota.productservice.dto.requests.CreateProductCategoryRequest;
 import com.toyota.productservice.dto.requests.UpdateProductCategoryRequest;
 import com.toyota.productservice.dto.responses.GetAllProductCategoriesResponse;
-import com.toyota.productservice.dto.responses.GetAllProductsResponse;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * Interface for product_category's service class.
@@ -13,33 +12,30 @@ import java.util.List;
 
 public interface ProductCategoryService {
     /**
-     * Retrieves all product categories.
-     * @return a list of {@link GetAllProductCategoriesResponse} representing all product categories.
-     */
-    List<GetAllProductCategoriesResponse> getAllCategories();
-
-    /**
-     * Retrieves product categories whose names contain the specified string.
-     * @param name the string to search for in category names.
-     * @return a list of {@link GetAllProductCategoriesResponse} matching the search criteria.
-     */
-    List<GetAllProductCategoriesResponse> getCategoriesByNameContaining(String name);
-
-    /**
-     * Retrieves a product category by its ID.
+     * Retrieves filtered and paginated product categories.
      *
-     * @param id the ID of the category to retrieve.
-     * @return the {@link GetAllProductCategoriesResponse} representing the found product category.
+     * @param page           the page number to retrieve
+     * @param size           the number of items per page
+     * @param sort           the sorting criteria
+     * @param id             the ID to filter by
+     * @param categoryNumber the category number to filter by
+     * @param name           the name to filter by
+     * @param createdBy      the creator to filter by
+     * @return a Map containing the filtered product categories and pagination details
      */
-    GetAllProductCategoriesResponse getCategoryById(Long id);
+    Map<String, Object> getCategoriesFiltered(int page, int size, String[] sort, Long id, String categoryNumber,
+                                              String name, String createdBy);
 
     /**
-     * Retrieves all products belonging to a specific category.
+     * Retrieves products by category ID with pagination and sorting.
      *
-     * @param categoryId the ID of the category whose products are to be retrieved.
-     * @return a list of {@link GetAllProductsResponse} representing the products in the specified category.
+     * @param page       the page number to retrieve
+     * @param size       the number of items per page
+     * @param sort       the sorting criteria
+     * @param categoryId the ID of the product category
+     * @return a Map containing the products and pagination details
      */
-    List<GetAllProductsResponse> getProductsByCategoryId(Long categoryId);
+    Map<String, Object> getProductsByCategoryId(int page, int size, String[] sort, Long categoryId);
 
     /**
      * Adds a new product category.
@@ -58,7 +54,7 @@ public interface ProductCategoryService {
     GetAllProductCategoriesResponse updateCategory(UpdateProductCategoryRequest updateProductCategoryRequest);
 
     /**
-     * Deletes a product category by its ID.
+     * Marks the product category with the given ID as deleted.
      *
      * @param id the ID of the category to be deleted.
      * @return the {@link GetAllProductCategoriesResponse} representing the deleted product category.

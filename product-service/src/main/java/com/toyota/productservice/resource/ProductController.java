@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.TreeMap;
+import java.util.Map;
 
 /**
  * REST controller for managing products.
@@ -28,42 +28,27 @@ public class ProductController {
     /**
      * Retrieves a filtered list of products.
      *
-     * @param page the page number to retrieve (default is 0)
-     * @param size the size of the page (default is 3)
-     * @param sort the sort criteria (default is "id,asc")
-     * @param id optional filter by product ID
+     * @param page          the page number to retrieve (default is 0)
+     * @param size          the size of the page (default is 3)
+     * @param sort          the sort criteria (default is "id,asc")
+     * @param id            optional filter by product ID
      * @param barcodeNumber optional filter by barcode number
-     * @param state optional filter by state
+     * @param state         optional filter by state
      * @return a TreeMap containing the filtered products
      */
     @GetMapping("/get-all")
-    public ResponseEntity<TreeMap<String, Object>> getProductFiltered(
+    public ResponseEntity<Map<String, Object>> getProductsFiltered(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "3") int size,
             @RequestParam(defaultValue = "id,asc") String[] sort,
             @RequestParam(defaultValue = "") Long id,
             @RequestParam(defaultValue = "") String barcodeNumber,
-            @RequestParam(defaultValue = "") Boolean state) {
-        TreeMap<String, Object> response = this.productService.getProductFiltered(page, size, sort, id, barcodeNumber, state);
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-    /**
-     * Searches for products by name.
-     *
-     * @param name the name to search for
-     * @param page the page number to retrieve (default is 0)
-     * @param size the size of the page (default is 3)
-     * @param sort the sort criteria (default is "id,asc")
-     * @return a TreeMap containing the products with names containing the specified name
-     */
-    @GetMapping("/search")
-    public ResponseEntity<TreeMap<String, Object>> getProductsByNameContaining(
-            @RequestParam() String name,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "3") int size,
-            @RequestParam(defaultValue = "id,asc") String[] sort) {
-        TreeMap<String, Object> response = this.productService.getProductsByNameContaining(name, page, size, sort);
+            @RequestParam(defaultValue = "") String name,
+            @RequestParam(defaultValue = "") Integer quantity,
+            @RequestParam(defaultValue = "") Double unitPrice,
+            @RequestParam(defaultValue = "") Boolean state,
+            @RequestParam(defaultValue = "") String createdBy) {
+        Map<String, Object> response = this.productService.getProductsFiltered(page, size, sort, id, barcodeNumber, name, quantity, unitPrice, state, createdBy);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -113,10 +98,10 @@ public class ProductController {
     }
 
     /**
-     * Deletes a product.
+     * Soft deletes a product by its ID (marks it as deleted without removing it from the database).
      *
-     * @param id the ID of the product to delete
-     * @return the response object containing the details of the deleted product
+     * @param id the ID of the product to be soft deleted
+     * @return a ResponseEntity containing the details of the soft-deleted product
      */
     @DeleteMapping("/delete")
     public ResponseEntity<GetAllProductsResponse> deleteProduct(@RequestParam() Long id) {
