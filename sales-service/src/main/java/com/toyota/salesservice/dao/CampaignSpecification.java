@@ -43,7 +43,7 @@ public class CampaignSpecification implements Specification<Campaign> {
             predicates.add(criteriaBuilder.equal(root.get("id"), id));
         }
         if (campaignNumber != null && !campaignNumber.isEmpty()) {
-            predicates.add(criteriaBuilder.like(root.get("categoryNumber"), "%" + campaignNumber + "%"));
+            predicates.add(criteriaBuilder.like(root.get("campaignNumber"), "%" + campaignNumber + "%"));
         }
         if (name != null && !name.isEmpty()) {
             predicates.add(criteriaBuilder.like(root.get("name"), "%" + name + "%"));
