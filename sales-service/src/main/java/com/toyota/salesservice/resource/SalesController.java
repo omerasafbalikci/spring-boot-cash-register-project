@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.TreeMap;
+import java.util.Map;
 
 /**
  * REST controller for managing sales.
@@ -52,10 +52,11 @@ public class SalesController {
     }
 
     /**
-     * Deletes a sales record by its sales number.
+     * Endpoint to delete a sales record by its sales number.
+     * Marks the sales record and its associated sales items as deleted.
      *
-     * @param salesNumber the sales number
-     * @return the response containing the deleted sales data
+     * @param salesNumber the sales number of the sales record to delete
+     * @return a ResponseEntity containing the details of the deleted sales record
      */
     @DeleteMapping("/delete")
     public ResponseEntity<GetAllSalesResponse> deleteSales(@RequestParam String salesNumber) {
@@ -68,14 +69,14 @@ public class SalesController {
      *
      * @param startDate the start date of the period (format: yyyy-MM-dd HH:mm:ss)
      * @param endDate the end date of the period (format: yyyy-MM-dd HH:mm:ss)
-     * @return ResponseEntity with the sales statistics in a TreeMap format
+     * @return ResponseEntity with the sales statistics in a Map format
      */
     @GetMapping("/statistics")
-    public ResponseEntity<TreeMap<String, Object>> getSalesStatistics(
+    public ResponseEntity<Map<String, Object>> getSalesStatistics(
             @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime startDate,
             @RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime endDate) {
 
-        TreeMap<String, Object> salesStatistics = this.salesService.getSalesStatistics(startDate, endDate);
+        Map<String, Object> salesStatistics = this.salesService.getSalesStatistics(startDate, endDate);
 
         return new ResponseEntity<>(salesStatistics, HttpStatus.OK);
     }

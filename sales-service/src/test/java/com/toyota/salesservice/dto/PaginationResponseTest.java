@@ -16,7 +16,6 @@ public class PaginationResponseTest {
         List<GetAllSalesResponse> content = List.of(new GetAllSalesResponse());
         PaginationResponse<GetAllSalesResponse> page = new PaginationResponse<>(content, pageable);
         assertEquals(content, page.getContent());
-
     }
 
     @Test

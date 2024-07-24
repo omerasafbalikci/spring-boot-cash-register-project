@@ -49,4 +49,7 @@ public class SalesItems {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sales_id")
     private Sales sales;
+
+    @Column(name = "deleted")
+    private boolean deleted;
 }

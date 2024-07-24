@@ -54,4 +54,7 @@ public class Campaign {
     @OneToMany(mappedBy = "campaign", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonIgnore
     private List<SalesItems> salesItemsList;
+
+    @Column(name = "deleted")
+    private boolean deleted;
 }

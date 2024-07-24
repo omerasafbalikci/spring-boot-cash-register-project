@@ -74,6 +74,9 @@ public class SalesSpecification {
             if (change != null) {
                 predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("change"), change));
             }
+
+            predicate = criteriaBuilder.and(predicate, criteriaBuilder.isFalse(root.get("deleted")));
+
             return predicate;
         };
     }

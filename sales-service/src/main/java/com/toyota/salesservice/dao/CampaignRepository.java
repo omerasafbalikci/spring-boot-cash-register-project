@@ -2,6 +2,7 @@ package com.toyota.salesservice.dao;
 
 import com.toyota.salesservice.domain.Campaign;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -11,7 +12,7 @@ import java.util.Optional;
  */
 
 @Repository
-public interface CampaignRepository extends JpaRepository<Campaign, Long> {
-    Boolean existsByNameIgnoreCase(String name);
-    Optional<Campaign> findByCampaignNumber(String campaignNumber);
+public interface CampaignRepository extends JpaRepository<Campaign, Long>, JpaSpecificationExecutor<Campaign> {
+    Boolean existsByNameIgnoreCaseAndDeletedIsFalse(String name);
+    Optional<Campaign> findByIdAndDeletedFalse(Long id);
 }

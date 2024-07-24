@@ -111,7 +111,7 @@ public class SalesManager implements SalesService {
         for (CreateReturnRequest createReturnRequest : createReturnRequests) {
             logger.info("Processing return request for sales number '{}', barcode number '{}'.",
                     createReturnRequest.getSalesNumber(), createReturnRequest.getBarcodeNumber());
-            Optional<Sales> optionalSales = this.salesRepository.findBySalesNumber(createReturnRequest.getSalesNumber());
+            Optional<Sales> optionalSales = this.salesRepository.findBySalesNumberAndDeletedFalse(createReturnRequest.getSalesNumber());
             if (optionalSales.isEmpty()) {
                 logger.warn("Sales not found for sales number '{}'.", createReturnRequest.getSalesNumber());
                 throw new SalesNotFoundException("Sales not found: " + createReturnRequest.getSalesNumber());
@@ -159,16 +159,18 @@ public class SalesManager implements SalesService {
     }
 
     /**
-     * Deletes a sales record by its sales number.
+     * Soft deletes a sales record by its sales number.
+     * Marks the sales record and its associated sales items as deleted.
+     * Updates the inventory accordingly.
      *
-     * @param salesNumber the sales number
-     * @return the response containing the deleted sales data
-     * @throws SalesNotFoundException if the sales record is not found
+     * @param salesNumber the sales number of the sales record to delete
+     * @return a response containing the details of the deleted sales record
+     * @throws SalesNotFoundException if no sales record is found with the given sales number
      */
     @Override
     public GetAllSalesResponse deleteSales(String salesNumber) {
         logger.info("Attempting to delete sales record with sales number '{}'.", salesNumber);
-        Optional<Sales> optionalSales = this.salesRepository.findBySalesNumber(salesNumber);
+        Optional<Sales> optionalSales = this.salesRepository.findBySalesNumberAndDeletedFalse(salesNumber);
         if (optionalSales.isPresent()) {
             Sales sales = optionalSales.get();
             logger.debug("Sales record found with sales number '{}', proceeding with deletion.", salesNumber);
@@ -181,11 +183,13 @@ public class SalesManager implements SalesService {
             this.salesBusinessRules.updateInventory(inventoryRequests);
             logger.debug("Inventory updated successfully for sales number '{}'.", salesNumber);
 
-            this.salesItemRepository.deleteBySalesId(sales.getId());
-            logger.debug("Sales items deleted for sales number '{}'.", salesNumber);
+            salesItems.forEach(salesItem -> salesItem.setDeleted(true));
+            this.salesItemRepository.saveAll(salesItems);
+            logger.debug("Sales items marked as deleted for sales number '{}'.", salesNumber);
 
-            this.salesRepository.deleteById(sales.getId());
-            logger.info("Sales record deleted successfully with sales number '{}'.", salesNumber);
+            sales.setDeleted(true);
+            this.salesRepository.save(sales);
+            logger.info("Sales record marked as deleted successfully with sales number '{}'.", salesNumber);
 
             return this.modelMapperService.forResponse().map(sales, GetAllSalesResponse.class);
         } else {
@@ -198,22 +202,22 @@ public class SalesManager implements SalesService {
      * Retrieves sales statistics for a given period.
      *
      * @param startDate the start date of the period
-     * @param endDate the end date of the period
-     * @return a TreeMap containing the sales statistics:
-     *         - "totalSales": the total sales amount within the specified period
-     *         - "averageSales": the average sales amount per transaction within the specified period (0.0 if no sales)
-     *         - "totalSalesCount": the total number of sales transactions within the specified period
+     * @param endDate   the end date of the period
+     * @return a Map containing the sales statistics:
+     * - "totalSales": the total sales amount within the specified period
+     * - "averageSales": the average sales amount per transaction within the specified period (0.0 if no sales)
+     * - "totalSalesCount": the total number of sales transactions within the specified period
      */
     @Override
-    public TreeMap<String, Object> getSalesStatistics(LocalDateTime startDate, LocalDateTime endDate) {
+    public Map<String, Object> getSalesStatistics(LocalDateTime startDate, LocalDateTime endDate) {
         logger.info("Getting sales statistics from '{}' to '{}'.", startDate, endDate);
 
-        List<Sales> salesList = this.salesRepository.findBySalesDateBetween(startDate, endDate);
+        List<Sales> salesList = this.salesRepository.findBySalesDateBetweenAndDeletedFalse(startDate, endDate);
         double totalSales = salesList.stream().mapToDouble(Sales::getTotalPrice).sum();
         double averageSales = salesList.isEmpty() ? 0.0 : totalSales / salesList.size();
         long totalSalesCount = salesList.size();
 
-        TreeMap<String, Object> response = new TreeMap<>();
+        Map<String, Object> response = new HashMap<>();
         response.put("totalSales", totalSales);
         response.put("averageSales", averageSales);
         response.put("totalSalesCount", totalSalesCount);
@@ -258,22 +262,22 @@ public class SalesManager implements SalesService {
     /**
      * Fetches sales records with pagination and filtering.
      *
-     * @param page       the page number
-     * @param size       the page size
-     * @param sort       the sort criteria
-     * @param id         the sales ID
+     * @param page        the page number
+     * @param size        the page size
+     * @param sort        the sort criteria
+     * @param id          the sales ID
      * @param salesNumber the sales number
-     * @param salesDate  the sales date
-     * @param createdBy  the creator of the sales record
+     * @param salesDate   the sales date
+     * @param createdBy   the creator of the sales record
      * @param paymentType the payment type
-     * @param totalPrice the total price of the sales
-     * @param money      the money involved in the sales
-     * @param change     the change given in the sales
+     * @param totalPrice  the total price of the sales
+     * @param money       the money involved in the sales
+     * @param change      the change given in the sales
      * @return the pagination response containing the sales data
      */
     @Override
     public PaginationResponse<GetAllSalesResponse> getSalesFiltered(int page, int size, String[] sort, Long id, String salesNumber,
-                                              String salesDate, String createdBy, String paymentType, Double totalPrice, Double money, Double change) {
+                                                                    String salesDate, String createdBy, String paymentType, Double totalPrice, Double money, Double change) {
         logger.info("Fetching all sales with pagination. Page: {}, Size: {}, Sort: {}.", page, size, Arrays.toString(sort));
         Pageable pagingSort = PageRequest.of(page, size, Sort.by(getOrder(sort)));
         Specification<Sales> specification = SalesSpecification.filterByCriteria(id, salesNumber, salesDate, createdBy, paymentType, totalPrice, money, change);

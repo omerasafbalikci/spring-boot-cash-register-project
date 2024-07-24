@@ -12,8 +12,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -27,36 +27,17 @@ public class CampaignControllerTest {
     private CampaignController campaignController;
 
     @Test
-    void getAllCampaigns_shouldReturnListOfCampaigns() {
+    void getProductCategoriesFiltered() {
         // Given
-        List<GetAllCampaignsResponse> mockResponses = Collections.singletonList(new GetAllCampaignsResponse());
-        when(campaignService.getAllCampaigns()).thenReturn(mockResponses);
+        Map<String, Object> response = new HashMap<>();
+        when(campaignService.getCampaignsFiltered(0, 3, new String[]{"id", "asc"}, null, null, null, null, null, null, null)).thenReturn(response);
 
         // When
-        ResponseEntity<List<GetAllCampaignsResponse>> responseEntity = campaignController.getAllCampaigns();
+        ResponseEntity<Map<String, Object>> result = campaignController.getCampaignsFiltered(0, 3, new String[]{"id", "asc"}, null, null, null, null, null, null, null);
 
         // Then
-        assertNotNull(responseEntity);
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertEquals(mockResponses, responseEntity.getBody());
-        verify(campaignService, times(1)).getAllCampaigns();
-    }
-
-    @Test
-    void getCampaignByCampaignNumber_shouldReturnCampaign() {
-        // Given
-        String campaignNumber = "CAM123";
-        GetAllCampaignsResponse mockResponse = new GetAllCampaignsResponse();
-        when(campaignService.getCampaignByCampaignNumber(campaignNumber)).thenReturn(mockResponse);
-
-        // When
-        ResponseEntity<GetAllCampaignsResponse> responseEntity = campaignController.getCampaignByCampaignNumber(campaignNumber);
-
-        // Then
-        assertNotNull(responseEntity);
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertEquals(mockResponse, responseEntity.getBody());
-        verify(campaignService, times(1)).getCampaignByCampaignNumber(campaignNumber);
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertEquals(response, result.getBody());
     }
 
     @Test

@@ -107,7 +107,7 @@ public class CampaignBusinessRules {
             campaign.setCampaignType(existingCampaign.getCampaignType());
         }
 
-        if (this.campaignRepository.existsByNameIgnoreCase(campaign.getName()) && !existingCampaign.getName().equals(campaign.getName())) {
+        if (this.campaignRepository.existsByNameIgnoreCaseAndDeletedIsFalse(campaign.getName()) && !existingCampaign.getName().equals(campaign.getName())) {
             logger.warn("Campaign with the same name already exists. Campaign Name: {}. Campaign ID: {}.", campaign.getName(), campaign.getId());
             throw new CampaignAlreadyExistsException("Campaign already exists");
         }

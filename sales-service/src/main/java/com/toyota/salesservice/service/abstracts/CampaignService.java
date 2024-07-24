@@ -4,7 +4,7 @@ import com.toyota.salesservice.dto.requests.CreateCampaignRequest;
 import com.toyota.salesservice.dto.requests.UpdateCampaignRequest;
 import com.toyota.salesservice.dto.responses.GetAllCampaignsResponse;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * Interface for campaign's service class.
@@ -12,19 +12,22 @@ import java.util.List;
 
 public interface CampaignService {
     /**
-     * Retrieves all campaigns.
+     * Fetches a paginated and filtered list of campaigns.
      *
-     * @return a list of responses containing campaign details
+     * @param page             the page number to retrieve
+     * @param size             the size of the page to retrieve
+     * @param sort             the sorting criteria
+     * @param id               the ID filter
+     * @param campaignNumber   the campaign number filter
+     * @param name             the name filter
+     * @param campaignCategory the campaign category filter
+     * @param campaignKey      the campaign key filter
+     * @param state            the state filter
+     * @param createdBy        the creator filter
+     * @return a map containing the filtered campaigns and pagination details
      */
-    List<GetAllCampaignsResponse> getAllCampaigns();
-
-    /**
-     * Retrieves a campaign by its campaign number.
-     *
-     * @param campaignNumber the campaign number
-     * @return the response containing campaign details
-     */
-    GetAllCampaignsResponse getCampaignByCampaignNumber(String campaignNumber);
+    Map<String, Object> getCampaignsFiltered(int page, int size, String[] sort, Long id, String campaignNumber, String name, String campaignCategory,
+                                             String campaignKey, Boolean state, String createdBy);
 
     /**
      * Adds a new campaign.
@@ -43,15 +46,15 @@ public interface CampaignService {
     GetAllCampaignsResponse updateCampaign(UpdateCampaignRequest updateCampaignRequest);
 
     /**
-     * Deletes a campaign by its ID.
+     * Marks a campaign as deleted by its ID.
      *
-     * @param id the ID of the campaign to delete
-     * @return the response containing the deleted campaign details
+     * @param id the ID of the campaign to be marked as deleted.
+     * @return a {@link GetAllCampaignsResponse} object representing the campaign that was marked as deleted.
      */
     GetAllCampaignsResponse deleteCampaign(Long id);
 
     /**
-     * Deletes all campaigns.
+     * Marks all campaigns as deleted.
      */
     void deleteAllCampaigns();
 }

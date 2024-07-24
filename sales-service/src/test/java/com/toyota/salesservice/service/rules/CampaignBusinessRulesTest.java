@@ -139,13 +139,13 @@ public class CampaignBusinessRulesTest {
         existingCampaign.setId(1L);
         existingCampaign.setName("Existing Campaign");
 
-        when(campaignRepository.existsByNameIgnoreCase(campaign.getName())).thenReturn(true);
+        when(campaignRepository.existsByNameIgnoreCaseAndDeletedIsFalse(campaign.getName())).thenReturn(true);
 
         // Act & Assert
         CampaignAlreadyExistsException exception = assertThrows(CampaignAlreadyExistsException.class, () -> campaignBusinessRules.checkUpdate(campaign, existingCampaign));
 
         assertEquals("Campaign already exists", exception.getMessage());
-        verify(campaignRepository, times(1)).existsByNameIgnoreCase(campaign.getName());
+        verify(campaignRepository, times(1)).existsByNameIgnoreCaseAndDeletedIsFalse(campaign.getName());
     }
 
     @Test
@@ -159,12 +159,12 @@ public class CampaignBusinessRulesTest {
         existingCampaign.setId(1L);
         existingCampaign.setName("Existing Campaign");
 
-        when(campaignRepository.existsByNameIgnoreCase(campaign.getName())).thenReturn(true);
+        when(campaignRepository.existsByNameIgnoreCaseAndDeletedIsFalse(campaign.getName())).thenReturn(true);
 
         // Act & Assert
         assertDoesNotThrow(() -> campaignBusinessRules.checkUpdate(campaign, existingCampaign));
 
-        verify(campaignRepository, times(1)).existsByNameIgnoreCase(campaign.getName());
+        verify(campaignRepository, times(1)).existsByNameIgnoreCaseAndDeletedIsFalse(campaign.getName());
     }
 
     @Test
@@ -178,11 +178,11 @@ public class CampaignBusinessRulesTest {
         existingCampaign.setId(1L);
         existingCampaign.setName("Existing Campaign");
 
-        when(campaignRepository.existsByNameIgnoreCase(campaign.getName())).thenReturn(false);
+        when(campaignRepository.existsByNameIgnoreCaseAndDeletedIsFalse(campaign.getName())).thenReturn(false);
 
         // Act & Assert
         assertDoesNotThrow(() -> campaignBusinessRules.checkUpdate(campaign, existingCampaign));
 
-        verify(campaignRepository, times(1)).existsByNameIgnoreCase(campaign.getName());
+        verify(campaignRepository, times(1)).existsByNameIgnoreCaseAndDeletedIsFalse(campaign.getName());
     }
 }

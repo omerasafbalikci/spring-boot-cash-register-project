@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -91,7 +92,7 @@ public class SalesControllerTest {
         when(salesService.getSalesStatistics(startDate, endDate)).thenReturn(mockStatistics);
 
         // When
-        ResponseEntity<TreeMap<String, Object>> responseEntity = salesController.getSalesStatistics(startDate, endDate);
+        ResponseEntity<Map<String, Object>> responseEntity = salesController.getSalesStatistics(startDate, endDate);
 
         // Then
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());

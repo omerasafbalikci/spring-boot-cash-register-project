@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * REST controller for managing campaigns.
@@ -23,26 +23,34 @@ public class CampaignController {
     private final CampaignService campaignService;
 
     /**
-     * Retrieves all campaigns.
+     * Retrieves a paginated and filtered list of campaigns.
      *
-     * @return a ResponseEntity containing a list of all campaigns
+     * @param page the page number to retrieve, default is 0
+     * @param size the size of the page to retrieve, default is 3
+     * @param sort the sorting criteria, default is "id,asc"
+     * @param id the ID filter, default is an empty value
+     * @param campaignNumber the campaign number filter, default is an empty value
+     * @param name the name filter, default is an empty value
+     * @param campaignCategory the campaign category filter, default is an empty value
+     * @param campaignKey the campaign key filter, default is an empty value
+     * @param state the state filter, default is an empty value
+     * @param createdBy the creator filter, default is an empty value
+     * @return a ResponseEntity containing the filtered campaigns and pagination details
      */
     @GetMapping("/get-all")
-    public ResponseEntity<List<GetAllCampaignsResponse>> getAllCampaigns() {
-        List<GetAllCampaignsResponse> responses = this.campaignService.getAllCampaigns();
-        return new ResponseEntity<>(responses, HttpStatus.OK);
-    }
-
-    /**
-     * Retrieves a campaign by its campaign number.
-     *
-     * @param campaignNumber the campaign number to search for
-     * @return a ResponseEntity containing the campaign details
-     */
-    @GetMapping("/campaign-number")
-    public ResponseEntity<GetAllCampaignsResponse> getCampaignByCampaignNumber(@RequestParam String campaignNumber) {
-        GetAllCampaignsResponse response = this.campaignService.getCampaignByCampaignNumber(campaignNumber);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<Map<String, Object>> getCampaignsFiltered(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "3") int size,
+            @RequestParam(defaultValue = "id,asc") String[] sort,
+            @RequestParam(defaultValue = "") Long id,
+            @RequestParam(defaultValue = "") String campaignNumber,
+            @RequestParam(defaultValue = "") String name,
+            @RequestParam(defaultValue = "") String campaignCategory,
+            @RequestParam(defaultValue = "") String campaignKey,
+            @RequestParam(defaultValue = "") Boolean state,
+            @RequestParam(defaultValue = "") String createdBy) {
+        Map<String, Object> response = this.campaignService.getCampaignsFiltered(page, size, sort, id, campaignNumber, name, campaignCategory, campaignKey, state, createdBy);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     /**
@@ -70,10 +78,10 @@ public class CampaignController {
     }
 
     /**
-     * Deletes a campaign by its ID.
+     * Soft deletes a campaign by its ID.
      *
-     * @param id the ID of the campaign to delete
-     * @return a ResponseEntity containing the details of the deleted campaign
+     * @param id the ID of the campaign to be deleted
+     * @return a ResponseEntity containing the deleted campaign's details
      */
     @DeleteMapping("/delete")
     public ResponseEntity<GetAllCampaignsResponse> deleteCampaign(@RequestParam() Long id) {
@@ -82,9 +90,9 @@ public class CampaignController {
     }
 
     /**
-     * Deletes all campaigns.
+     * Soft deletes all campaigns by marking them as deleted.
      *
-     * @return a string message indicating that the deletion was successful
+     * @return a success message indicating all campaigns have been marked as deleted
      */
     @DeleteMapping("/delete-all")
     public String deleteAllCampaign() {

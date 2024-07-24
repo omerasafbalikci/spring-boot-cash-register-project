@@ -6,6 +6,7 @@ import com.toyota.salesservice.domain.PaymentType;
 import com.toyota.salesservice.domain.Sales;
 import com.toyota.salesservice.domain.SalesItems;
 import com.toyota.salesservice.dto.requests.CreateReturnRequest;
+import com.toyota.salesservice.dto.requests.InventoryRequest;
 import com.toyota.salesservice.dto.responses.GetAllSalesItemsResponse;
 import com.toyota.salesservice.dto.responses.GetAllSalesResponse;
 import com.toyota.salesservice.dto.responses.PaginationResponse;
@@ -71,14 +72,14 @@ public class SalesManagerTest {
 
         when(modelMapperService.forResponse()).thenReturn(modelMapper);
 
-        when(salesRepository.findBySalesNumber("123")).thenReturn(Optional.of(sales1));
+        when(salesRepository.findBySalesNumberAndDeletedFalse("123")).thenReturn(Optional.of(sales1));
 
         GetAllSalesItemsResponse mockResponse = new GetAllSalesItemsResponse();
         when(modelMapperService.forResponse().map(any(SalesItems.class), eq(GetAllSalesItemsResponse.class))).thenReturn(mockResponse);
 
         List<GetAllSalesItemsResponse> responses = salesManager.toReturn(createReturnRequests);
 
-        verify(salesRepository, times(1)).findBySalesNumber("123");
+        verify(salesRepository, times(1)).findBySalesNumberAndDeletedFalse("123");
         verify(salesRepository, times(1)).save(any(Sales.class));
 
 
@@ -91,62 +92,52 @@ public class SalesManagerTest {
         List<CreateReturnRequest> createReturnRequests = new ArrayList<>();
         createReturnRequests.add(new CreateReturnRequest("456", "DEF456", 3, LocalDateTime.now()));
 
-        when(salesRepository.findBySalesNumber("456")).thenReturn(Optional.empty());
+        when(salesRepository.findBySalesNumberAndDeletedFalse("456")).thenReturn(Optional.empty());
 
         assertThrows(SalesNotFoundException.class, () -> salesManager.toReturn(createReturnRequests));
 
-        verify(salesRepository, times(1)).findBySalesNumber("456");
+        verify(salesRepository, times(1)).findBySalesNumberAndDeletedFalse("456");
     }
 
     @Test
-    public void testDeleteSales_SuccessfulDeletion() {
-        String salesNumber = "123";
-
-        Sales sales = Sales.builder()
-                .id(1L)
-                .salesNumber(salesNumber)
-                .salesItemsList(new ArrayList<>())
-                .build();
-
+    public void testDeleteSales_Success() {
+        String salesNumber = "12345";
+        Sales sales = new Sales();
+        SalesItems salesItem = new SalesItems();
+        sales.setSalesItemsList(List.of(salesItem));
         Optional<Sales> optionalSales = Optional.of(sales);
 
-        List<SalesItems> salesItems = new ArrayList<>();
-        salesItems.add(new SalesItems());
-
-        GetAllSalesResponse mockResponse = new GetAllSalesResponse();
-
-        when(salesRepository.findBySalesNumber(salesNumber)).thenReturn(optionalSales);
+        // Mock behavior
         when(modelMapperService.forResponse()).thenReturn(modelMapper);
-        when(modelMapperService.forResponse().map(sales, GetAllSalesResponse.class)).thenReturn(mockResponse);
+        when(modelMapperService.forRequest()).thenReturn(modelMapper);
+        when(salesRepository.findBySalesNumberAndDeletedFalse(salesNumber)).thenReturn(optionalSales);
+        when(modelMapper.map(any(SalesItems.class), eq(InventoryRequest.class))).thenReturn(new InventoryRequest());
+        when(modelMapper.map(any(Sales.class), eq(GetAllSalesResponse.class))).thenReturn(new GetAllSalesResponse());
 
+        // Mocked methods
         doNothing().when(salesBusinessRules).updateInventory(anyList());
+        when(salesItemRepository.saveAll(anyList())).thenReturn(List.of(salesItem));
 
         GetAllSalesResponse response = salesManager.deleteSales(salesNumber);
 
-        verify(salesRepository, times(1)).findBySalesNumber(salesNumber);
-        verify(salesRepository, times(1)).deleteById(sales.getId());
-        verify(salesItemRepository, times(1)).deleteBySalesId(sales.getId());
-
-        verify(salesBusinessRules, times(1)).updateInventory(anyList());
-
         assertNotNull(response);
-        assertEquals(mockResponse, response);
+        verify(salesRepository).findBySalesNumberAndDeletedFalse(salesNumber);
+        verify(salesBusinessRules).updateInventory(anyList());
+        verify(salesItemRepository).saveAll(anyList());
+        verify(salesRepository).save(any(Sales.class));
     }
 
     @Test
-    public void testDeleteSales_SalesNotFoundException() {
-        String salesNumber = "456";
+    public void testDeleteSales_SalesNotFound() {
+        String salesNumber = "99999";
+        when(salesRepository.findBySalesNumberAndDeletedFalse(salesNumber)).thenReturn(Optional.empty());
 
-        Optional<Sales> optionalSales = Optional.empty();
+        SalesNotFoundException thrown = assertThrows(SalesNotFoundException.class, () -> salesManager.deleteSales(salesNumber));
 
-        when(salesRepository.findBySalesNumber(salesNumber)).thenReturn(optionalSales);
-
-        assertThrows(SalesNotFoundException.class, () -> salesManager.deleteSales(salesNumber));
-
-        verify(salesRepository, times(1)).findBySalesNumber(salesNumber);
-        verify(salesRepository, never()).deleteById(anyLong());
-        verify(salesItemRepository, never()).deleteBySalesId(anyLong());
-        verify(salesBusinessRules, never()).updateInventory(anyList());
+        assertEquals("Sales not found: " + salesNumber, thrown.getMessage());
+        verify(salesRepository).findBySalesNumberAndDeletedFalse(salesNumber);
+        verifyNoMoreInteractions(salesRepository);
+        verifyNoInteractions(salesBusinessRules, salesItemRepository);
     }
 
     @Test
@@ -158,16 +149,16 @@ public class SalesManagerTest {
         salesList.add(Sales.builder().totalPrice(100.0).build());
         salesList.add(Sales.builder().totalPrice(200.0).build());
 
-        when(salesRepository.findBySalesDateBetween(startDate, endDate)).thenReturn(salesList);
+        when(salesRepository.findBySalesDateBetweenAndDeletedFalse(startDate, endDate)).thenReturn(salesList);
 
-        TreeMap<String, Object> salesStatistics = salesManager.getSalesStatistics(startDate, endDate);
+        Map<String, Object> salesStatistics = salesManager.getSalesStatistics(startDate, endDate);
 
         assertNotNull(salesStatistics);
         assertEquals(300.0, salesStatistics.get("totalSales"));
         assertEquals(150.0, salesStatistics.get("averageSales"));
         assertEquals(2L, salesStatistics.get("totalSalesCount"));
 
-        verify(salesRepository, times(1)).findBySalesDateBetween(startDate, endDate);
+        verify(salesRepository, times(1)).findBySalesDateBetweenAndDeletedFalse(startDate, endDate);
     }
 
     @SuppressWarnings("unchecked")
@@ -209,6 +200,4 @@ public class SalesManagerTest {
         assertNotNull(result);
         assertEquals(mockSales.size(), result.getContent().size());
     }
-
-
 }

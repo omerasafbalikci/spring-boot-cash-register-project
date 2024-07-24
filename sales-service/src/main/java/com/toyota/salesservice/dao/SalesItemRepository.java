@@ -10,5 +10,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SalesItemRepository extends JpaRepository<SalesItems, Long> {
-    void deleteBySalesId(Long salesId);
 }

@@ -9,7 +9,7 @@ import com.toyota.salesservice.utilities.exceptions.SalesNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.TreeMap;
+import java.util.Map;
 
 /**
  * Interface for sales service class.
@@ -33,11 +33,13 @@ public interface SalesService {
     List<GetAllSalesItemsResponse> toReturn(List<CreateReturnRequest> createReturnRequest);
 
     /**
-     * Deletes a sales record by its sales number.
+     * Soft deletes a sales record by its sales number.
+     * Marks the sales record and its associated sales items as deleted.
+     * Updates the inventory accordingly.
      *
-     * @param salesNumber the sales number
-     * @return the response containing the deleted sales data
-     * @throws SalesNotFoundException if the sales record is not found
+     * @param salesNumber the sales number of the sales record to delete
+     * @return a response containing the details of the deleted sales record
+     * @throws SalesNotFoundException if no sales record is found with the given sales number
      */
     GetAllSalesResponse deleteSales(String salesNumber);
 
@@ -46,12 +48,12 @@ public interface SalesService {
      *
      * @param startDate the start date of the period to retrieve statistics for
      * @param endDate the end date of the period to retrieve statistics for
-     * @return a TreeMap containing the sales statistics:
+     * @return a Map containing the sales statistics:
      *         - "totalSales": the total sales amount within the specified period
      *         - "averageSales": the average sales amount per transaction within the specified period
      *         - "totalSalesCount": the total number of sales transactions within the specified period
      */
-    TreeMap<String, Object> getSalesStatistics(LocalDateTime startDate, LocalDateTime endDate);
+    Map<String, Object> getSalesStatistics(LocalDateTime startDate, LocalDateTime endDate);
 
     /**
      * Retrieves sales records filtered by various criteria.

@@ -15,6 +15,6 @@ import java.util.Optional;
 
 @Repository
 public interface SalesRepository extends JpaRepository<Sales, Long>, JpaSpecificationExecutor<Sales> {
-    Optional<Sales> findBySalesNumber(String salesNumber);
-    List<Sales> findBySalesDateBetween(LocalDateTime startDate, LocalDateTime endDate);
+    Optional<Sales> findBySalesNumberAndDeletedFalse(String salesNumber);
+    List<Sales> findBySalesDateBetweenAndDeletedFalse(LocalDateTime startDate, LocalDateTime endDate);
 }

@@ -6,17 +6,26 @@
   <component name="ChangeListManager">
     <list default="true" id="4d6e52b4-0d65-4c7c-b617-aca701f9252f" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product-service/src/main/java/com/toyota/productservice/dao/ProductSpecification.java" beforeDir="false" afterPath="$PROJECT_DIR$/product-service/src/main/java/com/toyota/productservice/dao/ProductSpecification.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product-service/src/main/java/com/toyota/productservice/resource/ProductCategoryController.java" beforeDir="false" afterPath="$PROJECT_DIR$/product-service/src/main/java/com/toyota/productservice/resource/ProductCategoryController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product-service/src/main/java/com/toyota/productservice/resource/ProductController.java" beforeDir="false" afterPath="$PROJECT_DIR$/product-service/src/main/java/com/toyota/productservice/resource/ProductController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product-service/src/main/java/com/toyota/productservice/service/abstracts/ProductCategoryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/product-service/src/main/java/com/toyota/productservice/service/abstracts/ProductCategoryService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product-service/src/main/java/com/toyota/productservice/service/abstracts/ProductService.java" beforeDir="false" afterPath="$PROJECT_DIR$/product-service/src/main/java/com/toyota/productservice/service/abstracts/ProductService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product-service/src/main/java/com/toyota/productservice/service/concretes/ProductCategoryManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/product-service/src/main/java/com/toyota/productservice/service/concretes/ProductCategoryManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product-service/src/main/java/com/toyota/productservice/service/concretes/ProductManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/product-service/src/main/java/com/toyota/productservice/service/concretes/ProductManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product-service/src/test/java/com/toyota/productservice/resource/ProductCategoryControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/product-service/src/test/java/com/toyota/productservice/resource/ProductCategoryControllerTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product-service/src/test/java/com/toyota/productservice/resource/ProductControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/product-service/src/test/java/com/toyota/productservice/resource/ProductControllerTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product-service/src/test/java/com/toyota/productservice/service/concretes/ProductCategoryManagerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/product-service/src/test/java/com/toyota/productservice/service/concretes/ProductCategoryManagerTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product-service/src/test/java/com/toyota/productservice/service/concretes/ProductManagerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/product-service/src/test/java/com/toyota/productservice/service/concretes/ProductManagerTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sales-service/src/main/java/com/toyota/salesservice/dao/CampaignRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/sales-service/src/main/java/com/toyota/salesservice/dao/CampaignRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sales-service/src/main/java/com/toyota/salesservice/dao/SalesItemRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/sales-service/src/main/java/com/toyota/salesservice/dao/SalesItemRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sales-service/src/main/java/com/toyota/salesservice/dao/SalesRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/sales-service/src/main/java/com/toyota/salesservice/dao/SalesRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sales-service/src/main/java/com/toyota/salesservice/dao/SalesSpecification.java" beforeDir="false" afterPath="$PROJECT_DIR$/sales-service/src/main/java/com/toyota/salesservice/dao/SalesSpecification.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sales-service/src/main/java/com/toyota/salesservice/domain/Campaign.java" beforeDir="false" afterPath="$PROJECT_DIR$/sales-service/src/main/java/com/toyota/salesservice/domain/Campaign.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sales-service/src/main/java/com/toyota/salesservice/domain/Sales.java" beforeDir="false" afterPath="$PROJECT_DIR$/sales-service/src/main/java/com/toyota/salesservice/domain/Sales.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sales-service/src/main/java/com/toyota/salesservice/domain/SalesItems.java" beforeDir="false" afterPath="$PROJECT_DIR$/sales-service/src/main/java/com/toyota/salesservice/domain/SalesItems.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sales-service/src/main/java/com/toyota/salesservice/resource/CampaignController.java" beforeDir="false" afterPath="$PROJECT_DIR$/sales-service/src/main/java/com/toyota/salesservice/resource/CampaignController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sales-service/src/main/java/com/toyota/salesservice/resource/SalesController.java" beforeDir="false" afterPath="$PROJECT_DIR$/sales-service/src/main/java/com/toyota/salesservice/resource/SalesController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sales-service/src/main/java/com/toyota/salesservice/service/abstracts/CampaignService.java" beforeDir="false" afterPath="$PROJECT_DIR$/sales-service/src/main/java/com/toyota/salesservice/service/abstracts/CampaignService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sales-service/src/main/java/com/toyota/salesservice/service/abstracts/SalesService.java" beforeDir="false" afterPath="$PROJECT_DIR$/sales-service/src/main/java/com/toyota/salesservice/service/abstracts/SalesService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sales-service/src/main/java/com/toyota/salesservice/service/concretes/CampaignManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/sales-service/src/main/java/com/toyota/salesservice/service/concretes/CampaignManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sales-service/src/main/java/com/toyota/salesservice/service/concretes/SalesManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/sales-service/src/main/java/com/toyota/salesservice/service/concretes/SalesManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sales-service/src/main/java/com/toyota/salesservice/service/rules/CampaignBusinessRules.java" beforeDir="false" afterPath="$PROJECT_DIR$/sales-service/src/main/java/com/toyota/salesservice/service/rules/CampaignBusinessRules.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sales-service/src/test/java/com/toyota/salesservice/dto/PaginationResponseTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/sales-service/src/test/java/com/toyota/salesservice/dto/PaginationResponseTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sales-service/src/test/java/com/toyota/salesservice/resource/CampaignControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/sales-service/src/test/java/com/toyota/salesservice/resource/CampaignControllerTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sales-service/src/test/java/com/toyota/salesservice/resource/SalesControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/sales-service/src/test/java/com/toyota/salesservice/resource/SalesControllerTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sales-service/src/test/java/com/toyota/salesservice/service/concretes/CampaignManagerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/sales-service/src/test/java/com/toyota/salesservice/service/concretes/CampaignManagerTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sales-service/src/test/java/com/toyota/salesservice/service/concretes/SalesManagerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/sales-service/src/test/java/com/toyota/salesservice/service/concretes/SalesManagerTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sales-service/src/test/java/com/toyota/salesservice/service/rules/CampaignBusinessRulesTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/sales-service/src/test/java/com/toyota/salesservice/service/rules/CampaignBusinessRulesTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,146 +50,164 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.ApigatewayApplication.executor&quot;: &quot;Run&quot;,
-    &quot;Application.AuthenticationauthorizationserviceApplication.executor&quot;: &quot;Run&quot;,
-    &quot;Application.DiscoveryserverApplication.executor&quot;: &quot;Run&quot;,
-    &quot;Application.ProductserviceApplication.executor&quot;: &quot;Run&quot;,
-    &quot;Application.ReportserviceApplication.executor&quot;: &quot;Run&quot;,
-    &quot;Application.SalesserviceApplication.executor&quot;: &quot;Run&quot;,
-    &quot;Application.UsermanagementserviceApplication.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.CampaignBusinessRulesTest.checkCampaignDetails_whenBuyPayEntryIsIncorrect_shouldThrowException.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.CampaignBusinessRulesTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.CampaignManagerTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.GlobalExceptionHandlerTest (1).executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.GlobalExceptionHandlerTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.JwtAuthenticationFilterTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.JwtManagerTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.MailManagerTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductCategoryControllerTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductCategoryControllerTest.getProductCategoriesFiltered.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductCategoryControllerTest.getProductsByCategoryId.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductCategoryManagerTest.addCategory_shouldAddNewCategory_whenCategoryDoesNotExist.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductCategoryManagerTest.addCategory_shouldThrowException_whenCategoryExists.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductCategoryManagerTest.deleteCategory_categoryNotFound.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductCategoryManagerTest.deleteCategory_success.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductCategoryManagerTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductCategoryManagerTest.getCategoriesFiltered_asc.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductCategoryManagerTest.getProductFiltered_asc.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductCategoryManagerTest.getProductsByCategoryId_noProductCategoryFound.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductCategoryManagerTest.getProductsByCategoryId_returnsProducts.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductCategoryManagerTest.testGetCategoriesFiltered.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductCategoryManagerTest.testGetProductsByCategoryId_CategoryExists.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductCategoryManagerTest.updateCategory_shouldThrowException_whenCategoryDoesNotExist.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductCategoryManagerTest.updateCategory_shouldThrowException_whenCategoryNameAlreadyExists.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductCategoryManagerTest.updateCategory_shouldUpdateCategory_whenCategoryExistsAndNameIsUnique.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductControllerTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductControllerTest.getProductsFiltered.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductManagerTest.addProduct_existingProductDifferentPrice.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductManagerTest.addProduct_existingProductSamePrice.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductManagerTest.addProduct_newProduct.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductManagerTest.addProduct_productCategoryNotFound.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductManagerTest.checkProductInInventory_insufficientQuantity.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductManagerTest.checkProductInInventory_productNotFound.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductManagerTest.checkProductInInventory_sufficientQuantity.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductManagerTest.deleteProduct_notFound.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductManagerTest.deleteProduct_success.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductManagerTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductManagerTest.getProductFiltered_asc.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductManagerTest.getProductFiltered_desc.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductManagerTest.updateProductInInventory_productFound.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductManagerTest.updateProductInInventory_productNotFound.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductManagerTest.updateProduct_nameAlreadyExists.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductManagerTest.updateProduct_notFound.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ProductManagerTest.updateProduct_success.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.RoleTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.SalesBusinessRulesTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.SalesManagerTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.TokenRepositoryTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.UserControllerTest (1).executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.UserControllerTest.deleteUsername.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.UserControllerTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.UserControllerTest.restoreUser.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.UserManagerTest (1).executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.UserManagerTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.UserManagerTest.restoreUser_success.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.UserManagerTest.restoreUser_unexpectedFail.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.UserManagerTest.restoreUser_userNotFound.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.UserManagerTest.restoreUsername_success.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.UserManagerTest.restoreUsername_userNotFound.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.UsermanagementserviceApplicationTests.executor&quot;: &quot;Run&quot;,
-    &quot;Maven.toyota-project [clean].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.toyota-project [install].executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/omera/Desktop/springboot-microservices-market-checkout&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.ApigatewayApplication.executor": "Run",
+    "Application.AuthenticationauthorizationserviceApplication.executor": "Run",
+    "Application.DiscoveryserverApplication.executor": "Run",
+    "Application.ProductserviceApplication.executor": "Run",
+    "Application.ReportserviceApplication.executor": "Run",
+    "Application.SalesserviceApplication.executor": "Run",
+    "Application.UsermanagementserviceApplication.executor": "Run",
+    "JUnit.CampaignBusinessRulesTest.checkCampaignDetails_whenBuyPayEntryIsIncorrect_shouldThrowException.executor": "Run",
+    "JUnit.CampaignBusinessRulesTest.executor": "Run",
+    "JUnit.CampaignControllerTest.executor": "Run",
+    "JUnit.CampaignManagerTest.deleteAllCampaigns_shouldThrowCampaignNotFoundException.executor": "Run",
+    "JUnit.CampaignManagerTest.executor": "Run",
+    "JUnit.GlobalExceptionHandlerTest (1).executor": "Run",
+    "JUnit.GlobalExceptionHandlerTest.executor": "Run",
+    "JUnit.JwtAuthenticationFilterTest.executor": "Run",
+    "JUnit.JwtManagerTest.executor": "Run",
+    "JUnit.MailManagerTest.executor": "Run",
+    "JUnit.PaginationResponseTest.executor": "Run",
+    "JUnit.ProductCategoryControllerTest.executor": "Run",
+    "JUnit.ProductCategoryControllerTest.getProductCategoriesFiltered.executor": "Run",
+    "JUnit.ProductCategoryControllerTest.getProductsByCategoryId.executor": "Run",
+    "JUnit.ProductCategoryManagerTest.addCategory_shouldAddNewCategory_whenCategoryDoesNotExist.executor": "Run",
+    "JUnit.ProductCategoryManagerTest.addCategory_shouldThrowException_whenCategoryExists.executor": "Run",
+    "JUnit.ProductCategoryManagerTest.deleteCategory_categoryNotFound.executor": "Run",
+    "JUnit.ProductCategoryManagerTest.deleteCategory_success.executor": "Run",
+    "JUnit.ProductCategoryManagerTest.executor": "Run",
+    "JUnit.ProductCategoryManagerTest.getCategoriesFiltered_asc.executor": "Run",
+    "JUnit.ProductCategoryManagerTest.getProductFiltered_asc.executor": "Run",
+    "JUnit.ProductCategoryManagerTest.getProductsByCategoryId_noProductCategoryFound.executor": "Run",
+    "JUnit.ProductCategoryManagerTest.getProductsByCategoryId_returnsProducts.executor": "Run",
+    "JUnit.ProductCategoryManagerTest.testGetCategoriesFiltered.executor": "Run",
+    "JUnit.ProductCategoryManagerTest.testGetProductsByCategoryId_CategoryExists.executor": "Run",
+    "JUnit.ProductCategoryManagerTest.updateCategory_shouldThrowException_whenCategoryDoesNotExist.executor": "Run",
+    "JUnit.ProductCategoryManagerTest.updateCategory_shouldThrowException_whenCategoryNameAlreadyExists.executor": "Run",
+    "JUnit.ProductCategoryManagerTest.updateCategory_shouldUpdateCategory_whenCategoryExistsAndNameIsUnique.executor": "Run",
+    "JUnit.ProductControllerTest.executor": "Run",
+    "JUnit.ProductControllerTest.getProductsFiltered.executor": "Run",
+    "JUnit.ProductManagerTest.addProduct_existingProductDifferentPrice.executor": "Run",
+    "JUnit.ProductManagerTest.addProduct_existingProductSamePrice.executor": "Run",
+    "JUnit.ProductManagerTest.addProduct_newProduct.executor": "Run",
+    "JUnit.ProductManagerTest.addProduct_productCategoryNotFound.executor": "Run",
+    "JUnit.ProductManagerTest.checkProductInInventory_insufficientQuantity.executor": "Run",
+    "JUnit.ProductManagerTest.checkProductInInventory_productNotFound.executor": "Run",
+    "JUnit.ProductManagerTest.checkProductInInventory_sufficientQuantity.executor": "Run",
+    "JUnit.ProductManagerTest.deleteProduct_notFound.executor": "Run",
+    "JUnit.ProductManagerTest.deleteProduct_success.executor": "Run",
+    "JUnit.ProductManagerTest.executor": "Run",
+    "JUnit.ProductManagerTest.getProductFiltered_asc.executor": "Run",
+    "JUnit.ProductManagerTest.getProductFiltered_desc.executor": "Run",
+    "JUnit.ProductManagerTest.updateProductInInventory_productFound.executor": "Run",
+    "JUnit.ProductManagerTest.updateProductInInventory_productNotFound.executor": "Run",
+    "JUnit.ProductManagerTest.updateProduct_nameAlreadyExists.executor": "Run",
+    "JUnit.ProductManagerTest.updateProduct_notFound.executor": "Run",
+    "JUnit.ProductManagerTest.updateProduct_success.executor": "Run",
+    "JUnit.RoleTest.executor": "Run",
+    "JUnit.SalesBusinessRulesTest.executor": "Run",
+    "JUnit.SalesControllerTest.executor": "Run",
+    "JUnit.SalesManagerTest.executor": "Run",
+    "JUnit.SalesManagerTest.testDeleteSales_SalesNotFound.executor": "Run",
+    "JUnit.SalesManagerTest.testDeleteSales_Success.executor": "Run",
+    "JUnit.TokenRepositoryTest.executor": "Run",
+    "JUnit.UserControllerTest (1).executor": "Run",
+    "JUnit.UserControllerTest.deleteUsername.executor": "Run",
+    "JUnit.UserControllerTest.executor": "Run",
+    "JUnit.UserControllerTest.restoreUser.executor": "Run",
+    "JUnit.UserManagerTest (1).executor": "Run",
+    "JUnit.UserManagerTest.executor": "Run",
+    "JUnit.UserManagerTest.restoreUser_success.executor": "Run",
+    "JUnit.UserManagerTest.restoreUser_unexpectedFail.executor": "Run",
+    "JUnit.UserManagerTest.restoreUser_userNotFound.executor": "Run",
+    "JUnit.UserManagerTest.restoreUsername_success.executor": "Run",
+    "JUnit.UserManagerTest.restoreUsername_userNotFound.executor": "Run",
+    "JUnit.UsermanagementserviceApplicationTests.executor": "Run",
+    "Maven.toyota-project [clean].executor": "Run",
+    "Maven.toyota-project [install].executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/omera/Desktop/springboot-microservices-market-checkout",
+    "settings.editor.selected.configurable": "inlay.hints"
   }
-}</component>
-  <component name="RunManager" selected="Application.ProductserviceApplication">
-    <configuration name="ApigatewayApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="com.toyota.apigateway.ApigatewayApplication" />
-      <module name="apigateway" />
+}]]></component>
+  <component name="RunManager" selected="JUnit.CampaignControllerTest">
+    <configuration name="CampaignControllerTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="salesservice" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.toyota.apigateway.*" />
+          <option name="PATTERN" value="com.toyota.salesservice.resource.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
+      <option name="PACKAGE_NAME" value="com.toyota.salesservice.resource" />
+      <option name="MAIN_CLASS_NAME" value="com.toyota.salesservice.resource.CampaignControllerTest" />
+      <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="AuthenticationauthorizationserviceApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="com.toyota.authenticationauthorizationservice.AuthenticationauthorizationserviceApplication" />
-      <module name="authenticationauthorizationservice" />
+    <configuration name="CampaignManagerTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="salesservice" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.toyota.authenticationauthorizationservice.*" />
+          <option name="PATTERN" value="com.toyota.salesservice.service.concretes.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
+      <option name="PACKAGE_NAME" value="com.toyota.salesservice.service.concretes" />
+      <option name="MAIN_CLASS_NAME" value="com.toyota.salesservice.service.concretes.CampaignManagerTest" />
+      <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="DiscoveryserverApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="com.toyota.discoveryserver.DiscoveryserverApplication" />
-      <module name="discoveryserver" />
+    <configuration name="CampaignManagerTest.deleteAllCampaigns_shouldThrowCampaignNotFoundException" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="salesservice" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.toyota.discoveryserver.*" />
+          <option name="PATTERN" value="com.toyota.salesservice.service.concretes.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
+      <option name="PACKAGE_NAME" value="com.toyota.salesservice.service.concretes" />
+      <option name="MAIN_CLASS_NAME" value="com.toyota.salesservice.service.concretes.CampaignManagerTest" />
+      <option name="METHOD_NAME" value="deleteAllCampaigns_shouldThrowCampaignNotFoundException" />
+      <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="ProductserviceApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="com.toyota.productservice.ProductserviceApplication" />
-      <module name="productservice" />
+    <configuration name="PaginationResponseTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="salesservice" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.toyota.productservice.*" />
+          <option name="PATTERN" value="com.toyota.salesservice.dto.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
+      <option name="PACKAGE_NAME" value="com.toyota.salesservice.dto" />
+      <option name="MAIN_CLASS_NAME" value="com.toyota.salesservice.dto.PaginationResponseTest" />
+      <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="UsermanagementserviceApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="com.toyota.usermanagementservice.UsermanagementserviceApplication" />
-      <module name="usermanagementservice" />
+    <configuration name="SalesBusinessRulesTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="salesservice" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.toyota.usermanagementservice.*" />
+          <option name="PATTERN" value="com.toyota.salesservice.service.rules.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
+      <option name="PACKAGE_NAME" value="com.toyota.salesservice.service.rules" />
+      <option name="MAIN_CLASS_NAME" value="com.toyota.salesservice.service.rules.SalesBusinessRulesTest" />
+      <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -200,11 +227,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.ProductserviceApplication" />
-        <item itemvalue="Application.UsermanagementserviceApplication" />
-        <item itemvalue="Application.AuthenticationauthorizationserviceApplication" />
-        <item itemvalue="Application.ApigatewayApplication" />
-        <item itemvalue="Application.DiscoveryserverApplication" />
+        <item itemvalue="JUnit.CampaignControllerTest" />
+        <item itemvalue="JUnit.CampaignManagerTest.deleteAllCampaigns_shouldThrowCampaignNotFoundException" />
+        <item itemvalue="JUnit.CampaignManagerTest" />
+        <item itemvalue="JUnit.PaginationResponseTest" />
+        <item itemvalue="JUnit.SalesBusinessRulesTest" />
       </list>
     </recent_temporary>
   </component>
