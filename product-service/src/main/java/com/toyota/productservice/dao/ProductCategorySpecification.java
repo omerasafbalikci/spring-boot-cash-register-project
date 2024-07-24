@@ -45,7 +45,7 @@ public class ProductCategorySpecification implements Specification<ProductCatego
             predicates.add(criteriaBuilder.like(root.get("name"), "%" + name + "%"));
         }
         if (createdBy != null && !createdBy.isEmpty()) {
-            predicates.add(criteriaBuilder.like(root.get("createdBy"), "%" + categoryNumber + "%"));
+            predicates.add(criteriaBuilder.like(root.get("createdBy"), "%" + createdBy + "%"));
         }
 
         predicates.add(criteriaBuilder.isFalse(root.get("deleted")));

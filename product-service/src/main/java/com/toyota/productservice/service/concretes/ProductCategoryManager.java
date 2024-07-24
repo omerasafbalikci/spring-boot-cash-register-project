@@ -65,7 +65,7 @@ public class ProductCategoryManager implements ProductCategoryService {
         response.put("currentPage", categoryPage.getNumber());
         response.put("totalItems", categoryPage.getTotalElements());
         response.put("totalPages", categoryPage.getTotalPages());
-        logger.debug("Get product categories: Retrieved {} products for page {}. Total items: {}. Total pages: {}.", responses.size(), categoryPage.getNumber(), categoryPage.getTotalElements(), categoryPage.getTotalPages());
+        logger.debug("Get product categories: Retrieved {} product categories for page {}. Total items: {}. Total pages: {}.", responses.size(), categoryPage.getNumber(), categoryPage.getTotalElements(), categoryPage.getTotalPages());
         return response;
     }
 
