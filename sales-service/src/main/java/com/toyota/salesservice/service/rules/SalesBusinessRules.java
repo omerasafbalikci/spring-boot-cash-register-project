@@ -150,7 +150,7 @@ public class SalesBusinessRules {
                     salesItem.setUnitPrice(response.getUnitPrice());
                     salesItem.setState(response.getState());
                     salesItem.setTotalPrice(response.getUnitPrice() * response.getQuantity());
-                    campaignIds.get(i).flatMap(this.campaignRepository::findById).ifPresent(campaign -> {
+                    campaignIds.get(i).flatMap(this.campaignRepository::findByIdAndDeletedFalse).ifPresent(campaign -> {
                         salesItem.setCampaign(campaign);
                         logger.info("Set campaign for sales item with barcode '{}'.", barcodeNumbers.get(i));
                     });
