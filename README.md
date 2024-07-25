@@ -49,16 +49,12 @@ This project is a Spring Boot based microservice project that provides market ch
     - Required Role: NONE
     - Endpoints for product categories:
         - Get Category: `GET /api/product-categories/get-all`
-        - Search Category: `GET /api/product-categories/search`
-        - Get Category By ID: `GET /api/product-categories/id`
-        - Get Products By Category ID: `GET /api/product-categories/products`
         - Add Category: `POST /api/product-categories/add`
         - Update Category: `PUT /api/product-categories/update`
         - Delete Category: `DELETE /api/product-categories/delete`
 
     - Endpoints for products:
         - Get Products: `GET /api/products/get-all`
-        - Search Product: `GET /api/products/search`
         - Add Product: `POST /api/products/add`
         - Update Product: `PUT /api/products/update`
         - Delete Product: `DELETE /api/products/delete`
@@ -68,7 +64,6 @@ This project is a Spring Boot based microservice project that provides market ch
     - Required Role: CASHIER
     - Endpoints for campaigns:
         - Get Campaigns: `GET /api/campaigns/get-all`
-        - Get Campaign By Campaign Number: `GET /api/campaigns/campaign-number`
         - Add Campaign: `POST /api/campaigns/create`
         - Update Campaign: `PUT /api/campaigns/update`
         - Delete Campaign: `DELETE /api/campaigns/delete`
@@ -203,7 +198,7 @@ Response:
 #### Delete product category
 
 Endpoint: `DELETE /api/product-categories/delete`  
-Description: Deletes a category in the database.
+Description: Deletes a category in the database. (soft delete)
 
 Request Parameters:
 
@@ -228,127 +223,49 @@ Response:
 #### Get all product categories
 
 Endpoint: `GET /api/product-categories/get-all`  
-Description: Lists all categories.
-
-Response:
-
-```json
-[
-    {
-      "id": 1,
-      "categoryNumber": "c5348973",
-      "name": "Yiyecek",
-      "description": "Aradığın tüm yiyecekler burada!",
-      "imageUrl": "www.images.com/yiyecek",
-      "createdBy": "Ömer Asaf Balıkçı",
-      "updatedAt": "2024-06-24T04:19:56.531168"
-    },
-    {
-      "id": 2,
-      "categoryNumber": "f17b09f9",
-      "name": "İçecek",
-      "description": "Buz gibi ferahlatan içecekler!",
-      "imageUrl": "www.images.com/içecek",
-      "createdBy": "Ömer Asaf Balıkçı",
-      "updatedAt": "2024-06-24T04:23:37.268661"
-    }
-]
-```
-
-#### Search product category
-
-Endpoint: `GET /api/product-categories/search`  
-Description: It searches within all categories.
+Description: Paging, filtering and sorting all product categories
+brings with.
 
 Request Parameters:
 
-| Key    | Value     |
-|--------|-----------|
-| `name` | `yiyecek` |
-
-Response:
-
-```json
-[
-    {
-      "id": 1,
-      "categoryNumber": "c5348973",
-      "name": "Yiyecek",
-      "description": "Aradığın tüm yiyecekler burada!",
-      "imageUrl": "www.images.com/yiyecek",
-      "createdBy": "Ömer Asaf Balıkçı",
-      "updatedAt": "2024-06-24T04:19:56.531168"
-    }
-]
-```
-
-#### Get product category by id
-
-Endpoint: `GET /api/product-categories/id`  
-Description: Returns category by id.
-
-Request Parameters:
-
-| Key  | Value |
-|------|-------|
-| `id` | `1`   |
+| Parameter        | Type      | Description                |
+|------------------|-----------|----------------------------|
+| `id`             | `Long`    | Filter for id              |
+| `categoryNumber` | `String`  | Filter for category number |
+| `name`           | `String`  | Filter for name            |
+| `createdBy`      | `String`  | Filter for created by      |
+| `page`           | `Integer` | Page number                |
+| `size`           | `Integer` | Page size                  |
+| `sort`           | `String`  | Sort (id,asc)              |
 
 Response:
 
 ```json
 {
-    "id": 1,
-    "categoryNumber": "c5348973",
-    "name": "Yiyecek",
-    "description": "Aradığın tüm yiyecekler burada!",
-    "imageUrl": "www.images.com/yiyecek",
-    "createdBy": "Ömer Asaf Balıkçı",
-    "updatedAt": "2024-06-24T04:19:56.531168"
+    "currentPage": 0,
+    "productCategories": [
+      {
+        "id": 1,
+        "categoryNumber": "c5348973",
+        "name": "Yiyecek",
+        "description": "Aradığın tüm yiyecekler burada!",
+        "imageUrl": "www.images.com/yiyecek",
+        "createdBy": "Ömer Asaf Balıkçı",
+        "updatedAt": "2024-06-24T04:19:56.531168"
+      },
+      {
+        "id": 2,
+        "categoryNumber": "f17b09f9",
+        "name": "İçecek",
+        "description": "Buz gibi ferahlatan içecekler!",
+        "imageUrl": "www.images.com/içecek",
+        "createdBy": "Ömer Asaf Balıkçı",
+        "updatedAt": "2024-06-24T04:23:37.268661"
+      }
+     ],
+     "totalItems": 2,
+     "totalPages": 1
 }
-```
-
-#### Get products by product category id
-
-Endpoint: `GET /api/product-categories/products`  
-Description: Lists products by category ID.
-
-Request Parameters:
-
-| Key          | Value |
-|--------------|-------|
-| `categoryId` | `1`   |
-
-Response:
-
-```json
-[
-    {
-      "id": 1,
-      "barcodeNumber": "c12d30cb",
-      "name": "Ekmek",
-      "description": "Karbonhidrat",
-      "quantity": 100,
-      "unitPrice": 10.0,
-      "state": true,
-      "imageUrl": "www.images.com/yiyecek/ekmek",
-      "createdBy": "Ömer Asaf Balıkçı",
-      "updatedAt": "2024-06-24T23:11:06.776624",
-      "productCategoryName": "Yiyecek"
-    },
-    {
-      "id": 2,
-      "barcodeNumber": "43e1c32f",
-      "name": "Et",
-      "description": "Protein",
-      "quantity": 150,
-      "unitPrice": 500.0,
-      "state": true,
-      "imageUrl": "www.images.com/yiyecek/et",
-      "createdBy": "Ömer Asaf Balıkçı",
-      "updatedAt": "2024-06-24T23:25:59.84176",
-      "productCategoryName": "Yiyecek"
-    }
-]
 ```
 
 ### Endpoints for products
@@ -433,7 +350,7 @@ Response:
 #### Delete product
 
 Endpoint: `DELETE /api/products/delete`   
-Description: Deletes a product in the database.
+Description: Deletes a product in the database. (soft delete)
 
 Request Parameters:
 
@@ -467,14 +384,19 @@ brings with.
 
 Request Parameters:
 
-| Parameter                | Type      | Description               |
-|--------------------------|-----------|---------------------------|
-| `id`                     | `Long`    | Filter for id             |
-| `barcodeNumber`          | `String`  | Filter for barcode number |
-| `state`                  | `Boolean` | Filter for state          |
-| `page`                   | `Integer` | Page number               |
-| `size`                   | `Integer` | Page size                 |
-| `sort`                   | `String`  | Sort (id,asc)             |
+| Parameter       | Type      | Description               |
+|-----------------|-----------|---------------------------|
+| `id`            | `Long`    | Filter for id             |
+| `barcodeNumber` | `String`  | Filter for barcode number |
+| `name`          | `String`  | Filter for name           |
+| `quantity`      | `Integer` | Filter for quantity       |
+| `unitPrice`     | `Double`  | Filter for unit price     |
+| `state`         | `Boolean` | Filter for state          |
+| `createdBy`     | `String`  | Filter for created by     |
+| `categoryId`    | `Integer` | Filter for category id    |
+| `page`          | `Integer` | Page number               |
+| `size`          | `Integer` | Page size                 |
+| `sort`          | `String`  | Sort (id,asc)             |
 
 Response:
 
@@ -523,58 +445,6 @@ Response:
       }
     ],
     "totalItems": 3,
-    "totalPages": 1
-}
-```
-
-#### Search products
-
-Endpoint: `GET /api/products/search`  
-Description: Paging, filtering and sorting all products with search operation.
-
-Request Parameters:
-
-| Key    | Value    |
-|--------|----------|
-| `name` | `e`      |
-| `page` | `0`      |
-| `size` | `3`      |
-| `sort` | `id,asc` |
-
-Response:
-
-```json
-{
-    "currentPage": 0,
-    "products": [
-      {
-        "id": 1,
-        "barcodeNumber": "c12d30cb",
-        "name": "Ekmek",
-        "description": "Karbonhidrat",
-        "quantity": 100,
-        "unitPrice": 10.0,
-        "state": true,
-        "imageUrl": "www.images.com/yiyecek/ekmek",
-        "createdBy": "Ömer Asaf Balıkçı",
-        "updatedAt": "2024-06-24T23:11:06.776624",
-        "productCategoryName": "Yiyecek"
-      },
-      {
-        "id": 2,
-        "barcodeNumber": "43e1c32f",
-        "name": "Et",
-        "description": "Protein",
-        "quantity": 150,
-        "unitPrice": 500.0,
-        "state": true,
-        "imageUrl": "www.images.com/yiyecek/et",
-        "createdBy": "Ömer Asaf Balıkçı",
-        "updatedAt": "2024-06-24T23:25:59.84176",
-        "productCategoryName": "Yiyecek"
-      }
-    ],
-    "totalItems": 2,
     "totalPages": 1
 }
 ```
@@ -653,7 +523,7 @@ Response:
 #### Delete campaign
 
 Endpoint: `DELETE /api/campaigns/delete`  
-Description: Deletes a campaign in the database.
+Description: Deletes a campaign in the database. (soft delete)
 
 Request Parameters:
 
@@ -680,7 +550,7 @@ Response:
 #### Delete all campaigns
 
 Endpoint: `DELETE /api/campaigns/delete-all`  
-Description: Deletes all campaigns in the database.
+Description: Deletes all campaigns in the database. (soft delete)
 
 Response:
 
@@ -691,12 +561,30 @@ Response:
 #### Get all campaigns
 
 Endpoint: `GET /campaigns/get-all`  
-Description: Lists all campaigns.
+Description: Paging, filtering and sorting all campaigns
+brings with.
+
+Request Parameters:
+
+| Parameter          | Type      | Description                  |
+|--------------------|-----------|------------------------------|
+| `id`               | `Long`    | Filter for id                |
+| `campaignNumber`   | `String`  | Filter for campaign number   |
+| `name`             | `String`  | Filter for name              |
+| `campaignCategory` | `String`  | Filter for campaign category |
+| `campaignKey`      | `String`  | Filter for campaign key      |
+| `state`            | `Boolean` | Filter for state             |
+| `createdBy`        | `String`  | Filter for created by        |
+| `page`             | `Integer` | Page number                  |
+| `size`             | `Integer` | Page size                    |
+| `sort`             | `String`  | Sort (id,asc)                |
 
 Response:
 
 ```json
-[
+{
+  "currentPage": 0,
+  "campaigns": [
     {
       "id": 1,
       "campaignNumber": "998af4f5",
@@ -720,7 +608,7 @@ Response:
       "updatedAt": "2024-06-25T00:03:20.207655"
     },
     {
-      "id": 4,
+      "id": 3,
       "campaignNumber": "209af7c6",
       "name": "30 TL İNDİRİM!",
       "campaignCategory": "MONEYDISCOUNT",
@@ -731,7 +619,7 @@ Response:
       "updatedAt": "2024-06-25T00:05:23.498168"
     },
     {
-      "id": 3,
+      "id": 4,
       "campaignNumber": "0a56d5a2",
       "name": "%50 İNDİRİM!",
       "campaignCategory": "PERCENT",
@@ -741,33 +629,9 @@ Response:
       "createdBy": "Ömer Asaf Balıkçı",
       "updatedAt": "2024-06-25T00:06:58.695363"
     }
-]
-```
-
-#### Get campaign by campaign number
-
-Endpoint: `GET /api/campaigns/campaign-number`  
-Description: Returns campaign by campaign number.
-
-Request Parameters:
-
-| Key              | Value      |
-|------------------|------------|
-| `campaignNumber` | `998af4f5` |
-
-Response:
-
-```json
-{
-    "id": 1,
-    "campaignNumber": "998af4f5",
-    "name": "3 AL 2 ÖDE!",
-    "campaignCategory": "BUYPAY",
-    "campaignKey": "3,2",
-    "campaignType": 1,
-    "state": true,
-    "createdBy": "Ömer Asaf Balıkçı",
-    "updatedAt": "2024-06-25T00:01:04.689911"
+  ],
+  "totalItems": 4,
+  "totalPages": 1
 }
 ```
 
@@ -876,7 +740,7 @@ Response:
 #### Delete sales
 
 Endpoint: `DELETE /api/sales/delete`   
-Description: Deletes the sale from the database.
+Description: Deletes the sale from the database. (soft delete)
 
 Request Parameters:
 
@@ -1137,7 +1001,6 @@ Response:
         "lastName": "Balıkçı",
         "username": "omerasaf",
         "email": "omerasaf@gmail.com",
-        "deleted": false,
         "roles": [
           "MANAGER"
         ],
@@ -1149,7 +1012,6 @@ Response:
         "lastName": "Aktaş",
         "username": "sevda",
         "email": "sevdaaktas@gmail.com",
-        "deleted": false,
         "roles": [
           "CASHIER"
         ],
@@ -1161,7 +1023,6 @@ Response:
       "lastName": "Balıkçı",
       "username": "kadircan",
       "email": "kadircan@gmail.com",
-      "deleted": false,
       "roles": [
         "CASHIER",
         "ADMIN"
@@ -1227,7 +1088,6 @@ Response:
     "lastName": "Balıkçı",
     "username": "asa7",
     "email": "asa7@gmail.com",
-    "deleted": false,
     "roles": [
       "MANAGER"
     ],
@@ -1262,7 +1122,6 @@ Response:
     "lastName": "Balıkçı",
     "username": "asaf",
     "email": "asaf@gmail.com",
-    "deleted": false,
     "roles": [
       "MANAGER"
     ],
@@ -1290,7 +1149,6 @@ Response:
     "lastName": "Balıkçı",
     "username": "asaf",
     "email": "asaf@gmail.com",
-    "deleted": true,
     "roles": [
       "CASHIER"
     ],
@@ -1318,7 +1176,6 @@ Response:
     "lastName": "Balıkçı",
     "username": "asaf",
     "email": "asaf@gmail.com",
-    "deleted": false,
     "roles": [
       "CASHIER",
       "MANAGER"
@@ -1347,7 +1204,6 @@ Response:
     "lastName": "Balıkçı",
     "username": "asaf",
     "email": "asaf@gmail.com",
-    "deleted": false,
     "roles": [
       "CASHIER"
     ],
@@ -1396,9 +1252,9 @@ Description: Function used when password is forgotten.
 
 Request Parameters:
 
-| Key     | Value            |
-|---------|------------------|
-| `email` | `asaf@gmail.com` |
+| Key     | Value                       |
+|---------|-----------------------------|
+| `email` | `balikciomerasaf@gmail.com` |
 
 Response:
 ```json
