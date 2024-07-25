@@ -48,7 +48,7 @@ This project is a Spring Boot based microservice project that provides market ch
 4. **Product Service:** Products and categories; It performs operations such as listing, creating, updating and deleting. Checks whether the products are in stock and takes necessary actions.
     - Required Role: NONE
     - Endpoints for product categories:
-        - Get Category: `GET /api/product-categories/get-all`
+        - Get Categories: `GET /api/product-categories/get-all`
         - Add Category: `POST /api/product-categories/add`
         - Update Category: `PUT /api/product-categories/update`
         - Delete Category: `DELETE /api/product-categories/delete`
