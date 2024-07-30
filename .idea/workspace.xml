@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="4d6e52b4-0d65-4c7c-b617-aca701f9252f" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/authenticationauthorization-service/src/main/java/com/toyota/authenticationauthorizationservice/service/concretes/UserManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/authenticationauthorization-service/src/main/java/com/toyota/authenticationauthorizationservice/service/concretes/UserManager.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -115,7 +116,20 @@
     &quot;settings.editor.selected.configurable&quot;: &quot;inlay.hints&quot;
   }
 }</component>
-  <component name="RunManager" selected="Application.ReportserviceApplication">
+  <component name="RunManager" selected="Application.UsermanagementserviceApplication">
+    <configuration name="ApigatewayApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.toyota.apigateway.ApigatewayApplication" />
+      <module name="apigateway" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.toyota.apigateway.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="AuthenticationauthorizationserviceApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.toyota.authenticationauthorizationservice.AuthenticationauthorizationserviceApplication" />
       <module name="authenticationauthorizationservice" />
@@ -129,12 +143,12 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="ProductserviceApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="com.toyota.productservice.ProductserviceApplication" />
-      <module name="productservice" />
+    <configuration name="DiscoveryserverApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.toyota.discoveryserver.DiscoveryserverApplication" />
+      <module name="discoveryserver" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.toyota.productservice.*" />
+          <option name="PATTERN" value="com.toyota.discoveryserver.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -148,19 +162,6 @@
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="com.toyota.reportservice.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="SalesserviceApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="com.toyota.salesservice.SalesserviceApplication" />
-      <module name="salesservice" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.toyota.salesservice.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -196,11 +197,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.ReportserviceApplication" />
-        <item itemvalue="Application.SalesserviceApplication" />
-        <item itemvalue="Application.ProductserviceApplication" />
         <item itemvalue="Application.UsermanagementserviceApplication" />
         <item itemvalue="Application.AuthenticationauthorizationserviceApplication" />
+        <item itemvalue="Application.ApigatewayApplication" />
+        <item itemvalue="Application.DiscoveryserverApplication" />
+        <item itemvalue="Application.ReportserviceApplication" />
       </list>
     </recent_temporary>
   </component>

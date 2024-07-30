@@ -20,7 +20,6 @@ import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -231,12 +230,6 @@ public class UserManager implements UserService {
     private void sendPasswordResetEmail(String username, String userMail, String resetToken) {
         String resetUrl = "http://localhost:8080/auth/reset-password?token=" + resetToken;
         String message = String.format("Hello %s,\n\nYou requested a password reset. Please use the following link to reset your password:\n%s\n\nIf you did not request this, please ignore this email.\n\nÖMER ASAF BALIKÇI", username, resetUrl);
-
-        SimpleMailMessage mailMessage = new SimpleMailMessage();
-        mailMessage.setTo(userMail);
-        mailMessage.setSubject("Password Reset Request");
-        mailMessage.setText(message);
-        mailMessage.setFrom("asafmarket.ltd@gmail.com");
 
         this.mailService.sendEmail(userMail, "Password Reset Request", message);
         logger.info("Password reset email sent to: {}", userMail);
