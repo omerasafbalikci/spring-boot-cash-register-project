@@ -245,7 +245,7 @@ public class UserManager implements UserService {
     @Override
     public String handlePasswordReset(String token, String newPassword) {
         logger.info("Handling password reset for token: {}", token);
-        Optional<User> optionalUser = this.userRepository.findByResetToken(token);
+        Optional<User> optionalUser = this.userRepository.findByResetTokenAndDeletedIsFalse(token);
 
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
