@@ -87,7 +87,7 @@ This project is a Spring Boot based microservice project that provides cash regi
 
 To start the project without docker, follow these steps:
 
-1. Clone the repository: `git clone https://github.com/omerasafbalikcii/springboot-microservices-market-checkout.git`
+1. Clone the repository: `git clone https://github.com/omerasafbalikci/springboot-cash-register-project`
 2. Build the project using maven:
    `mvn clean install`
 3. Go to each microservice directory and
@@ -100,7 +100,7 @@ To stop:
 
 To start the project with docker, follow these steps:
 
-1. Clone the repository: `git clone https://github.com/omerasafbalikcii/springboot-microservices-market-checkout.git`
+1. Clone the repository: `git clone https://github.com/omerasafbalikci/springboot-cash-register-project`
 2. Build the project using maven:
    `mvn clean install`
 3. Go to the root directory of the project
