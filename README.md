@@ -1,6 +1,6 @@
-# Market Checkout Project
+# Cash Register Project
 
-This project is a Spring Boot based microservice project that provides market checkout functionality. Each microservice undertakes specific tasks and these services come together to form a complete system.
+This project is a Spring Boot based microservice project that provides cash register functionality. Each microservice undertakes specific tasks and these services come together to form a complete system.
 
 ## Technologies used:
 
